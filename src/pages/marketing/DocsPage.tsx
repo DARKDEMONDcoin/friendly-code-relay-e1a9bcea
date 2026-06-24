@@ -3568,7 +3568,7 @@ export default function DocsPage() {
                 className={`text-[11px] md:text-[12px] font-black uppercase tracking-[0.2em] scroll-mt-28 ${query.trim() ? "" : "sr-only"}`}
                 style={{ color: PARCHMENT, opacity: 0.55 }}
               >
-                {group.label}
+                {tGroupLabel(group)}
               </h2>
 
 
