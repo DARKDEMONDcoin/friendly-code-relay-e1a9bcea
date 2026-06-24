@@ -167,18 +167,22 @@ export default function AssistantMediaBlock({ msg, setMessages, setInput }: Prop
                 ),
               );
               const res = await regenerateScene(msg.mediaPlan!, idx);
+              const merged = (msg.mediaResults ?? []).map((r) =>
+                r.index === idx ? res : r,
+              );
               setMessages((prev) =>
                 prev.map((mm) =>
                   matches(mm)
                     ? {
                         ...mm,
-                        mediaResults: (mm.mediaResults ?? []).map((r) =>
-                          r.index === idx ? res : r,
-                        ),
+                        mediaResults: merged,
                       }
                     : mm,
                 ),
               );
+              if (msg.id) {
+                void updateMessageMetadata(msg.id, { mediaResults: merged });
+              }
             }}
           />
         )}
