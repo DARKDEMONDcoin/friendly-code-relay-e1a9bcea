@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Mail, MessageSquare, Building2, Twitter, Clock, ShieldCheck } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import LandingNavbar from "@/components/landing/LandingNavbar";
@@ -48,8 +50,16 @@ const countries = [
 const companySizes = ["1-10", "11-50", "51-200", "201-1000", "1000+"];
 
 const ContactPage = () => {
+  const navigate = useNavigate();
   const [tab, setTab] = useState<"support" | "enterprise">("support");
   const [submitting, setSubmitting] = useState(false);
+
+  const channels = [
+    { icon: MessageSquare, title: "Instant AI support", desc: "24/7 chat — answers in seconds, handles 95% of questions.", cta: "Open chat", onClick: () => navigate("/support"), tone: "from-blue-500/20 to-cyan-500/10" },
+    { icon: Mail, title: "Email a human", desc: "Write us at support@megsyai.com — reply within 24h.", cta: "Copy email", onClick: () => { navigator.clipboard?.writeText("support@megsyai.com"); toast.success("Email copied"); }, tone: "from-violet-500/20 to-fuchsia-500/10" },
+    { icon: Building2, title: "Enterprise sales", desc: "Custom MC, SSO, SLA, annual contracts & dedicated success.", cta: "Talk to sales", onClick: () => navigate("/enterprise"), tone: "from-amber-500/20 to-orange-500/10" },
+    { icon: Twitter, title: "Follow us", desc: "Product updates, model drops & behind-the-scenes on X.", cta: "@megsyai", onClick: () => window.open("https://twitter.com/megsyai", "_blank"), tone: "from-emerald-500/20 to-teal-500/10" },
+  ];
 
   const supportForm = useForm<SupportData>({ resolver: zodResolver(supportSchema) });
   const enterpriseForm = useForm<EnterpriseData>({ resolver: zodResolver(enterpriseSchema) });
@@ -135,7 +145,51 @@ const ContactPage = () => {
         </div>
       </section>
 
+      {/* CHANNELS GRID — pick the fastest path */}
+      <section className="border-t border-border/30 py-16 md:py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="mb-10 max-w-3xl"
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">Pick a channel</p>
+            <h2 className="mt-4 font-display text-3xl uppercase leading-[0.95] tracking-tight md:text-5xl">
+              The fastest route <span className="text-primary">to a real answer.</span>
+            </h2>
+          </motion.div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {channels.map((c, i) => (
+              <motion.button
+                key={c.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06 }}
+                onClick={c.onClick}
+                className={`group relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-br ${c.tone} p-6 text-left transition-all hover:border-primary/40 hover:-translate-y-0.5`}
+              >
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-border/40 bg-background/60">
+                  <c.icon className="h-5 w-5 text-foreground" />
+                </div>
+                <h3 className="text-base font-semibold">{c.title}</h3>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">{c.desc}</p>
+                <p className="mt-4 text-[12px] font-semibold uppercase tracking-wider text-primary">{c.cta} →</p>
+              </motion.button>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> Replies within 24h</span>
+            <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5" /> GDPR & DPA-ready</span>
+            <span className="inline-flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" /> support@megsyai.com</span>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 md:py-24">
+
         <div className="mx-auto max-w-2xl px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

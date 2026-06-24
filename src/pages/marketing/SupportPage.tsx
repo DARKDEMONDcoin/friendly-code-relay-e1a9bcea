@@ -371,6 +371,34 @@ const SupportPage = () => {
                 ))}
               </div>
 
+              <div className="mt-8 w-full max-w-lg">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground mb-3">
+                  Browse by topic
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {[
+                    { label: "Plans & yearly", q: "Compare monthly vs yearly plans and savings" },
+                    { label: "Credits (MC)", q: "How do Megsy Credits work and how do I top up?" },
+                    { label: "Image gen", q: "How do I generate high-quality images?" },
+                    { label: "Video gen", q: "How do I generate videos and what does it cost?" },
+                    { label: "Code Builder", q: "How does Megsy Code Builder work?" },
+                    { label: "Referrals", q: "How do referrals and free credits work?" },
+                    { label: "Refunds", q: "What's the refund policy?" },
+                    { label: "Enterprise", q: "I need enterprise / SSO / custom contract" },
+                    { label: "Account", q: "How do I delete or export my account?" },
+                  ].map((t) => (
+                    <button
+                      key={t.label}
+                      type="button"
+                      onClick={() => void send(t.q)}
+                      className="text-[12px] px-3 py-2 rounded-full border border-border bg-card hover:bg-muted/40 hover:border-primary/40 transition-colors"
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="mt-6 flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-[11px] text-muted-foreground">
                 <AlertCircle className="h-3.5 w-3.5 text-primary shrink-0" />
                 <span>Billing, refunds, or account changes are escalated to our human team.</span>
