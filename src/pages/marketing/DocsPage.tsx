@@ -2075,25 +2075,65 @@ function buildAutoGroups(): DocGroup[] {
     },
     {
       id: "live-surface",
-      label: `Site surface (${pagePaths.length} pages · ${edgeFns.length} functions — auto-detected)`,
+      label: `Site surface (${DOC_REGISTRY_STATS.pageCount} pages · ${DOC_REGISTRY_STATS.edgeFunctionCount} functions — auto-detected)`,
       sections: [
         {
           id: "live-pages",
-          title: `Every page on the site — ${pagePaths.length} detected`,
+          title: `Every page on the site — ${DOC_REGISTRY_STATS.pageCount} detected`,
           icon: ListTree,
           accent: ACTION,
           intro:
-            "Auto-discovered at build time via Vite glob over src/pages/**. Any new page you create appears here instantly, with zero edits to /docs.",
+            "Auto-discovered at build time via Vite glob over src/pages/**. Each row shows the file path and a one-line description parsed from the page's leading `/** @doc ... */` comment. New pages appear automatically — adding a `@doc` tag gives a richer summary, but pages without one still show up with a humanized fallback so nothing ever silently disappears.",
           blocks: pagesBlocks,
         },
         {
           id: "live-edge-fns",
-          title: `Backend edge functions — ${edgeFns.length} detected`,
+          title: `Backend edge functions — ${DOC_REGISTRY_STATS.edgeFunctionCount} detected`,
           icon: Cpu,
           accent: MINT,
           intro:
-            "Auto-discovered from supabase/functions/**. These run on the server for chat streaming, media generation, payments, blog publishing, and more.",
-          blocks: [{ kind: "ul", items: edgeFns }],
+            "Auto-discovered from supabase/functions/**. These run on the server (Deno runtime) for chat streaming, media generation, payments, blog publishing, OAuth, GitHub push, sitemap, and more. Descriptions are pulled from each function's `/** @doc ... */` header — add one to give the function a human-readable summary here.",
+          blocks: edgeFnBlocks,
+        },
+        {
+          id: "live-integrations",
+          title: `Connectors & integrations — ${INTEGRATIONS_LIST.length} apps across ${INTEGRATION_CATEGORIES.length - 1} categories`,
+          icon: Link2,
+          accent: BLUSH,
+          intro:
+            "Auto-synced from src/lib/integrationsData.ts. Add a connector there and it appears here instantly, grouped by category, with its type (OAuth, notification, service, or Pipedream-powered) and description.",
+          blocks: integrationsBlocks,
+        },
+        {
+          id: "live-slides-templates",
+          title: `Slides templates — ${SLIDES_TEMPLATES.length} available`,
+          icon: Presentation,
+          accent: ACTION,
+          intro:
+            "Every slide-deck template registered in src/lib/slidesTemplates.ts. Premium HTML templates (interactive 3D, animated) and standard print-friendly templates are auto-listed with their category.",
+          blocks: [
+            {
+              kind: "kv",
+              rows: SLIDES_TEMPLATES.map((t) => ({
+                k: t.id,
+                v: `${t.name || t.id} — ${t.category}${t.description ? ` · ${t.description}` : ""}`,
+              })),
+            },
+          ],
+        },
+        {
+          id: "live-skills",
+          title: `Skill tools & models — ${SKILL_TOOLS.length} tools · ${SKILL_MODELS.length} models`,
+          icon: Wand2,
+          accent: MINT,
+          intro:
+            "Auto-synced catalog of every tool a custom Skill can call, and every base model a Skill can be wired to. Source of truth: src/lib/skillTools.ts.",
+          blocks: [
+            { kind: "h", text: "Tools available to skills" },
+            { kind: "kv", rows: SKILL_TOOLS.map((t) => ({ k: t.id, v: t.label })) },
+            { kind: "h", text: "Base models available to skills" },
+            { kind: "kv", rows: SKILL_MODELS.map((m) => ({ k: m.id, v: m.label })) },
+          ],
         },
       ],
     },
