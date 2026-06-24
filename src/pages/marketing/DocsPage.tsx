@@ -2187,7 +2187,561 @@ const STATIC_GROUPS: DocGroup[] = [
       },
     ],
   },
+
+  /* ─────────────────────────── Trust & Compliance ─────────────────────────── */
+  {
+    id: "trust",
+    label: "Trust & Compliance",
+    sections: [
+      {
+        id: "trust-center",
+        title: "Trust Center — /trust",
+        icon: ShieldCheck,
+        accent: MINT,
+        intro:
+          "Single landing for everything related to security, privacy and platform reliability. Maintained by Megsy AI — not an independent certification.",
+        blocks: [
+          { kind: "ul", items: [
+            "Summarises which platform controls are enabled today (auth, RLS, encryption-in-transit, edge isolation).",
+            "Links out to: Compliance, Subprocessors, DPA, Privacy, Cookies, Moderation, Content Policy, AI Disclaimer and Security report.",
+            "Includes a security contact: security@megsyai.com and a vulnerability-disclosure path via /.well-known/security.txt.",
+            "Updated whenever a new subprocessor, region or platform control changes.",
+          ]},
+          { kind: "note", text: "This page describes app-owner practices and approved platform capabilities. It is not a SOC 2 / ISO certification." },
+          { kind: "link", href: "/trust", label: "Open Trust Center →" },
+        ],
+      },
+      {
+        id: "compliance",
+        title: "Compliance posture — /compliance",
+        icon: BadgeCheck,
+        accent: ACTION,
+        intro:
+          "Plain-language summary of the laws and frameworks we align with, plus what is still in-progress.",
+        blocks: [
+          { kind: "ul", items: [
+            "GDPR / UK-GDPR data-subject rights flow (access, rectification, deletion, portability, objection).",
+            "CCPA / CPRA: ‘Do not sell or share my personal information’ surface in Privacy Settings.",
+            "Region-aware data residency notes for EU users.",
+            "Children’s safety stance — see Age Policy.",
+            "Status of certifications in-progress is stated honestly; nothing is implied that hasn’t been audited.",
+          ]},
+          { kind: "link", href: "/compliance", label: "Read the compliance page →" },
+        ],
+      },
+      {
+        id: "subprocessors",
+        title: "Subprocessors — /subprocessors",
+        icon: Database,
+        accent: BLUSH,
+        intro: "Current list of third parties that may process customer data on our behalf.",
+        blocks: [
+          { kind: "ul", items: [
+            "Each row: vendor, purpose, data categories, hosting region.",
+            "Includes model providers (OpenAI, Anthropic, Google, xAI, Alibaba, Meta, Fal, Recraft, BFL, Ideogram, Pixverse, Kling, Hailuo…), infra (Supabase, Cloudflare, Vercel/Lovable hosting), payments (Dodo, Stripe-like), email (Resend), analytics (privacy-first only).",
+            "Material changes are announced 30 days in advance for paid customers per the DPA.",
+          ]},
+          { kind: "link", href: "/subprocessors", label: "See the current list →" },
+        ],
+      },
+      {
+        id: "dpa",
+        title: "Data Processing Agreement — /dpa",
+        icon: ScrollText,
+        accent: MINT,
+        blocks: [
+          { kind: "p", text: "Customers acting as data controllers can request our standard DPA (Article 28 GDPR) directly from /dpa. The page includes the SCC module references for cross-border transfers and a downloadable PDF version." },
+          { kind: "link", href: "/dpa", label: "Open the DPA →" },
+        ],
+      },
+      {
+        id: "dmca",
+        title: "DMCA / takedowns — /dmca",
+        icon: ShieldAlert,
+        accent: BLUSH,
+        blocks: [
+          { kind: "p", text: "If you are a rights-holder and believe content generated, hosted or surfaced by Megsy AI infringes your copyright, send a properly-formed DMCA notice to the address on /dmca. The page lists required fields and our designated agent." },
+          { kind: "link", href: "/dmca", label: "DMCA notice form →" },
+        ],
+      },
+      {
+        id: "moderation",
+        title: "Moderation & safety — /moderation",
+        icon: Shield,
+        accent: ACTION,
+        intro: "What is automatically blocked, what is reviewed, and what to expect when a generation is rejected.",
+        blocks: [
+          { kind: "ul", items: [
+            "Real-time prompt + output classifiers across text, image, video and voice.",
+            "Hard blocks: CSAM, non-consensual sexual content, real-person likeness misuse, weapons/explosives manufacturing, malware that targets real systems.",
+            "Soft warnings for sensitive themes — you can revise the prompt and retry.",
+            "Appeals: every rejection links to a ‘Report a mistake’ button → human review within 24h on paid plans.",
+          ]},
+          { kind: "link", href: "/moderation", label: "Full moderation policy →" },
+          { kind: "link", href: "/content-policy", label: "Content policy →" },
+        ],
+      },
+      {
+        id: "ai-disclaimer",
+        title: "AI Disclaimer — /ai-disclaimer",
+        icon: HelpCircle,
+        accent: BLUSH,
+        blocks: [
+          { kind: "p", text: "States plainly that Megsy outputs are AI-generated, may contain mistakes, must not be relied on for medical, legal, financial or safety-critical decisions, and that the user is responsible for reviewing outputs before using them." },
+          { kind: "link", href: "/ai-disclaimer", label: "Read the disclaimer →" },
+        ],
+      },
+      {
+        id: "age-policy",
+        title: "Age policy — /age-policy",
+        icon: Users,
+        accent: MINT,
+        blocks: [
+          { kind: "p", text: "Megsy AI is intended for users 13+ (16+ in the EU/UK without parental consent). Accounts found to belong to underage users are suspended; parents/guardians can request deletion at privacy@megsyai.com." },
+          { kind: "link", href: "/age-policy", label: "Read the age policy →" },
+        ],
+      },
+      {
+        id: "accessibility",
+        title: "Accessibility — /accessibility",
+        icon: Eye,
+        accent: ACTION,
+        intro: "Our public commitment to WCAG 2.2 AA and the controls available today.",
+        blocks: [
+          { kind: "ul", items: [
+            "Keyboard-navigable across every screen; visible focus rings on every interactive element.",
+            "Screen-reader labels on icons, model badges, tool buttons and message actions.",
+            "Reduced-motion mode honours the OS-level prefers-reduced-motion media query.",
+            "High-contrast theme + adjustable font size in Settings → Customization.",
+            "Voice mode for hands-free interaction.",
+            "Report a barrier: accessibility@megsyai.com — we aim to acknowledge within 2 business days.",
+          ]},
+          { kind: "link", href: "/accessibility", label: "Open the accessibility statement →" },
+        ],
+      },
+      {
+        id: "affiliate-terms",
+        title: "Affiliate / Referral terms — /affiliate-terms",
+        icon: Gift,
+        accent: BLUSH,
+        blocks: [
+          { kind: "p", text: "Legal terms that govern the referral program: who can join, payout rules, anti-abuse, tax responsibility and termination. Read alongside /referrals (the program UI) and Withdraw (payout flow)." },
+          { kind: "link", href: "/affiliate-terms", label: "Read affiliate terms →" },
+        ],
+      },
+    ],
+  },
+
+  /* ─────────────────────────── Auth & Security flows ─────────────────────────── */
+  {
+    id: "auth-flows",
+    label: "Auth & Security flows",
+    sections: [
+      {
+        id: "reset-password",
+        title: "Reset password — /reset-password",
+        icon: Lock,
+        accent: MINT,
+        intro: "Triggered from /auth → ‘Forgot password’.",
+        blocks: [
+          { kind: "ol", items: [
+            "Enter the email on your account → we email a one-time reset link valid for 60 minutes.",
+            "The link lands on /reset-password with a signed token; the page rejects expired or reused tokens with a clear error.",
+            "Type a new password (min 10 chars, one number, one symbol). Strength meter is live.",
+            "On success you are signed in on this device. Other sessions remain valid unless you tap ‘Sign out everywhere’.",
+          ]},
+          { kind: "note", text: "If you no longer have access to the email, open /contact and request identity verification — never share your password with support." },
+        ],
+      },
+      {
+        id: "change-password",
+        title: "Change password — /change-password",
+        icon: Lock,
+        accent: ACTION,
+        blocks: [
+          { kind: "p", text: "Requires the current password. After saving, every other signed-in session is force-revoked. A confirmation email is sent for audit." },
+        ],
+      },
+      {
+        id: "change-email",
+        title: "Change email — /change-email",
+        icon: Pencil,
+        accent: BLUSH,
+        blocks: [
+          { kind: "ol", items: [
+            "Type the new email → we send a verification link to the new address.",
+            "Until you click it, the old email stays active.",
+            "After verification: invoices, receipts and account notices route to the new email; your referral & workspace memberships move automatically.",
+          ]},
+        ],
+      },
+      {
+        id: "two-factor",
+        title: "Two-factor authentication — /two-factor",
+        icon: ShieldCheck,
+        accent: MINT,
+        intro: "Enable an authenticator-app second factor (TOTP).",
+        blocks: [
+          { kind: "ol", items: [
+            "Open the page → scan the QR with Google Authenticator / 1Password / Authy.",
+            "Enter the 6-digit code to confirm.",
+            "Save the 10 backup codes somewhere safe — each is single-use.",
+            "From now on every new sign-in asks for the code at /mfa-challenge.",
+          ]},
+          { kind: "note", text: "Lost device + lost backup codes = identity-verified recovery only. Plan ahead." },
+        ],
+      },
+      {
+        id: "mfa-challenge",
+        title: "MFA challenge — /mfa-challenge",
+        icon: ShieldAlert,
+        accent: BLUSH,
+        blocks: [
+          { kind: "p", text: "Shown after a successful password sign-in when 2FA is enabled. Enter the 6-digit code or paste a backup code. A ‘Trust this device for 30 days’ checkbox skips the challenge on the same device until cookies are cleared." },
+        ],
+      },
+      {
+        id: "delete-account",
+        title: "Delete account — /delete-account",
+        icon: ShieldAlert,
+        accent: BLUSH,
+        intro: "A hard, irreversible action with a 14-day grace window.",
+        blocks: [
+          { kind: "ol", items: [
+            "Confirm with your password + a typed phrase.",
+            "Account is marked for deletion; you can cancel within 14 days by signing back in.",
+            "After 14 days: all chats, files, memories, skills, websites, slides and personal data are purged. Workspace data you owned is offered to co-admins first.",
+            "Receipts and invoices required by tax law are retained per Privacy Policy.",
+          ]},
+        ],
+      },
+      {
+        id: "oauth-authorize",
+        title: "OAuth — /oauth/authorize",
+        icon: Link2,
+        accent: ACTION,
+        intro: "Shown when a third-party app asks for access to your Megsy account.",
+        blocks: [
+          { kind: "ul", items: [
+            "The page lists: app name + logo, requested scopes (read chats, write files, run agents…), and expiration.",
+            "Granular scopes — you can untick anything you don’t want before approving.",
+            "Approved apps are listed under Settings → Security → Connected apps and can be revoked any time.",
+          ]},
+        ],
+      },
+      {
+        id: "oauth-callback",
+        title: "OAuth callback — /auth/callback",
+        icon: RefreshCw,
+        accent: MINT,
+        blocks: [
+          { kind: "p", text: "Internal landing for OAuth redirects (Google, Apple, GitHub, Microsoft, Telegram, integration providers). Validates the state token, exchanges the code for a session and routes you to where you started. If something goes wrong you see a friendly error with a ‘Try again’ button." },
+        ],
+      },
+      {
+        id: "accept-invite",
+        title: "Accept invite — /accept-invite",
+        icon: Users,
+        accent: ACTION,
+        blocks: [
+          { kind: "p", text: "Workspace, team or referral invites land here. The page shows who invited you, the workspace name, the role you’ll get and any pooled-credit benefits. Sign in or sign up in one step and you’re inside the workspace immediately." },
+        ],
+      },
+      {
+        id: "accept-workspace-invite",
+        title: "Accept workspace invite — /accept-workspace-invite",
+        icon: Building2,
+        accent: BLUSH,
+        blocks: [
+          { kind: "p", text: "Specialized invite flow for paid workspace seats. Confirms the seat assignment, role (Owner / Admin / Editor / Viewer) and shows which folders / chats you’ll see by default." },
+        ],
+      },
+      {
+        id: "referral-redirect",
+        title: "Referral redirect — /r/:code",
+        icon: Gift,
+        accent: MINT,
+        blocks: [
+          { kind: "p", text: "Bare-bones page that captures the referral code into a first-party cookie (30-day attribution window) and forwards to the landing page or sign-up screen. Used by every referral link shared from /referrals." },
+        ],
+      },
+      {
+        id: "connected-apps",
+        title: "Connected apps & sessions",
+        icon: Wrench,
+        accent: ACTION,
+        intro: "Settings → Security shows every signed-in device and every OAuth-connected app.",
+        blocks: [
+          { kind: "ul", items: [
+            "Sessions list: device, browser, last-seen, IP city/country. Revoke individually or ‘Sign out everywhere’.",
+            "OAuth apps: scope, granted-at, last-used. Revoke = the app stops working instantly.",
+            "Sign-in alerts: optional email when a new device signs in.",
+            "Audit log: last 90 days of security-relevant events (sign-ins, password changes, 2FA changes).",
+          ]},
+        ],
+      },
+    ],
+  },
+
+  /* ─────────────────────────── Deep-dives: marketing, billing, settings ─────────────────────────── */
+  {
+    id: "deep-dives",
+    label: "Page-by-page deep-dives",
+    sections: [
+      {
+        id: "about",
+        title: "About — /about",
+        icon: BookOpen,
+        accent: MINT,
+        blocks: [
+          { kind: "p", text: "The story behind Megsy AI — mission, team, why we built it. Includes contact and press details. Updated as the company grows." },
+          { kind: "link", href: "/about", label: "Read About →" },
+        ],
+      },
+      {
+        id: "features-guide",
+        title: "Features guide — /features-guide",
+        icon: ListTree,
+        accent: ACTION,
+        intro: "The long-form, marketing-grade tour of every capability. Different from /docs: this is sales-tone, with screenshots and demos.",
+        blocks: [
+          { kind: "ul", items: [
+            "Top-level grid of every product surface (Chat, Images, Video, Slides, Docs, Research, Code, Websites, Operator, Music, Voice, Learning).",
+            "Each card opens an expanded section with sample prompts, model line-up and pricing notes.",
+            "Use this when sending a link to a non-technical person; use /docs when you want the full reference.",
+          ]},
+          { kind: "link", href: "/features-guide", label: "Open the features guide →" },
+        ],
+      },
+      {
+        id: "egypt-landing",
+        title: "Egypt landing — /egypt",
+        icon: Globe2,
+        accent: BLUSH,
+        blocks: [
+          { kind: "p", text: "Local landing tailored to the Egyptian market: pricing in EGP equivalents, Vodafone Cash & Fawry payment routes, Egyptian-Arabic copy, local payment FAQs and contact in Cairo timezone." },
+          { kind: "link", href: "/egypt", label: "Open the Egypt landing →" },
+        ],
+      },
+      {
+        id: "comparisons-deep",
+        title: "Comparison pages — /compare/:slug",
+        icon: LayoutGrid,
+        accent: MINT,
+        intro: "SEO-friendly head-to-head pages — Megsy vs ChatGPT, vs Claude, vs Gemini, vs Manus, vs Genspark, vs Sora, vs Midjourney, etc.",
+        blocks: [
+          { kind: "ul", items: [
+            "Each page renders from /data/comparisons.ts → feature matrix, pricing, model line-up, real screenshots.",
+            "Sticky ‘Try Megsy free’ CTA, structured-data markup for rich Google snippets.",
+            "All comparisons are also linked from the docs auto-group ‘Comparison pages’.",
+          ]},
+        ],
+      },
+      {
+        id: "service-landings-deep",
+        title: "Service landings — /:service",
+        icon: Globe,
+        accent: ACTION,
+        intro: "Single-purpose, SEO-optimised landings for ‘AI image generator’, ‘AI video generator’, ‘AI slides maker’, ‘AI website builder’, ‘AI deep research’ and many more.",
+        blocks: [
+          { kind: "ul", items: [
+            "Driven by /data/serviceLandings — add a new entry and a new landing ships automatically with its own SEO metadata.",
+            "Each landing reuses the same hero, prompt-playground, model-grid and pricing components for consistency.",
+          ]},
+        ],
+      },
+      {
+        id: "blog-reading",
+        title: "Blog reading experience — /blog/:slug",
+        icon: ScrollText,
+        accent: MINT,
+        intro: "Long-form posts with first-class reading UX.",
+        blocks: [
+          { kind: "ul", items: [
+            "Auto table-of-contents on the right, scroll-spy highlights the current section.",
+            "Reading progress bar at the top; estimated reading time in the hero.",
+            "Social share + copy-link on every heading.",
+            "Hreflang alternates for every translation — Arabic, English, French, Spanish, German, Polish — sitemap is dynamic via /functions/v1/sitemap-blog.",
+            "Suggested next reads at the bottom (related-by-tag), plus a ‘Try this in Megsy’ CTA.",
+          ]},
+        ],
+      },
+      {
+        id: "billing-success",
+        title: "Billing success — /billing/success",
+        icon: CheckCircle2,
+        accent: ACTION,
+        blocks: [
+          { kind: "p", text: "Lands here after a successful checkout. Shows the order summary, the plan / top-up that was applied, the new MC balance and a receipt link. If the credits aren’t visible immediately, the page polls the webhook for up to 60 seconds before showing a ‘still working’ state with a support link." },
+        ],
+      },
+      {
+        id: "withdraw",
+        title: "Withdraw earnings — /withdraw",
+        icon: Wallet,
+        accent: BLUSH,
+        intro: "Cash out referral earnings to PayPal, bank transfer, USDT or local rails (e.g. Vodafone Cash in EG).",
+        blocks: [
+          { kind: "ol", items: [
+            "Pick a payout method → fill the required fields (saved encrypted).",
+            "Enter the amount (minimum thresholds vary per method, listed on the page).",
+            "Confirm with 2FA if enabled.",
+            "Payouts are batched daily; ETA per method is shown live.",
+            "Every payout shows up under Referrals → Withdrawals tab with status (Pending / Sent / Failed / Refunded).",
+          ]},
+          { kind: "link", href: "/withdraw", label: "Open Withdraw →" },
+        ],
+      },
+      {
+        id: "referral-resources",
+        title: "Referral resources — /referral-resources",
+        icon: Download,
+        accent: MINT,
+        intro: "Ready-to-share creative assets for ambassadors.",
+        blocks: [
+          { kind: "ul", items: [
+            "Vertical & square videos (TikTok / Reels / Shorts) showing Megsy in action.",
+            "Static images for X / LinkedIn / Instagram with your referral code baked in.",
+            "Copy-paste captions in Arabic, English, French and Spanish.",
+            "Megsy brand kit: logo, mark, colors, font names.",
+            "All assets carry your code automatically — no manual editing.",
+          ]},
+        ],
+      },
+      {
+        id: "referrals-tabs",
+        title: "Referrals — tabs",
+        icon: Gift,
+        accent: ACTION,
+        intro: "The /referrals dashboard has 4 tabs.",
+        blocks: [
+          { kind: "kv", rows: [
+            { k: "Dashboard", v: "Lifetime earnings, this-month earnings, click-through rate, conversion rate, top traffic sources." },
+            { k: "Program", v: "How the 30-day cookie works, payout %, recurring vs one-shot, tier thresholds (more referrals → higher %)." },
+            { k: "Tasks", v: "Mini-quests that grant bonus MC (e.g. ‘Get 3 friends to install the PWA’ → +500 MC)." },
+            { k: "Withdrawals", v: "History of every cash-out: method, amount, status, transaction id." },
+          ]},
+          { kind: "link", href: "/referrals", label: "Open referrals →" },
+        ],
+      },
+      {
+        id: "system-status-deep",
+        title: "System status — /settings/system-status",
+        icon: BadgeCheck,
+        accent: MINT,
+        blocks: [
+          { kind: "ul", items: [
+            "Live indicator per service: Chat, Image, Video, Research, Slides, Docs, Code, Voice, Music, Operator, Builder, API, Integrations, Payments, Auth.",
+            "Each row: current state (Operational / Degraded / Down), last-incident date, average response time.",
+            "Past 90 days of incidents with root-cause notes once resolved.",
+            "Subscribe to updates via email or webhook.",
+          ]},
+        ],
+      },
+      {
+        id: "switch-account",
+        title: "Switch account — /settings/switch-account",
+        icon: RefreshCw,
+        accent: BLUSH,
+        blocks: [
+          { kind: "p", text: "Add a second / third Megsy account (personal + work) and switch between them in one tap from the avatar menu. Each account keeps its own MC balance, chats, memory and integrations." },
+        ],
+      },
+      {
+        id: "skills-settings-deep",
+        title: "Skills — list & creator",
+        icon: Wand2,
+        accent: ACTION,
+        intro: "Two related pages: /settings/skills (your library) and /settings/skills/new (the visual creator).",
+        blocks: [
+          { kind: "ul", items: [
+            "/settings/skills — every skill you own, with usage count, last-used and a quick ‘Pin to composer’ toggle. Filter by skill type (chat, image, video, slides, docs, agent).",
+            "/settings/skills/new — multi-step builder: name, icon, tone, instructions, allowed tools, optional default model. Preview the first reply live before saving.",
+            "Shared skills (workspace level) live under the same UI with a small ‘Shared’ badge.",
+          ]},
+        ],
+      },
+      {
+        id: "settings-contact-help",
+        title: "Settings → Contact, Help, Support, Privacy",
+        icon: HelpCircle,
+        accent: BLUSH,
+        intro: "Four small but useful screens grouped under Settings.",
+        blocks: [
+          { kind: "kv", rows: [
+            { k: "/settings/contact", v: "Direct line to humans — pre-fills your account info so support replies are faster." },
+            { k: "/settings/help", v: "Curated help center entry — searchable, links into the relevant /docs section automatically." },
+            { k: "/settings/support", v: "Open a ticket with priority routing for Pro / Max / Enterprise plans; attach screenshots and chat ids." },
+            { k: "/settings/privacy", v: "Privacy controls in one place: ‘Do not sell my info’, training opt-out (always off by default — we never train on your data), data export, deletion request." },
+          ]},
+        ],
+      },
+      {
+        id: "shared-chat",
+        title: "Shared chat — /share/:id",
+        icon: Share2,
+        accent: MINT,
+        intro: "Public read-only view of any chat you choose to share.",
+        blocks: [
+          { kind: "ul", items: [
+            "Click ‘Share’ on a chat → choose a privacy mode (public link, password-gated, workspace-only).",
+            "The /share/:id page renders the full thread with messages, images, videos, slides and code, plus a clean reader theme.",
+            "A ‘Fork this chat into my Megsy’ button lets viewers continue the conversation in their own account.",
+            "Revoke the link any time from Settings → Privacy → Shared chats.",
+          ]},
+        ],
+      },
+      {
+        id: "research-preview",
+        title: "Research preview — /research/:id",
+        icon: Microscope,
+        accent: ACTION,
+        blocks: [
+          { kind: "p", text: "Public, polished read-mode for a Deep Research report — abstract, structured chapters, citations panel, source list, and a one-click ‘Open in chat’ to continue the investigation. Used as the share-target for research jobs." },
+        ],
+      },
+      {
+        id: "operator-pages",
+        title: "Operator — agents list, audit, settings",
+        icon: Bot,
+        accent: BLUSH,
+        intro: "The Operator product is administered across three Settings pages.",
+        blocks: [
+          { kind: "kv", rows: [
+            { k: "/settings/operator", v: "Global preferences: default browser persona, max runtime, safety guardrails, allowed domains, notification preferences." },
+            { k: "/settings/operator/agents", v: "Every dynamically-created sub-agent — name, role, usage count, edit / archive / delete." },
+            { k: "/settings/operator/audit", v: "Full step-by-step replay of every Operator run — pages visited, clicks, screenshots, files downloaded, MC spent. Exportable as PDF/JSON." },
+          ]},
+        ],
+      },
+      {
+        id: "workspace-pages",
+        title: "Workspace — list, create, detail, tasks",
+        icon: Building2,
+        accent: MINT,
+        intro: "Everything team-related is split across four pages.",
+        blocks: [
+          { kind: "kv", rows: [
+            { k: "/workspaces", v: "Every workspace you belong to with role badge and quick switcher." },
+            { k: "/workspaces/new", v: "Create a workspace: name, slug, color, default language, seat count, billing source." },
+            { k: "/workspaces/:id", v: "Detail page — members, roles, integrations, shared skills, shared memory, audit log, billing." },
+            { k: "/workspaces/:id/tasks", v: "Kanban-style task board fed by chat threads and Operator runs — assign, comment, mark done." },
+          ]},
+        ],
+      },
+      {
+        id: "404-not-found",
+        title: "404 / Not found",
+        icon: HelpCircle,
+        accent: ACTION,
+        blocks: [
+          { kind: "p", text: "Any unknown URL renders our friendly 404 with the Megsy mascot, a search box pre-pointed at /docs, and a list of the most-visited pages. The 404 returns a real HTTP 404 to crawlers so it doesn’t pollute search results." },
+        ],
+      },
+    ],
+  },
 ];
+
 
 
 
