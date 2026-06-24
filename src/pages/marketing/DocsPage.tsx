@@ -3002,14 +3002,7 @@ function BlockView({ block, accent }: { block: DocBlock; accent: string }) {
         </div>
       );
     case "code":
-      return (
-        <pre
-          className="rounded-xl p-4 overflow-x-auto text-[13px] leading-6"
-          style={{ backgroundColor: "hsl(var(--surface-3))", border: `1px solid hsl(var(--surface-4))` }}
-        >
-          <code>{block.text}</code>
-        </pre>
-      );
+      return <CodeBlock text={block.text} lang={block.lang} />;
     case "note":
       return (
         <div
