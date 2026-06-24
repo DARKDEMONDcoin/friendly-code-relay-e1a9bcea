@@ -3250,15 +3250,21 @@ export default function DocsPage() {
   // separately and surface rich results in SERP.
   const isDocsRoot = !params.groupId;
   const SITE_URL = "https://megsyai.com";
-  const groupPath = isDocsRoot ? "/docs" : `/docs/${currentGroup.id}`;
+  // Canonical English path (used as x-default + the hreflang="en" alternate).
+  const enPath = isDocsRoot ? "/docs" : `/docs/${currentGroup.id}`;
+  // The current locale's path — also used for canonical of this page.
+  const groupPath = `${pathPrefix}${enPath}`;
+  const localizedGroupLabel = tGroupLabel(currentGroup);
   const groupTitle = isDocsRoot
-    ? "Megsy AI Docs — The Complete Product Guide & PWA Install"
-    : `${currentGroup.label} — Megsy AI Docs`;
+    ? activeLang === "en"
+      ? "Megsy AI Docs — The Complete Product Guide & PWA Install"
+      : `Megsy AI Docs · ${getSiteLang(activeLang)?.nativeName ?? activeLang}`
+    : `${localizedGroupLabel} — Megsy AI Docs`;
   const groupDescription = isDocsRoot
     ? "The complete Megsy AI documentation: every feature, every agent, every setting, every page — explained in full. Plus step-by-step PWA install for iPhone, Android, Mac, Windows and Linux."
-    : `${currentGroup.label} in Megsy AI: ${currentGroup.sections
+    : `${localizedGroupLabel} in Megsy AI: ${currentGroup.sections
         .slice(0, 4)
-        .map((s) => s.title)
+        .map((s) => tSectionTitle(currentGroup.id, s))
         .join(" · ")}${currentGroup.sections.length > 4 ? ` and ${currentGroup.sections.length - 4} more sections` : ""}. Part of the full Megsy AI documentation.`;
 
   const breadcrumbsLd = {
@@ -3266,14 +3272,14 @@ export default function DocsPage() {
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
-      { "@type": "ListItem", position: 2, name: "Docs", item: `${SITE_URL}/docs` },
+      { "@type": "ListItem", position: 2, name: "Docs", item: `${SITE_URL}${pathPrefix}/docs` },
       ...(isDocsRoot
         ? []
         : [
             {
               "@type": "ListItem",
               position: 3,
-              name: currentGroup.label,
+              name: localizedGroupLabel,
               item: `${SITE_URL}${groupPath}`,
             },
           ]),
@@ -3285,14 +3291,14 @@ export default function DocsPage() {
     "@type": "TechArticle",
     headline: groupTitle,
     description: groupDescription,
-    inLanguage: "en",
+    inLanguage: activeLang,
     url: `${SITE_URL}${groupPath}`,
     isPartOf: { "@type": "WebSite", name: "Megsy AI", url: SITE_URL },
     author: { "@type": "Organization", name: "Megsy AI", url: SITE_URL },
     publisher: { "@type": "Organization", name: "Megsy AI", url: SITE_URL },
     hasPart: currentGroup.sections.map((s) => ({
       "@type": "WebPageElement",
-      name: s.title,
+      name: tSectionTitle(currentGroup.id, s),
       url: `${SITE_URL}${groupPath}/${s.id}`,
     })),
   };
@@ -3327,10 +3333,22 @@ export default function DocsPage() {
     <div className="min-h-screen" style={{ backgroundColor: INK, color: PARCHMENT }}>
       <SEOHead title={groupTitle} description={groupDescription} path={groupPath} />
       <Helmet>
-        {/* English-only docs — signal en self + x-default so Google serves this URL
-            to every locale instead of guessing. */}
-        <link rel="alternate" hrefLang="en" href={`${SITE_URL}${groupPath}`} />
-        <link rel="alternate" hrefLang="x-default" href={`${SITE_URL}${groupPath}`} />
+        <html lang={activeLang} dir={langDir} />
+        {/* Full hreflang matrix — one alternate per supported locale, plus
+            x-default pointing at the English version. Tells Google to serve
+            each user the docs in their own language. */}
+        {SITE_LANGS.map((l) => {
+          const prefix = l.code === "en" ? "" : `/${l.code}`;
+          return (
+            <link
+              key={l.code}
+              rel="alternate"
+              hrefLang={l.code}
+              href={`${SITE_URL}${prefix}${enPath}`}
+            />
+          );
+        })}
+        <link rel="alternate" hrefLang="x-default" href={`${SITE_URL}${enPath}`} />
         <script type="application/ld+json">{JSON.stringify(breadcrumbsLd)}</script>
         <script type="application/ld+json">{JSON.stringify(techArticleLd)}</script>
         {faqLd && (
