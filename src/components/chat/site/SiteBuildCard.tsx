@@ -87,7 +87,7 @@ export default function SiteBuildCard({ siteId }: Props) {
   const isError = status === "failed" || status === "error";
   const url = row?.published_url || row?.preview_url || "";
   const tasks = (row?.tasks || []).filter(Boolean);
-  const currentTask = tasks.findLast?.((t) => t.status === "running") || tasks[tasks.length - 1];
+  const currentTask = [...tasks].reverse().find((t) => t.status === "running") || tasks[tasks.length - 1];
 
   const downloadZip = async () => {
     if (!row?.files?.length) return toast.error("No source files saved");
