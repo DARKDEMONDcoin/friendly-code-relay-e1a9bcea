@@ -32,6 +32,7 @@ import {
   HelpCircle,
   Rocket,
   Search,
+  X,
   ChevronRight,
   CheckCircle2,
   Workflow,
@@ -3188,6 +3189,20 @@ export default function DocsPage() {
     })).filter((g) => g.sections.length > 0);
   }, [query]);
 
+  // Flat list of matched sections (for the live dropdown + result count).
+  const matchedFlat = useMemo(() => {
+    if (!query.trim()) return [] as Array<{ groupId: string; groupLabel: string; sectionId: string; sectionTitle: string }>;
+    const out: Array<{ groupId: string; groupLabel: string; sectionId: string; sectionTitle: string }> = [];
+    for (const g of filteredGroups) {
+      for (const s of g.sections) {
+        out.push({ groupId: g.id, groupLabel: g.label, sectionId: s.id, sectionTitle: s.title });
+      }
+    }
+    return out;
+  }, [filteredGroups, query]);
+  const matchCount = matchedFlat.length;
+  const [searchFocused, setSearchFocused] = useState(false);
+
   // ⌘K / Ctrl+K — focus search from anywhere.
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -3434,14 +3449,25 @@ export default function DocsPage() {
 
           {/* Search */}
           <div className="mt-7 relative max-w-xl">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: INK, opacity: 0.6 }} />
+            <Search className="absolute left-4 top-[22px] -translate-y-1/2 w-4 h-4 z-10" style={{ color: INK, opacity: 0.6 }} />
             <input
               ref={searchInputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && matchedFlat[0]) {
+                  e.preventDefault();
+                  const m = matchedFlat[0];
+                  navigate(`${pathPrefix}/docs/${m.groupId}/${m.sectionId}`);
+                  setQuery("");
+                  searchInputRef.current?.blur();
+                }
+              }}
               placeholder="Search the docs — try ‘install’, ‘credits’, ‘slides’, ‘operator’…"
               aria-label="Search documentation"
-              className="w-full h-12 pl-11 pr-20 rounded-2xl outline-none text-[15px] font-semibold"
+              className="w-full h-12 pl-11 pr-24 rounded-2xl outline-none text-[15px] font-semibold"
               style={{
                 backgroundColor: "#fff",
                 border: `2px solid ${INK}`,
@@ -3449,13 +3475,76 @@ export default function DocsPage() {
                 color: INK,
               }}
             />
-            <kbd
-              className="hidden sm:inline-flex absolute right-3 top-1/2 -translate-y-1/2 items-center gap-1 px-2 py-1 rounded-md text-[11px] font-black"
-              style={{ backgroundColor: INK, color: PARCHMENT }}
-              aria-hidden
-            >
-              ⌘K
-            </kbd>
+            {query ? (
+              <button
+                type="button"
+                onClick={() => { setQuery(""); searchInputRef.current?.focus(); }}
+                aria-label="Clear search"
+                className="absolute right-3 top-[22px] -translate-y-1/2 inline-flex items-center justify-center w-7 h-7 rounded-lg z-10"
+                style={{ backgroundColor: INK, color: PARCHMENT, border: `1.5px solid ${INK}` }}
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            ) : (
+              <kbd
+                className="hidden sm:inline-flex absolute right-3 top-[22px] -translate-y-1/2 items-center gap-1 px-2 py-1 rounded-md text-[11px] font-black"
+                style={{ backgroundColor: INK, color: PARCHMENT }}
+                aria-hidden
+              >
+                ⌘K
+              </kbd>
+            )}
+
+            {/* Live results count */}
+            {query.trim() && (
+              <div
+                className="mt-2 text-[12px] font-bold"
+                style={{ color: INK, opacity: 0.75 }}
+                aria-live="polite"
+              >
+                {matchCount === 0
+                  ? <>No matches for <span className="font-black">“{query}”</span>.</>
+                  : <>{matchCount} {matchCount === 1 ? "section" : "sections"} match <span className="font-black">“{query}”</span> · press <kbd className="px-1.5 py-0.5 rounded font-black" style={{ backgroundColor: INK, color: PARCHMENT }}>Enter</kbd> to jump to the first.</>}
+              </div>
+            )}
+
+            {/* Live dropdown — top 8 matches with one-click jump */}
+            {query.trim() && searchFocused && matchedFlat.length > 0 && (
+              <div
+                className="absolute left-0 right-0 top-[60px] z-30 rounded-2xl overflow-hidden max-h-[360px] overflow-y-auto"
+                style={{
+                  backgroundColor: "#fff",
+                  border: `2px solid ${INK}`,
+                  boxShadow: `4px 4px 0 ${INK}`,
+                }}
+                role="listbox"
+              >
+                {matchedFlat.slice(0, 8).map((m, i) => (
+                  <Link
+                    key={`${m.groupId}-${m.sectionId}`}
+                    to={`${pathPrefix}/docs/${m.groupId}/${m.sectionId}`}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => { setQuery(""); searchInputRef.current?.blur(); }}
+                    className="flex items-center justify-between gap-3 px-4 py-3 transition hover:bg-black/[0.04]"
+                    style={{
+                      color: INK,
+                      borderTop: i === 0 ? undefined : `1px solid hsl(var(--surface-4) / 0.4)`,
+                    }}
+                  >
+                    <div className="min-w-0">
+                      <div className="text-[14px] font-black truncate">{m.sectionTitle}</div>
+                      <div className="text-[11px] font-bold uppercase tracking-widest opacity-60 truncate">{m.groupLabel}</div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 shrink-0 opacity-60" />
+                  </Link>
+                ))}
+                {matchedFlat.length > 8 && (
+                  <div className="px-4 py-2 text-[11px] font-bold uppercase tracking-widest" style={{ color: INK, opacity: 0.6, borderTop: `1px solid hsl(var(--surface-4) / 0.4)` }}>
+                    + {matchedFlat.length - 8} more — scroll the page to see all
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2">
