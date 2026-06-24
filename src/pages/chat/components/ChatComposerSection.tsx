@@ -98,12 +98,12 @@ export function ChatComposerSection(props: ChatComposerSectionProps) {
               />
             )}
 
-            <ComposerMobileModeBar {...(composerMobileModeBarProps as any)} forceHidden={!modesShown} />
+            <ComposerMobileModeBar {...(composerMobileModeBarProps as any)} forceHidden={!effectiveModesShown} />
 
             <ComposerAnimatedInput
               {...(composerAnimatedInputProps as any)}
               modesToggleVisible
-              modesShown={modesShown}
+              modesShown={effectiveModesShown}
               onToggleModes={() => setModesShown((v) => !v)}
             />
           </div>
@@ -114,6 +114,7 @@ export function ChatComposerSection(props: ChatComposerSectionProps) {
 
           <div
             className={`${messagesLength === 0 ? "hidden md:flex" : "hidden"} flex-wrap items-center justify-center gap-1.5 mt-2 px-1`}
+
           >
             <DesktopModeChips {...(desktopModeChipsProps as any)} />
           </div>
