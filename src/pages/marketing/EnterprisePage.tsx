@@ -1,88 +1,49 @@
 /** @doc Enterprise plan — SSO, audit logs, custom contracts, dedicated support. */
 import { useState } from "react";
-import { motion } from "framer-motion";
 import {
-  Send,
-  Shield,
-  Zap,
-  Users,
-  Server,
-  Headphones,
-  Lock,
-  BarChart3,
-  Clock,
-  Globe,
+  Send, Shield, Zap, Users, Server, Headphones, Lock, BarChart3, Clock, Globe,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import LandingNavbar from "@/components/landing/LandingNavbar";
-import LandingFooter from "@/components/landing/LandingFooter";
 import SEOHead from "@/components/common/SEOHead";
+import {
+  CartoonMarketingPage, CartoonHero, CartoonContainer, CartoonCard,
+  PillButton, SectionEyebrow, SectionTitle,
+  INK, MUTED, TEXT, BORDER, YELLOW, MINT,
+} from "@/components/marketing/CartoonMarketingShell";
+import { PEACH, LAVENDER, PINK, BLUE } from "@/pages/billing/ReferralsPage";
+import enterpriseSticker from "@/assets/settings/enterprise-sticker.png";
 
 const companySizes = ["1-10", "11-50", "51-200", "201-500", "500+"];
 const needs = [
-  "Image generation at scale",
-  "Video generation at scale",
-  "Custom AI models",
-  "API access & webhooks",
-  "Dedicated infrastructure",
-  "SLA guarantees",
-  "Priority support",
-  "Custom integrations",
-  "Data privacy & compliance",
-  "Advanced analytics",
+  "Image generation at scale", "Video generation at scale", "Custom AI models",
+  "API access & webhooks", "Dedicated infrastructure", "SLA guarantees",
+  "Priority support", "Custom integrations", "Data privacy & compliance", "Advanced analytics",
 ];
 
 const features = [
-  {
-    icon: Zap,
-    title: "Custom credit allocation",
-    desc: "A monthly MC volume sized to your real usage, with one consolidated invoice.",
-  },
-  {
-    icon: Users,
-    title: "Team workspaces",
-    desc: "Shared seats with central billing and per-member usage visibility.",
-  },
-  {
-    icon: Headphones,
-    title: "Priority support channel",
-    desc: "A direct line to the founders for setup, escalations and product feedback.",
-  },
-  {
-    icon: Server,
-    title: "Higher rate limits",
-    desc: "Raised concurrent generation and API limits sized for production workloads.",
-  },
-  {
-    icon: Globe,
-    title: "Data residency on request",
-    desc: "We can discuss regional deployment options depending on your jurisdiction.",
-  },
-  {
-    icon: Lock,
-    title: "Custom data agreements",
-    desc: "DPA, custom retention windows and on-request training opt-outs on every plan.",
-  },
-  {
-    icon: BarChart3,
-    title: "Usage reporting",
-    desc: "Monthly usage breakdowns per team, per feature and per workspace.",
-  },
-  {
-    icon: Clock,
-    title: "Onboarding session",
-    desc: "A live session to set up your workspace, train your team and answer questions.",
-  },
-  {
-    icon: Shield,
-    title: "Contract & invoicing",
-    desc: "Annual contracts, custom payment terms, PO support and tax-compliant invoicing.",
-  },
+  { icon: Zap, title: "Custom credit allocation", desc: "A monthly MC volume sized to your real usage, on one invoice.", tone: YELLOW },
+  { icon: Users, title: "Team workspaces", desc: "Shared seats, central billing, per-member visibility.", tone: MINT },
+  { icon: Headphones, title: "Priority support channel", desc: "Direct line to the founders for setup and escalations.", tone: PEACH },
+  { icon: Server, title: "Higher rate limits", desc: "Raised concurrent generation & API limits for production.", tone: LAVENDER },
+  { icon: Globe, title: "Data residency on request", desc: "Regional deployment options depending on jurisdiction.", tone: BLUE },
+  { icon: Lock, title: "Custom data agreements", desc: "DPA, retention windows, training opt-outs on every plan.", tone: PINK },
+  { icon: BarChart3, title: "Usage reporting", desc: "Monthly breakdowns per team, per feature, per workspace.", tone: YELLOW },
+  { icon: Clock, title: "Onboarding session", desc: "Live setup, team training and Q&A with the team.", tone: MINT },
+  { icon: Shield, title: "Contracts & invoicing", desc: "Annual deals, POs, NET-30, tax-compliant invoicing.", tone: PEACH },
 ];
 
-const EnterpriseFormSection = () => {
+const fieldStyle = {
+  backgroundColor: "hsl(var(--surface-3))",
+  border: `2px solid ${BORDER}`,
+  color: TEXT,
+  fontWeight: 600,
+} as const;
+const fieldClass =
+  "w-full px-4 py-3 rounded-2xl text-[14px] outline-none transition placeholder:opacity-60 focus:border-[color:hsl(var(--brand-action))]";
+
+const EnterprisePage = () => {
   const navigate = useNavigate();
   const [companyName, setCompanyName] = useState("");
   const [contactName, setContactName] = useState("");
@@ -92,43 +53,21 @@ const EnterpriseFormSection = () => {
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const toggleNeed = (need: string) => {
-    setSelectedNeeds((prev) =>
-      prev.includes(need) ? prev.filter((n) => n !== need) : [...prev, need],
-    );
-  };
+  const toggleNeed = (need: string) =>
+    setSelectedNeeds((prev) => prev.includes(need) ? prev.filter((n) => n !== need) : [...prev, need]);
 
   const handleSubmit = async () => {
     if (!companyName || !contactName || !email) {
-      toast.error("Please fill in all required fields.");
-      return;
+      toast.error("Please fill in all required fields."); return;
     }
     setSubmitting(true);
     try {
       await supabase.from("contact_submissions").insert({
-        name: contactName,
-        email,
+        name: contactName, email,
         message: `Company: ${companyName}\nSize: ${companySize}\nNeeds: ${selectedNeeds.join(", ")}\n\n${message}`,
         form_type: "enterprise",
         subject: `Enterprise Inquiry - ${companyName}`,
       });
-
-      try {
-        await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/telegram-bot`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({
-            action: "notify_admin",
-            message: `🏢 Enterprise Inquiry\n\nCompany: ${companyName}\nContact: ${contactName}\nEmail: ${email}\nSize: ${companySize}\nNeeds: ${selectedNeeds.join(", ")}\n\nMessage: ${message || "N/A"}`,
-          }),
-        });
-      } catch {
-        /* silent */
-      }
-
       toast.success("Your inquiry has been submitted. We'll get back to you soon.");
       navigate("/pricing");
     } catch {
@@ -138,230 +77,166 @@ const EnterpriseFormSection = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="text-xs text-muted-foreground mb-1.5 block uppercase tracking-wider">
-            Company Name *
-          </label>
-          <input
-            value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-border bg-secondary/30 text-sm text-foreground outline-none focus:border-primary/30 transition-colors placeholder:text-muted-foreground/50"
-            placeholder="Acme Inc."
-          />
-        </div>
-        <div>
-          <label className="text-xs text-muted-foreground mb-1.5 block uppercase tracking-wider">
-            Contact Name *
-          </label>
-          <input
-            value={contactName}
-            onChange={(e) => setContactName(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-border bg-secondary/30 text-sm text-foreground outline-none focus:border-primary/30 transition-colors placeholder:text-muted-foreground/50"
-            placeholder="John Doe"
-          />
-        </div>
-      </div>
-      <div>
-        <label className="text-xs text-muted-foreground mb-1.5 block uppercase tracking-wider">
-          Business Email *
-        </label>
-        <input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          type="email"
-          className="w-full px-4 py-3 rounded-xl border border-border bg-secondary/30 text-sm text-foreground outline-none focus:border-primary/30 transition-colors placeholder:text-muted-foreground/50"
-          placeholder="john@company.com"
-        />
-      </div>
-      <div>
-        <label className="text-xs text-muted-foreground mb-1.5 block uppercase tracking-wider">
-          Company Size
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {companySizes.map((size) => (
-            <button
-              key={size}
-              onClick={() => setCompanySize(size)}
-              className={`px-4 py-2.5 rounded-xl text-sm border transition-colors ${companySize === size ? "border-white/40 bg-white/10 text-foreground" : "border-white/10 text-foreground/60 hover:border-white/30"}`}
-            >
-              {size}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div>
-        <label className="text-xs text-muted-foreground mb-1.5 block uppercase tracking-wider">
-          What do you need?
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {needs.map((need) => (
-            <button
-              key={need}
-              onClick={() => toggleNeed(need)}
-              className={`px-3 py-2 rounded-xl text-sm border transition-colors ${selectedNeeds.includes(need) ? "border-white/40 bg-white/10 text-foreground" : "border-white/10 text-foreground/60 hover:border-white/30"}`}
-            >
-              {need}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div>
-        <label className="text-xs text-muted-foreground mb-1.5 block uppercase tracking-wider">
-          Additional Details
-        </label>
-        <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          rows={4}
-          className="w-full px-4 py-3 rounded-xl border border-border bg-secondary/30 text-sm text-foreground outline-none focus:border-primary/30 transition-colors resize-none placeholder:text-muted-foreground/50"
-          placeholder="Tell us about your use case..."
-        />
-      </div>
-      <button
-        onClick={handleSubmit}
-        disabled={submitting || !companyName || !contactName || !email}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-white py-3.5 text-sm font-semibold text-foreground transition-transform hover:scale-[1.02] disabled:opacity-40"
-      >
-        <Send className="w-4 h-4" />
-        {submitting ? "Submitting..." : "Submit Inquiry"}
-      </button>
-    </div>
-  );
-};
-
-const EnterprisePage = () => {
-  return (
-    <div data-theme="dark" className="min-h-dvh overflow-x-hidden bg-background text-foreground">
+    <CartoonMarketingPage>
       <SEOHead
         title="Megsy AI for Enterprise — Custom Plans for Teams"
-        description="Custom credit volume, team workspaces, priority support and tailored contracts for organizations using Megsy AI at scale. Talk to the founders."
+        description="Custom credit volume, team workspaces, priority support and tailored contracts for organizations using Megsy AI at scale."
         path="/enterprise"
       />
-      <LandingNavbar />
 
-      {/* HERO — landing style */}
-      <section className="relative overflow-hidden bg-background pb-12 pt-32 text-center md:pt-44">
-        <div className="mx-auto w-full max-w-4xl px-4">
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-muted-foreground"
-          >
-            For teams
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="font-display text-[9vw] uppercase leading-[0.95] tracking-tight text-foreground md:text-[5.5vw]"
-          >
-            Megsy <span className="text-primary">for your team.</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mx-auto mt-4 max-w-2xl text-[13px] leading-snug text-muted-foreground md:mt-6 md:text-lg"
-          >
-            Custom credit volume, shared workspaces, priority support and tailored contracts — sized
-            to how your team actually uses Megsy.
-          </motion.p>
-        </div>
-      </section>
+      <CartoonHero
+        sticker={enterpriseSticker}
+        bg={YELLOW}
+        eyebrow="For teams"
+        title={<>Megsy for <span style={{ color: "hsl(var(--brand-blush))" }}>your team.</span></>}
+        subtitle="Custom credit volume, shared workspaces, priority support and tailored contracts — sized to how your team actually uses Megsy."
+        cta={
+          <>
+            <PillButton tone={INK} onClick={() => document.getElementById("ent-form")?.scrollIntoView({ behavior: "smooth" })}>
+              <Send className="w-4 h-4" strokeWidth={2.5} style={{ color: YELLOW }} />
+              <span style={{ color: YELLOW }}>Talk to sales</span>
+            </PillButton>
+            <PillButton tone={MINT} onClick={() => navigate("/pricing")}>See pricing</PillButton>
+          </>
+        }
+      />
 
-      {/* Features Grid */}
-      <section className="border-t border-border/30 py-20 md:py-28">
-        <div className="mx-auto max-w-6xl px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="mb-14 max-w-3xl"
-          >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-              What's included
-            </p>
-            <h2 className="mt-4 font-display text-4xl uppercase leading-[0.95] tracking-tight text-foreground md:text-5xl">
-              Built around <span className="text-primary">your team.</span>
-            </h2>
-          </motion.div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((h, i) => (
-              <motion.div
-                key={h.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                className="rounded-2xl border border-border/30 bg-white/[0.02] p-6 transition-colors hover:border-primary/30 hover:bg-white/[0.04]"
+      {/* Annual & multi-year band */}
+      <CartoonContainer>
+        <SectionEyebrow>Annual & multi-year</SectionEyebrow>
+        <SectionTitle className="mb-6">Lock pricing. Save up to 30%.</SectionTitle>
+        <CartoonCard tone={LAVENDER}>
+          <p className="text-[14px] md:text-[15px] leading-relaxed" style={{ color: INK, fontWeight: 600 }}>
+            Every paid plan can be billed yearly (2 months free + bonus MC upfront). Enterprise contracts add
+            custom MC pools, NET-30 invoicing, POs, multi-year price locks and volume discounts that scale with your team.
+          </p>
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            {[
+              { k: "Pro / Elite / Business yearly", v: "≈17% off + 480 / 1,000 / 2,400 bonus MC. Self-serve from /pricing." },
+              { k: "Enterprise annual contract", v: "Custom MC volume, single invoice, NET-30, PO support." },
+              { k: "Multi-year contracts", v: "Lock today's per-MC price for 2–3 years + volume discount." },
+            ].map((row) => (
+              <div
+                key={row.k}
+                className="rounded-2xl p-4"
+                style={{ backgroundColor: "rgba(255,255,255,0.55)", border: `2px solid ${INK}` }}
               >
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-border/30 bg-white/[0.04]">
-                  <h.icon className="h-5 w-5 text-primary" />
-                </div>
-                <h3 className="mb-2 text-base font-semibold text-foreground">{h.title}</h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">{h.desc}</p>
-              </motion.div>
+                <p className="text-[11.5px] uppercase tracking-[0.14em]" style={{ color: INK, fontWeight: 900 }}>{row.k}</p>
+                <p className="mt-2 text-[12.5px] leading-relaxed" style={{ color: INK, fontWeight: 600, opacity: 0.85 }}>{row.v}</p>
+              </div>
             ))}
           </div>
-        </div>
-      </section>
+        </CartoonCard>
+      </CartoonContainer>
 
-      {/* YEARLY / CONTRACT BAND */}
-      <section className="border-t border-border/30 py-16 md:py-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background p-8 md:p-12"
-          >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">Annual & multi-year</p>
-            <h2 className="mt-3 font-display text-3xl uppercase leading-tight md:text-5xl">
-              Lock pricing. <span className="text-primary">Save up to 30%.</span>
-            </h2>
-            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
-              Every paid plan can be billed yearly (2 months free + bonus MC upfront). Enterprise contracts add custom MC pools, NET-30 invoicing, POs, multi-year price locks and volume discounts that scale with your team.
-            </p>
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              {[
-                { k: "Pro / Elite / Business yearly", v: "≈17% off + 480 / 1,000 / 2,400 bonus MC upfront. Self-serve from /pricing." },
-                { k: "Enterprise annual contract", v: "Custom MC volume, single invoice, NET-30, PO support, tax-compliant globally." },
-                { k: "Multi-year contracts", v: "Lock today's per-MC price for 2–3 years with additional volume discount." },
-              ].map((row) => (
-                <div key={row.k} className="rounded-2xl border border-border/30 bg-background/40 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-primary">{row.k}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{row.v}</p>
-                </div>
-              ))}
+      {/* Features grid */}
+      <CartoonContainer>
+        <SectionEyebrow>What's included</SectionEyebrow>
+        <SectionTitle className="mb-6">Built around your team.</SectionTitle>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((f) => (
+            <div
+              key={f.title}
+              className="rounded-[22px] p-5"
+              style={{ backgroundColor: f.tone, border: `2.5px solid ${INK}`, boxShadow: `4px 4px 0 ${INK}`, color: INK }}
+            >
+              <div
+                className="mb-3 grid h-10 w-10 place-items-center rounded-xl"
+                style={{ backgroundColor: "rgba(255,255,255,0.55)", border: `2px solid ${INK}` }}
+              >
+                <f.icon className="w-5 h-5" strokeWidth={2.5} />
+              </div>
+              <p className="text-[14.5px]" style={{ fontWeight: 900 }}>{f.title}</p>
+              <p className="mt-1.5 text-[12.5px] leading-relaxed" style={{ opacity: 0.78, fontWeight: 600 }}>{f.desc}</p>
             </div>
-          </motion.div>
+          ))}
         </div>
-      </section>
-      {/* Contact Form */}
-      <section className="py-16 md:py-24 border-t border-border/50">
-        <div className="mx-auto max-w-2xl px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="font-display text-2xl font-bold text-foreground mb-2 text-center">
-              Get in Touch
-            </h2>
-            <p className="text-sm text-muted-foreground text-center mb-8">
-              Our team will create a custom plan for your needs.
-            </p>
-            <EnterpriseFormSection />
-          </motion.div>
-        </div>
-      </section>
+      </CartoonContainer>
 
-      <LandingFooter />
-    </div>
+      {/* Form */}
+      <CartoonContainer>
+        <div id="ent-form" />
+        <SectionEyebrow>Get in touch</SectionEyebrow>
+        <SectionTitle className="mb-6">Build a custom plan.</SectionTitle>
+
+        <CartoonCard className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-[11px] uppercase tracking-[0.16em] mb-1.5 block" style={{ color: MUTED, fontWeight: 900 }}>Company name *</label>
+              <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} className={fieldClass} style={fieldStyle} placeholder="Acme Inc." />
+            </div>
+            <div>
+              <label className="text-[11px] uppercase tracking-[0.16em] mb-1.5 block" style={{ color: MUTED, fontWeight: 900 }}>Contact name *</label>
+              <input value={contactName} onChange={(e) => setContactName(e.target.value)} className={fieldClass} style={fieldStyle} placeholder="Jane Doe" />
+            </div>
+          </div>
+          <div>
+            <label className="text-[11px] uppercase tracking-[0.16em] mb-1.5 block" style={{ color: MUTED, fontWeight: 900 }}>Business email *</label>
+            <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" className={fieldClass} style={fieldStyle} placeholder="jane@company.com" />
+          </div>
+
+          <div>
+            <label className="text-[11px] uppercase tracking-[0.16em] mb-1.5 block" style={{ color: MUTED, fontWeight: 900 }}>Company size</label>
+            <div className="flex flex-wrap gap-2">
+              {companySizes.map((size) => {
+                const active = companySize === size;
+                return (
+                  <button
+                    key={size}
+                    onClick={() => setCompanySize(size)}
+                    className="rounded-full px-4 py-2 text-[13px] transition active:translate-x-[1px] active:translate-y-[1px]"
+                    style={{
+                      backgroundColor: active ? YELLOW : "hsl(var(--surface-3))",
+                      color: active ? INK : TEXT,
+                      border: `2px solid ${active ? INK : BORDER}`,
+                      boxShadow: active ? `3px 3px 0 ${INK}` : "none",
+                      fontWeight: 800,
+                    }}
+                  >
+                    {size}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[11px] uppercase tracking-[0.16em] mb-1.5 block" style={{ color: MUTED, fontWeight: 900 }}>What do you need?</label>
+            <div className="flex flex-wrap gap-2">
+              {needs.map((need) => {
+                const active = selectedNeeds.includes(need);
+                return (
+                  <button
+                    key={need}
+                    onClick={() => toggleNeed(need)}
+                    className="rounded-full px-3 py-2 text-[12.5px] transition active:translate-x-[1px] active:translate-y-[1px]"
+                    style={{
+                      backgroundColor: active ? MINT : "hsl(var(--surface-3))",
+                      color: active ? INK : TEXT,
+                      border: `2px solid ${active ? INK : BORDER}`,
+                      boxShadow: active ? `3px 3px 0 ${INK}` : "none",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {need}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[11px] uppercase tracking-[0.16em] mb-1.5 block" style={{ color: MUTED, fontWeight: 900 }}>Additional details</label>
+            <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={4} className={`${fieldClass} resize-none`} style={fieldStyle} placeholder="Tell us about your use case…" />
+          </div>
+
+          <PillButton onClick={handleSubmit} disabled={submitting || !companyName || !contactName || !email} tone={YELLOW} className="w-full">
+            <Send className="w-4 h-4" strokeWidth={2.5} />
+            {submitting ? "Submitting…" : "Submit inquiry"}
+          </PillButton>
+        </CartoonCard>
+      </CartoonContainer>
+    </CartoonMarketingPage>
   );
 };
 
