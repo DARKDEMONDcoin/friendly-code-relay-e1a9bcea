@@ -71,6 +71,10 @@
   <url><loc>https://megsyai.com/docs/enterprise</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://megsyai.com/docs/legal</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://megsyai.com/docs/advanced</loc><changefreq>weekly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://megsyai.com/docs/globals</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://megsyai.com/docs/trust</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://megsyai.com/docs/auth-flows</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://megsyai.com/docs/deep-dives</loc><changefreq>weekly</changefreq><priority>0.75</priority></url>
   <url><loc>https://megsyai.com/enterprise</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://megsyai.com/security</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
   <url><loc>https://megsyai.com/egypt</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
