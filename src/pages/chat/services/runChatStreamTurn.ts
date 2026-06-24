@@ -714,7 +714,10 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
           );
         }
         if (aId) ownInsertedIdsRef.current.add(aId);
-        if (isDeepResearch) {
+        const siteIdA = detectSiteBuildId(assistantContent);
+        if (siteIdA && aId) {
+          void updateMessageMetadata(aId, { siteBuild: { siteId: siteIdA }, kind: "siteBuild" });
+        }
           const user = await getCachedUser();
           if (user) {
             await supabase.from("research_reports").upsert(
