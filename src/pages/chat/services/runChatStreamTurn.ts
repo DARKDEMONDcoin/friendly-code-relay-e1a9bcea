@@ -16,6 +16,17 @@ import {
 } from "../chatUtils";
 import type { Message, ProductResult, ChatMode } from "../chatConstants";
 import { runDeepResearchPlan } from "./runDeepResearchPlan";
+import { updateMessageMetadata } from "./conversationApi";
+
+/** Extracts the generated_sites UUID from a `build_website` preview URL embedded
+ *  in assistant text. Returns undefined when no match. */
+function detectSiteBuildId(text: string): string | undefined {
+  if (!text) return undefined;
+  const m = text.match(
+    /\/published-sites\/[0-9a-f-]{36}\/([0-9a-f-]{36})\/index\.html/i,
+  );
+  return m?.[1];
+}
 
 type SaveMessageFn = (
   conversationId: string,
