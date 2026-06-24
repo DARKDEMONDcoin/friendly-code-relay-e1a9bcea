@@ -2537,8 +2537,16 @@ export default function DocsPage() {
   const params = useParams<{ groupId?: string; sectionId?: string }>();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
-  const [activeId, setActiveId] = useState<string>(GROUPS[0].sections[0].id);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Resolve the active group from the URL (defaults to the first group).
+  const currentGroup = useMemo(
+    () => GROUPS.find((g) => g.id === params.groupId) ?? GROUPS[0],
+    [params.groupId],
+  );
+  const [activeId, setActiveId] = useState<string>(
+    () => params.sectionId || currentGroup.sections[0]?.id || GROUPS[0].sections[0].id,
+  );
 
   // Flat ordered list of every section across every group — used for prev/next.
   const flatSections = useMemo(
@@ -2548,6 +2556,13 @@ export default function DocsPage() {
       ),
     [],
   );
+
+  // When the route's group changes, scroll the page to the top so each
+  // group feels like its own dedicated docs page (Stripe/Linear style).
+  useEffect(() => {
+    if (params.sectionId) return; // section-specific scroll handled below
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [currentGroup.id, params.sectionId]);
 
   const filteredGroups = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -2614,10 +2629,23 @@ export default function DocsPage() {
     return () => io.disconnect();
   }, [filteredGroups]);
 
-  // Active group derived from active section, used by the right-side mini TOC.
-  const activeGroup = useMemo(() => {
-    return GROUPS.find((g) => g.sections.some((s) => s.id === activeId)) ?? GROUPS[0];
-  }, [activeId]);
+  // When the user is searching, show every matching group; otherwise only
+  // render the current group as its own dedicated page (Stripe-style).
+  const displayedGroups = useMemo(
+    () =>
+      query.trim()
+        ? filteredGroups
+        : filteredGroups.filter((g) => g.id === currentGroup.id),
+    [query, filteredGroups, currentGroup.id],
+  );
+
+  // Index of the current group (for top-level Prev / Next page nav).
+  const currentGroupIdx = GROUPS.findIndex((g) => g.id === currentGroup.id);
+  const prevGroup = currentGroupIdx > 0 ? GROUPS[currentGroupIdx - 1] : null;
+  const nextGroup =
+    currentGroupIdx >= 0 && currentGroupIdx < GROUPS.length - 1
+      ? GROUPS[currentGroupIdx + 1]
+      : null;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: INK, color: PARCHMENT }}>
@@ -2680,65 +2708,82 @@ export default function DocsPage() {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2">
-            {GROUPS.slice(0, 6).map((g) => (
-              <a
-                key={g.id}
-                href={`#group-${g.id}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-bold transition active:translate-x-[1px] active:translate-y-[1px]"
-                style={{ backgroundColor: "#fff", border: `2px solid ${INK}`, color: INK, boxShadow: `2px 2px 0 ${INK}` }}
-              >
-                {g.label}
-              </a>
-            ))}
+            {GROUPS.slice(0, 8).map((g) => {
+              const isCurrent = g.id === currentGroup.id;
+              return (
+                <Link
+                  key={g.id}
+                  to={`/docs/${g.id}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-bold transition active:translate-x-[1px] active:translate-y-[1px]"
+                  style={{
+                    backgroundColor: isCurrent ? INK : "#fff",
+                    color: isCurrent ? PARCHMENT : INK,
+                    border: `2px solid ${INK}`,
+                    boxShadow: `2px 2px 0 ${INK}`,
+                  }}
+                >
+                  {g.label}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </header>
+
 
       {/* Body — 3-column on xl: left TOC · content · right mini TOC */}
       <main className="px-4 pb-24 mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_220px] gap-10">
         {/* Sidebar TOC */}
         <aside className="hidden lg:block sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto pr-2">
           <nav className="space-y-6" aria-label="Documentation sections">
-            {filteredGroups.map((group) => (
-              <div key={group.id}>
-                <div
-                  className="text-[11px] font-black uppercase tracking-widest mb-2 px-2"
-                  style={{ color: PARCHMENT, opacity: 0.55 }}
-                >
-                  {group.label}
+            {filteredGroups.map((group) => {
+              const isCurrentGroup = group.id === currentGroup.id;
+              return (
+                <div key={group.id}>
+                  <Link
+                    to={`/docs/${group.id}`}
+                    className="block text-[11px] font-black uppercase tracking-widest mb-2 px-2 transition"
+                    style={{
+                      color: isCurrentGroup ? PARCHMENT : PARCHMENT,
+                      opacity: isCurrentGroup ? 1 : 0.55,
+                    }}
+                  >
+                    {group.label}
+                  </Link>
+                  <ul className="space-y-0.5">
+                    {group.sections.map((s) => {
+                      const Icon = s.icon;
+                      const active = isCurrentGroup && s.id === activeId;
+                      return (
+                        <li key={s.id}>
+                          <Link
+                            to={`/docs/${group.id}/${s.id}`}
+                            className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[13.5px] transition"
+                            style={
+                              active
+                                ? {
+                                    backgroundColor: PARCHMENT,
+                                    color: INK,
+                                    fontWeight: 800,
+                                    border: `1.5px solid ${INK}`,
+                                    boxShadow: `2px 2px 0 ${INK}`,
+                                  }
+                                : { color: PARCHMENT, opacity: isCurrentGroup ? 0.85 : 0.55 }
+                            }
+                          >
+                            <Icon className="w-3.5 h-3.5 shrink-0" />
+                            <span className="truncate">{s.title}</span>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
                 </div>
-                <ul className="space-y-0.5">
-                  {group.sections.map((s) => {
-                    const Icon = s.icon;
-                    const active = s.id === activeId;
-                    return (
-                      <li key={s.id}>
-                        <a
-                          href={`#${s.id}`}
-                          className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[13.5px] transition"
-                          style={
-                            active
-                              ? {
-                                  backgroundColor: PARCHMENT,
-                                  color: INK,
-                                  fontWeight: 800,
-                                  border: `1.5px solid ${INK}`,
-                                  boxShadow: `2px 2px 0 ${INK}`,
-                                }
-                              : { color: PARCHMENT, opacity: 0.75 }
-                          }
-                        >
-                          <Icon className="w-3.5 h-3.5 shrink-0" />
-                          <span className="truncate">{s.title}</span>
-                        </a>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            ))}
+              );
+            })}
           </nav>
         </aside>
+
 
         {/* Content */}
         <div className="min-w-0 space-y-16">
@@ -2748,15 +2793,42 @@ export default function DocsPage() {
             </div>
           )}
 
-          {filteredGroups.map((group) => (
+          {/* When NOT searching, show a clear "page header" for the current group
+              so each group reads like its own dedicated docs page. */}
+          {!query.trim() && (
+            <header className="space-y-3">
+              <div
+                className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest"
+                style={{
+                  backgroundColor: PARCHMENT,
+                  color: INK,
+                  border: `1.5px solid ${INK}`,
+                }}
+              >
+                <MegsyStar className="w-3 h-3" /> {currentGroup.label}
+              </div>
+              <h2
+                className="text-3xl md:text-[34px] font-black tracking-tight"
+                style={{ color: PARCHMENT }}
+              >
+                {currentGroup.label}
+              </h2>
+              <p className="text-[15px] opacity-70 max-w-3xl">
+                {currentGroup.sections.length} section{currentGroup.sections.length === 1 ? "" : "s"} · everything you need to know about {currentGroup.label.toLowerCase()} in Megsy AI.
+              </p>
+            </header>
+          )}
+
+          {displayedGroups.map((group) => (
             <section key={group.id} aria-labelledby={`group-${group.id}`} className="space-y-10">
               <h2
                 id={`group-${group.id}`}
-                className="text-[11px] md:text-[12px] font-black uppercase tracking-[0.2em] scroll-mt-28"
+                className={`text-[11px] md:text-[12px] font-black uppercase tracking-[0.2em] scroll-mt-28 ${query.trim() ? "" : "sr-only"}`}
                 style={{ color: PARCHMENT, opacity: 0.55 }}
               >
                 {group.label}
               </h2>
+
 
               {group.sections.map((s) => {
                 const Icon = s.icon;
@@ -2818,39 +2890,36 @@ export default function DocsPage() {
                         aria-label="Section navigation"
                       >
                         {prev ? (
-                          <a
-                            href={`#${prev.section.id}`}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              document.getElementById(prev.section.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-                            }}
+                          <Link
+                            to={`/docs/${prev.group.id}/${prev.section.id}`}
                             className="flex items-center gap-3 p-4 rounded-2xl transition hover:translate-x-[-2px]"
                             style={{ border: `1.5px solid hsl(var(--surface-4))`, backgroundColor: "hsl(var(--surface-2))" }}
                           >
                             <ChevronLeft className="w-4 h-4 opacity-60 shrink-0" />
                             <div className="min-w-0">
-                              <div className="text-[11px] font-black uppercase tracking-widest opacity-60">Previous</div>
+                              <div className="text-[11px] font-black uppercase tracking-widest opacity-60">
+                                Previous{prev.group.id !== group.id ? ` · ${prev.group.label}` : ""}
+                              </div>
                               <div className="text-[14px] font-bold truncate">{prev.section.title}</div>
                             </div>
-                          </a>
+                          </Link>
                         ) : <span />}
                         {next ? (
-                          <a
-                            href={`#${next.section.id}`}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              document.getElementById(next.section.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-                            }}
+                          <Link
+                            to={`/docs/${next.group.id}/${next.section.id}`}
                             className="flex items-center gap-3 p-4 rounded-2xl transition text-right hover:translate-x-[2px] justify-end"
                             style={{ border: `1.5px solid hsl(var(--surface-4))`, backgroundColor: "hsl(var(--surface-2))" }}
                           >
                             <div className="min-w-0">
-                              <div className="text-[11px] font-black uppercase tracking-widest opacity-60">Next</div>
+                              <div className="text-[11px] font-black uppercase tracking-widest opacity-60">
+                                Next{next.group.id !== group.id ? ` · ${next.group.label}` : ""}
+                              </div>
                               <div className="text-[14px] font-bold truncate">{next.section.title}</div>
                             </div>
                             <ChevronRight className="w-4 h-4 opacity-60 shrink-0" />
-                          </a>
+                          </Link>
                         ) : <span />}
+
                       </nav>
                     )}
                   </article>
@@ -2858,6 +2927,53 @@ export default function DocsPage() {
               })}
             </section>
           ))}
+
+          {/* Page-level prev / next group (Stripe-style). */}
+          {!query.trim() && (prevGroup || nextGroup) && (
+            <nav
+              className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+              aria-label="Page navigation"
+            >
+              {prevGroup ? (
+                <Link
+                  to={`/docs/${prevGroup.id}`}
+                  className="flex items-center gap-3 p-5 rounded-[24px] transition hover:translate-x-[-2px]"
+                  style={{
+                    backgroundColor: PARCHMENT,
+                    color: INK,
+                    border: `2px solid ${INK}`,
+                    boxShadow: `4px 4px 0 ${INK}`,
+                  }}
+                >
+                  <ChevronLeft className="w-5 h-5 shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-black uppercase tracking-widest opacity-70">Previous page</div>
+                    <div className="text-[16px] font-black truncate">{prevGroup.label}</div>
+                  </div>
+                </Link>
+              ) : <span />}
+              {nextGroup ? (
+                <Link
+                  to={`/docs/${nextGroup.id}`}
+                  className="flex items-center gap-3 p-5 rounded-[24px] transition text-right hover:translate-x-[2px] justify-end"
+                  style={{
+                    backgroundColor: PARCHMENT,
+                    color: INK,
+                    border: `2px solid ${INK}`,
+                    boxShadow: `4px 4px 0 ${INK}`,
+                  }}
+                >
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-black uppercase tracking-widest opacity-70">Next page</div>
+                    <div className="text-[16px] font-black truncate">{nextGroup.label}</div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 shrink-0" />
+                </Link>
+              ) : <span />}
+            </nav>
+          )}
+
+
 
           {/* Closing CTA */}
           <section
@@ -2908,7 +3024,7 @@ export default function DocsPage() {
             On this page
           </div>
           <ul className="space-y-1.5 border-l-2 pl-3" style={{ borderColor: "hsl(var(--surface-4))" }}>
-            {activeGroup.sections.map((s) => {
+            {currentGroup.sections.map((s) => {
               const active = s.id === activeId;
               return (
                 <li key={s.id}>
