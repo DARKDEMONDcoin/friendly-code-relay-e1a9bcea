@@ -3091,10 +3091,19 @@ const SectionFallback = () => (
 );
 
 export default function DocsPage() {
-  const params = useParams<{ groupId?: string; sectionId?: string }>();
+  const params = useParams<{ lang?: string; groupId?: string; sectionId?: string }>();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Resolve the active locale. If the URL contains an unknown :lang segment
+  // we treat it as part of the path (default = English).
+  const activeLang = useMemo(() => {
+    const code = params.lang && getSiteLang(params.lang) ? params.lang! : "en";
+    return code;
+  }, [params.lang]);
+  const langDir = getSiteLang(activeLang)?.dir ?? "ltr";
+  const pathPrefix = langPrefix(activeLang); // "" for en, "/{code}" otherwise
 
   // Resolve the active group from the URL (defaults to the first group).
   const currentGroup = useMemo(
@@ -3104,6 +3113,36 @@ export default function DocsPage() {
   const [activeId, setActiveId] = useState<string>(
     () => params.sectionId || currentGroup.sections[0]?.id || GROUPS[0].sections[0].id,
   );
+
+  // ── Auto-translation (Qwen-Max via DashScope, cached in i18n_translations) ──
+  // We translate the navigation-level strings for ALL groups (so the sidebar &
+  // page header are localized) plus the active group's section titles+intros.
+  // Body blocks remain in English for now (translated lazily as the user
+  // navigates — keeps the first paint fast and cost bounded).
+  const i18nEntries = useMemo(() => {
+    const entries: Array<{ key: string; value: unknown }> = [];
+    for (const g of GROUPS) {
+      entries.push({ key: `docs:group:${g.id}:label`, value: g.label });
+      for (const s of g.sections) {
+        entries.push({ key: `docs:section:${g.id}:${s.id}:title`, value: s.title });
+        if (s.intro) {
+          entries.push({ key: `docs:section:${g.id}:${s.id}:intro`, value: s.intro });
+        }
+      }
+    }
+    return entries;
+  }, []);
+  const { t } = useI18nTranslations({
+    namespace: "docs",
+    language: activeLang,
+    entries: i18nEntries,
+  });
+  const tGroupLabel = (g: { id: string; label: string }) =>
+    t<string>(`docs:group:${g.id}:label`, g.label);
+  const tSectionTitle = (gid: string, s: { id: string; title: string }) =>
+    t<string>(`docs:section:${gid}:${s.id}:title`, s.title);
+  const tSectionIntro = (gid: string, s: { id: string; intro?: string }) =>
+    s.intro ? t<string>(`docs:section:${gid}:${s.id}:intro`, s.intro) : undefined;
 
   // Flat ordered list of every section across every group — used for prev/next.
   const flatSections = useMemo(
