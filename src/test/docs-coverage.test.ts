@@ -1,15 +1,13 @@
-/**
- * Guarantees every user-facing surface stays documented forever.
- *
- * This test fails the build if any file under `src/pages/**` or
- * `supabase/functions/*/index.ts` is missing a `@doc` tag in its
- * leading comment. The /docs page still renders undocumented files
- * (with a humanized fallback), but a real one-line description is
- * required for any new surface.
- *
- * Add this to the top of any new page/function to satisfy the rule:
- *   /** @doc Short, human-friendly description of what this does. *\/
- */
+// Guarantees every user-facing surface stays documented forever.
+//
+// This test fails the build if any file under `src/pages/**` or
+// `supabase/functions/<name>/index.ts` is missing a `@doc` tag in its
+// leading comment. The /docs page still renders undocumented files
+// (with a humanized fallback), but a real one-line description is
+// required for any new surface.
+//
+// Add this to the top of any new page/function to satisfy the rule:
+//   /** @doc Short, human-friendly description of what this does. */
 import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
