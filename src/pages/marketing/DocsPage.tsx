@@ -3455,7 +3455,7 @@ export default function DocsPage() {
               return (
                 <Link
                   key={g.id}
-                  to={`/docs/${g.id}`}
+                  to={`${pathPrefix}/docs/${g.id}`}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-bold transition active:translate-x-[1px] active:translate-y-[1px]"
                   style={{
                     backgroundColor: isCurrent ? INK : "#fff",
@@ -3483,7 +3483,7 @@ export default function DocsPage() {
               return (
                 <div key={group.id}>
                   <Link
-                    to={`/docs/${group.id}`}
+                    to={`${pathPrefix}/docs/${group.id}`}
                     className="block text-[11px] font-black uppercase tracking-widest mb-2 px-2 transition"
                     style={{
                       color: isCurrentGroup ? PARCHMENT : PARCHMENT,
@@ -3499,7 +3499,7 @@ export default function DocsPage() {
                       return (
                         <li key={s.id}>
                           <Link
-                            to={`/docs/${group.id}/${s.id}`}
+                            to={`${pathPrefix}/docs/${group.id}/${s.id}`}
                             className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[13.5px] transition"
                             style={
                               active
@@ -3605,7 +3605,7 @@ export default function DocsPage() {
                           href={`#${s.id}`}
                           onClick={(e) => {
                             e.preventDefault();
-                            navigate(`/docs/${group.id}/${s.id}`);
+                            navigate(`${pathPrefix}/docs/${group.id}/${s.id}`);
                             history.replaceState(null, "", `#${s.id}`);
                           }}
                           className="hover:underline"
@@ -3633,7 +3633,7 @@ export default function DocsPage() {
                       >
                         {prev ? (
                           <Link
-                            to={`/docs/${prev.group.id}/${prev.section.id}`}
+                            to={`${pathPrefix}/docs/${prev.group.id}/${prev.section.id}`}
                             className="flex items-center gap-3 p-4 rounded-2xl transition hover:translate-x-[-2px]"
                             style={{ border: `1.5px solid hsl(var(--surface-4))`, backgroundColor: "hsl(var(--surface-2))" }}
                           >
@@ -3648,7 +3648,7 @@ export default function DocsPage() {
                         ) : <span />}
                         {next ? (
                           <Link
-                            to={`/docs/${next.group.id}/${next.section.id}`}
+                            to={`${pathPrefix}/docs/${next.group.id}/${next.section.id}`}
                             className="flex items-center gap-3 p-4 rounded-2xl transition text-right hover:translate-x-[2px] justify-end"
                             style={{ border: `1.5px solid hsl(var(--surface-4))`, backgroundColor: "hsl(var(--surface-2))" }}
                           >
@@ -3678,7 +3678,7 @@ export default function DocsPage() {
             >
               {prevGroup ? (
                 <Link
-                  to={`/docs/${prevGroup.id}`}
+                  to={`${pathPrefix}/docs/${prevGroup.id}`}
                   className="flex items-center gap-3 p-5 rounded-[24px] transition hover:translate-x-[-2px]"
                   style={{
                     backgroundColor: PARCHMENT,
@@ -3696,7 +3696,7 @@ export default function DocsPage() {
               ) : <span />}
               {nextGroup ? (
                 <Link
-                  to={`/docs/${nextGroup.id}`}
+                  to={`${pathPrefix}/docs/${nextGroup.id}`}
                   className="flex items-center gap-3 p-5 rounded-[24px] transition text-right hover:translate-x-[2px] justify-end"
                   style={{
                     backgroundColor: PARCHMENT,
