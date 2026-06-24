@@ -2752,7 +2752,610 @@ const STATIC_GROUPS: DocGroup[] = [
       },
     ],
   },
+
+  /* ─────────────────────── Trust & Compliance ─────────────────────── */
+  {
+    id: "trust-compliance",
+    label: "Trust & Compliance",
+    sections: [
+      {
+        id: "trust-center",
+        title: "Trust Center",
+        icon: ShieldCheck,
+        accent: MINT,
+        intro:
+          "/trust is the public hub for everything security, privacy, infrastructure and reliability on Megsy AI. App-owned editable content maintained by the Megsy team — not an independent certification.",
+        blocks: [
+          { kind: "h", text: "What you'll find" },
+          { kind: "ul", items: [
+            "Hosting & data-residency context — Supabase EU/US regions, Cloudflare edge, encrypted at rest (AES-256) and in transit (TLS 1.3).",
+            "Access controls in the app — MFA, SSO (Business+), per-workspace roles, audit log of admin actions.",
+            "Subprocessor list (live link to /subprocessors).",
+            "Vulnerability reporting — security@megsyai.com + .well-known/security.txt.",
+            "Data retention defaults & deletion windows (full account purge ≤ 30 days).",
+          ]},
+          { kind: "note", text: "Shared responsibility: Megsy secures the platform, the workspace owner controls who has access and which integrations are enabled, the end-user controls what they upload." },
+        ],
+      },
+      {
+        id: "compliance",
+        title: "Compliance posture",
+        icon: BadgeCheck,
+        accent: ACTION,
+        intro: "Live status of the certifications, frameworks and regulations Megsy aligns to. Statements here are reviewed quarterly.",
+        blocks: [
+          { kind: "kv", rows: [
+            { k: "GDPR (EU)", v: "Full DPA available on request, EU data residency option on Business+." },
+            { k: "CCPA / CPRA", v: "Privacy request flow at /settings/security → Privacy → Export / Delete." },
+            { k: "SOC 2 Type II", v: "In progress via a Big-4 auditor — target ETA in Trust Center." },
+            { k: "ISO 27001", v: "Controls mapped, certification on the roadmap." },
+            { k: "HIPAA / PCI", v: "Not in scope — do not upload PHI or raw cardholder data." },
+          ]},
+        ],
+      },
+      {
+        id: "subprocessors",
+        title: "Subprocessors",
+        icon: Layers,
+        accent: BLUSH,
+        intro: "Every third-party that may process customer data on Megsy's behalf is listed at /subprocessors with purpose and region.",
+        blocks: [
+          { kind: "ul", items: [
+            "Supabase — primary database, auth, storage (EU / US).",
+            "Cloudflare — CDN, DDoS protection, edge caching.",
+            "Alibaba Cloud Model Studio — Qwen chat & image inference.",
+            "OpenAI, Anthropic, Google, BFL, Recraft, ByteDance, Luma, Pixverse, Kling — optional model providers, only invoked when you pick that model.",
+            "Polar.sh — billing, invoices, tax (Merchant of Record).",
+            "Resend — transactional email (receipts, password reset).",
+          ]},
+          { kind: "note", text: "We publish material changes 30 days in advance — subscribe at /trust to get notified." },
+        ],
+      },
+      {
+        id: "dpa",
+        title: "Data Processing Agreement (DPA)",
+        icon: ScrollText,
+        accent: MINT,
+        intro: "Pre-signed DPA available for any paying workspace on request — covers GDPR Art. 28, SCCs for international transfers, and our subprocessor commitments.",
+        blocks: [
+          { kind: "ol", items: [
+            "Email legal@megsyai.com with your workspace name and billing email.",
+            "Receive the counter-signed PDF within 2 business days.",
+            "Optional: countersign your own DPA for review (we accept reasonable revisions).",
+          ]},
+        ],
+      },
+      {
+        id: "dmca",
+        title: "DMCA & IP takedowns",
+        icon: ShieldAlert,
+        accent: ACTION,
+        intro: "Megsy respects intellectual property. If content generated or hosted on the platform infringes your rights, file a DMCA notice and we'll act within 48h.",
+        blocks: [
+          { kind: "ul", items: [
+            "Send to: dmca@megsyai.com — include the work, the infringing URL, and a good-faith statement.",
+            "Counter-notice window: 10 business days after takedown.",
+            "Repeat-infringer policy: accounts with 3+ valid notices are terminated.",
+          ]},
+        ],
+      },
+      {
+        id: "moderation",
+        title: "Content moderation policy",
+        icon: Eye,
+        accent: BLUSH,
+        intro: "Every image, video and chat output is screened in real time. Prohibited: CSAM, non-consensual intimate imagery, deepfakes of real people without consent, violent extremism, malware, KYC fraud.",
+        blocks: [
+          { kind: "ul", items: [
+            "Image & video: NSFW classifier + face-likeness check on every generation.",
+            "Chat: provider-side safety + Megsy override list for jailbreak patterns.",
+            "User reports → reviewed within 24h. Three confirmed violations = permanent ban.",
+          ]},
+        ],
+      },
+      {
+        id: "ai-disclaimer",
+        title: "AI disclaimer",
+        icon: Bot,
+        accent: ACTION,
+        intro: "Outputs from Megsy are AI-generated and may be wrong, biased, or out of date.",
+        blocks: [
+          { kind: "ul", items: [
+            "Do not rely on Megsy for medical, legal or financial advice without a qualified professional review.",
+            "Cite the sources Deep Research returns rather than the synthesized text.",
+            "Generated images/videos may resemble real people, brands or copyrighted works — verify before publishing.",
+          ]},
+        ],
+      },
+      {
+        id: "age-policy",
+        title: "Age policy",
+        icon: Lock,
+        accent: MINT,
+        intro: "Megsy AI is for users 13+ (16+ in the EEA, UK and parts of Asia). Adult/NSFW models are gated behind a self-declared 18+ acknowledgement stored in your profile.",
+        blocks: [
+          { kind: "ul", items: [
+            "Under-13 (US) and under-16 (EEA/UK) accounts are not permitted.",
+            "Age gate is shown the first time you open an adult-capable model.",
+            "Workspace owners can disable adult models org-wide in /settings/workspace → Safety.",
+          ]},
+        ],
+      },
+      {
+        id: "accessibility",
+        title: "Accessibility (a11y)",
+        icon: Globe2,
+        accent: BLUSH,
+        intro: "Megsy targets WCAG 2.2 AA. The whole product is keyboard-navigable, screen-reader labelled and respects reduced-motion preferences.",
+        blocks: [
+          { kind: "ul", items: [
+            "All interactive elements ship with aria-labels.",
+            "Color contrast verified for both light and dark themes.",
+            "Captions auto-generated on every TTS / music output.",
+            "Report an a11y bug: accessibility@megsyai.com — fixed-priority queue.",
+          ]},
+        ],
+      },
+    ],
+  },
+
+  /* ─────────────────── Auth & Security flows (deep) ─────────────────── */
+  {
+    id: "auth-flows",
+    label: "Auth & Security flows",
+    sections: [
+      {
+        id: "oauth-authorize",
+        title: "/oauth/authorize — Sign in with Megsy",
+        icon: Shield,
+        accent: ACTION,
+        intro: "Third-party apps that want to read or act on your Megsy account redirect here. You see exactly which scopes they request before approving.",
+        blocks: [
+          { kind: "h", text: "What you'll see" },
+          { kind: "ul", items: [
+            "App name, logo, developer, and verification badge if registered.",
+            "Granular scopes (read profile, read chats, run agents, manage workspace, etc.) — toggle off individual scopes you don't want to grant.",
+            "Expiry & revocation — every grant is listed in /settings/security → Connected apps.",
+          ]},
+          { kind: "note", text: "Megsy never shares your password. Tokens are opaque, can be revoked anytime, and automatically expire after 90 days of inactivity." },
+        ],
+      },
+      {
+        id: "mfa-challenge",
+        title: "/mfa/challenge — Multi-factor sign-in",
+        icon: ShieldCheck,
+        accent: MINT,
+        intro: "Triggered after password sign-in when MFA is enabled, or when signing in from a new device.",
+        blocks: [
+          { kind: "ul", items: [
+            "TOTP (Google Authenticator, 1Password, Authy) — 6-digit code.",
+            "Backup codes — single-use, stored encrypted; regenerate from /settings/security.",
+            "Trust this device for 30 days — opt-in, per-device.",
+          ]},
+        ],
+      },
+      {
+        id: "two-factor",
+        title: "/auth/2fa — Enroll a second factor",
+        icon: Shield,
+        accent: ACTION,
+        intro: "Setup wizard for MFA. Strongly recommended for all accounts; required on Business+ workspaces.",
+        blocks: [
+          { kind: "ol", items: [
+            "Scan the QR code with your authenticator app.",
+            "Confirm the first 6-digit code.",
+            "Download the 10 backup codes — keep them offline.",
+          ]},
+        ],
+      },
+      {
+        id: "change-email",
+        title: "/auth/change-email — Update your sign-in email",
+        icon: Pencil,
+        accent: BLUSH,
+        intro: "Two-step verified change: confirm old email, then confirm new email. Both inboxes get a notification.",
+        blocks: [
+          { kind: "ul", items: [
+            "If you lose access to the old inbox, contact support@megsyai.com with proof of payment.",
+            "Active sessions stay signed in; new logins use the new email.",
+            "Workspace invitations sent to the old address remain valid for 14 days.",
+          ]},
+        ],
+      },
+      {
+        id: "change-password",
+        title: "/auth/change-password — Rotate your password",
+        icon: Lock,
+        accent: ACTION,
+        intro: "Requires current password. All other sessions are signed out automatically after a successful change.",
+        blocks: [
+          { kind: "ul", items: [
+            "Minimum 10 chars, at least one number and one symbol.",
+            "Reused / breached passwords are rejected (HaveIBeenPwned check).",
+            "Forgot it? Use /auth/reset-password — email link valid 1h.",
+          ]},
+        ],
+      },
+      {
+        id: "delete-account",
+        title: "/auth/delete-account — Permanently delete",
+        icon: ShieldAlert,
+        accent: BLUSH,
+        intro: "Self-service hard delete. Type 'DELETE' to confirm. Runs the GDPR purge pipeline.",
+        blocks: [
+          { kind: "ul", items: [
+            "Profile, chats, generations, uploads, memory and integrations: erased within 24h.",
+            "Billing records & invoices: kept for 7 years (legal obligation).",
+            "Active subscription is canceled and you're refunded any unused full months.",
+            "Workspace owners must transfer or delete the workspace first.",
+          ]},
+        ],
+      },
+      {
+        id: "accept-invite",
+        title: "/auth/accept-invite — Join via email invite",
+        icon: Gift,
+        accent: MINT,
+        intro: "Standard invitation flow used for shared chats, shared slides, and beta program access.",
+        blocks: [
+          { kind: "ul", items: [
+            "Single-use signed link, expires in 14 days.",
+            "Lands on signup if you don't have an account, then resumes the invite.",
+            "Already signed in with a different email? You can switch or accept on the current account.",
+          ]},
+        ],
+      },
+      {
+        id: "accept-workspace-invite",
+        title: "/auth/accept-workspace-invite — Join a team",
+        icon: Users,
+        accent: ACTION,
+        intro: "Workspace-level invite. Shows the inviter, the workspace name, your assigned role, and the MC pool you'll share.",
+        blocks: [
+          { kind: "ul", items: [
+            "Roles: Owner · Admin · Member · Viewer — set by the inviter.",
+            "Joining a workspace doesn't merge your personal MC; the workspace has its own pool.",
+            "Leave anytime from /settings/workspace → Members.",
+          ]},
+        ],
+      },
+      {
+        id: "referral-redirect",
+        title: "/r/:code — Referral redirect",
+        icon: Share2,
+        accent: BLUSH,
+        intro: "Short link that attributes the visitor to the referrer's code, then forwards to the marketing site (or a specific landing if the link carries ?to=).",
+        blocks: [
+          { kind: "ul", items: [
+            "First-touch attribution stored in a 60-day cookie + server-side fingerprint.",
+            "On signup, both sides receive the referral reward defined in /settings/referrals → Program.",
+            "Fraud detection auto-voids self-referrals and duplicate IPs.",
+          ]},
+        ],
+      },
+    ],
+  },
+
+  /* ────────────────── Billing & Referral flows (deep) ────────────────── */
+  {
+    id: "billing-flows",
+    label: "Billing & Referral flows",
+    sections: [
+      {
+        id: "billing-success",
+        title: "/billing/success — Post-checkout confirmation",
+        icon: CheckCircle2,
+        accent: MINT,
+        intro: "Landing page after a successful Polar checkout. Verifies the checkout_id server-side, activates the plan, credits your MC pool, then redirects to /chat.",
+        blocks: [
+          { kind: "ul", items: [
+            "Receipt is emailed within ~60 seconds.",
+            "Bonus MC for annual plans are credited immediately and never expire while the subscription is active.",
+            "If the page shows 'still processing' for >2 min, refresh — webhooks occasionally lag.",
+          ]},
+        ],
+      },
+      {
+        id: "withdraw",
+        title: "/billing/withdraw — Cash out referral earnings",
+        icon: Wallet,
+        accent: ACTION,
+        intro: "Convert your accrued referral earnings to a real-money payout. Minimum threshold $25.",
+        blocks: [
+          { kind: "ul", items: [
+            "Methods: PayPal, Wise, USDT (TRC-20), bank wire (≥ $200).",
+            "Cleared after a 30-day reversal window from the referee's first payment.",
+            "Tax form: W-9 (US) or W-8BEN (rest of world) is requested above $600/yr.",
+            "Track every request at /billing/referrals → Withdrawals tab.",
+          ]},
+        ],
+      },
+      {
+        id: "referral-resources",
+        title: "/billing/referral-resources — Creator kit",
+        icon: PaintBucket,
+        accent: BLUSH,
+        intro: "Ready-to-post assets for influencers: vertical videos, square posts, banners, demo GIFs, copy in 25 languages.",
+        blocks: [
+          { kind: "ul", items: [
+            "Every asset is pre-tagged with your referral code — just download and post.",
+            "Megsy-branded video templates (faceswap, talking, problem/solution) you can remix.",
+            "UTM-prepared link generator for each platform (TikTok, IG Reels, YouTube Shorts, X).",
+          ]},
+        ],
+      },
+      {
+        id: "referrals-dashboard",
+        title: "/billing/referrals — Dashboard tab",
+        icon: LayoutGrid,
+        accent: MINT,
+        intro: "Top-level view of your referral business: clicks, signups, paid conversions, lifetime earnings, tier progress.",
+        blocks: [
+          { kind: "ul", items: [
+            "Real-time chart (last 30 / 90 / 365 days).",
+            "Geo + source breakdown — see which platform converts best.",
+            "Tier ladder: more MC + higher % as you cross each milestone.",
+          ]},
+        ],
+      },
+      {
+        id: "referrals-program",
+        title: "/billing/referrals — Program tab",
+        icon: Crown,
+        accent: ACTION,
+        intro: "The current commission structure. Updated centrally — your existing referrals are always paid at the rate at which they signed up (no retroactive cuts).",
+        blocks: [
+          { kind: "kv", rows: [
+            { k: "Tier 1 (0–9 paid)", v: "20% recurring + 240 MC bonus per signup" },
+            { k: "Tier 2 (10–49)", v: "25% recurring + 480 MC" },
+            { k: "Tier 3 (50+)", v: "30% recurring + 1,200 MC + dedicated AM" },
+          ]},
+        ],
+      },
+      {
+        id: "referrals-tasks",
+        title: "/billing/referrals — Tasks tab",
+        icon: ListTree,
+        accent: BLUSH,
+        intro: "Bite-size MC bounties: follow Megsy on X/IG/YT, post a review, invite 3 friends, etc. Managed live from the Telegram admin bot.",
+        blocks: [
+          { kind: "ul", items: [
+            "Auto-verified where possible (OAuth follow checks).",
+            "Manual tasks require a screenshot — reviewed within 24h.",
+            "Rewards land in your MC balance instantly on approval.",
+          ]},
+        ],
+      },
+      {
+        id: "referrals-withdrawals",
+        title: "/billing/referrals — Withdrawals tab",
+        icon: Receipt,
+        accent: MINT,
+        intro: "Lifetime history of every payout request with status (pending · processing · paid · rejected) and transaction proof when available.",
+        blocks: [
+          { kind: "ul", items: [
+            "Filter by year for tax season.",
+            "Export to CSV / PDF.",
+            "Rejected requests show the reason and how to fix it.",
+          ]},
+        ],
+      },
+      {
+        id: "influencer-grant",
+        title: "Influencer Pro grant (1 month, manual)",
+        icon: Gift,
+        accent: ACTION,
+        intro: "Megsy admins can manually activate a 1-month Pro subscription for vetted influencers from the Telegram admin bot — no card, no auto-renewal.",
+        blocks: [
+          { kind: "ol", items: [
+            "Admin opens the Megsy bot in Telegram → main menu → 🎁 منح Pro لمؤثر (شهر).",
+            "Admin pastes the influencer's signup email.",
+            "Bot activates plan = pro, status = active, current_period_end = +30 days, then notifies the admin channel.",
+          ]},
+          { kind: "note", text: "Strictly one-off. The subscription expires automatically after 30 days unless renewed manually." },
+        ],
+      },
+    ],
+  },
+
+  /* ───────────────── Settings details (the missing ones) ───────────────── */
+  {
+    id: "settings-detail",
+    label: "Settings — page by page",
+    sections: [
+      {
+        id: "system-status",
+        title: "/settings/system-status — Live service health",
+        icon: BadgeCheck,
+        accent: MINT,
+        intro: "Real-time status (Operational · Degraded · Outage) for every Megsy service, plus a public RSS feed and email subscribers list.",
+        blocks: [
+          { kind: "ul", items: [
+            "Services tracked: Chat, Image, Video, Slides, Docs, Research, Code, Voice, Music, Operator, Builder, API, Integrations, Payments, Auth.",
+            "Incidents kept for 12 months with root-cause notes.",
+            "Subscribe via email or webhook for instant updates.",
+          ]},
+        ],
+      },
+      {
+        id: "switch-account",
+        title: "/settings/switch-account — Multi-account switcher",
+        icon: Users,
+        accent: ACTION,
+        intro: "Sign into multiple Megsy accounts on the same browser and switch with one click — like Gmail's account picker.",
+        blocks: [
+          { kind: "ul", items: [
+            "Up to 5 accounts cached per browser.",
+            "Each account keeps its own MC, workspaces, chat history.",
+            "Sign out of one without affecting the others.",
+          ]},
+        ],
+      },
+      {
+        id: "skills-new-vs-list",
+        title: "Skills — New vs Library",
+        icon: Wand2,
+        accent: BLUSH,
+        intro: "Two pages, one feature. /settings/skills/new is the builder, /settings/skills is the library of everything you've built (and what your workspace has shared).",
+        blocks: [
+          { kind: "kv", rows: [
+            { k: "/settings/skills/new", v: "Visual builder: pick a base model, write a system prompt, enable tools, set the slash trigger, optionally upload reference files." },
+            { k: "/settings/skills", v: "List + filter + duplicate + share. Workspace owners see all org skills; members see their own + shared." },
+          ]},
+        ],
+      },
+      {
+        id: "settings-contact",
+        title: "/settings/contact — Contact info",
+        icon: MessageSquare,
+        accent: ACTION,
+        intro: "Manage the contact email and phone shown on invoices and used for security-critical notifications (login alerts, password reset).",
+        blocks: [
+          { kind: "ul", items: [
+            "Separate from your sign-in email — useful for ops aliases.",
+            "Phone is opt-in and only used for high-severity security alerts.",
+          ]},
+        ],
+      },
+      {
+        id: "settings-help",
+        title: "/settings/help — Self-serve help",
+        icon: HelpCircle,
+        accent: MINT,
+        intro: "Curated index of the 30 most-asked questions plus a deep link into /docs and a button to open the AI support chat.",
+        blocks: [
+          { kind: "ul", items: [
+            "Search is the same engine as /docs.",
+            "Most issues resolve in <60s without contacting support.",
+          ]},
+        ],
+      },
+      {
+        id: "settings-support",
+        title: "/settings/support — Talk to a human (AI-first)",
+        icon: Bell,
+        accent: ACTION,
+        intro: "Opens the in-app support thread. Megsy Support AI answers instantly; if it can't, it escalates to a human within the SLA of your plan.",
+        blocks: [
+          { kind: "kv", rows: [
+            { k: "Starter / Pro", v: "Human reply within 24h." },
+            { k: "Elite / Business", v: "Within 8h, business days." },
+            { k: "Enterprise", v: "Within 1h, 24/7, dedicated AM." },
+          ]},
+        ],
+      },
+      {
+        id: "settings-privacy",
+        title: "/settings/privacy — Your data, your rules",
+        icon: Lock,
+        accent: BLUSH,
+        intro: "One-click controls for the GDPR/CCPA rights and the training-opt-out toggle.",
+        blocks: [
+          { kind: "ul", items: [
+            "Export everything (JSON + media zip) — emailed within 24h.",
+            "Delete all chats, generations, memory — irreversible.",
+            "Opt out of model training on your data — on by default for Pro+.",
+            "Manage cookies & analytics consent.",
+          ]},
+        ],
+      },
+    ],
+  },
+
+  /* ──────────────────── Marketing pages — deep dives ──────────────────── */
+  {
+    id: "marketing-detail",
+    label: "Marketing pages — deep dives",
+    sections: [
+      {
+        id: "about-deep",
+        title: "/about — The story & the team",
+        icon: BookOpen,
+        accent: MINT,
+        intro: "Why Megsy exists, the founding team, the timeline, and the numbers (36+ engines, 25 languages, 24/7 support).",
+        blocks: [
+          { kind: "ul", items: [
+            "Mission, values, and the 5-year roadmap.",
+            "Investor & advisor list.",
+            "Press kit (logos, screenshots, founder bios) — direct download.",
+          ]},
+        ],
+      },
+      {
+        id: "egypt-page",
+        title: "/egypt — Local launch page (Arabic + EGP)",
+        icon: MapPin,
+        accent: ACTION,
+        intro: "Region-tuned landing for Egypt: full Arabic copy, prices in EGP, local payment options (Fawry, InstaPay, Vodafone Cash), and an influencer leaderboard.",
+        blocks: [
+          { kind: "ul", items: [
+            "Arabic-first design with RTL throughout.",
+            "Local case studies and creator highlights.",
+            "Direct WhatsApp support button for Egyptian customers.",
+          ]},
+        ],
+      },
+      {
+        id: "features-guide-deep",
+        title: "/features — Full features guide",
+        icon: LayoutGrid,
+        accent: BLUSH,
+        intro: "The master grid of every product surface (Chat, Images, Video, Slides, Docs, Research, Code, Websites, Operator, Music, Voice, Learning) with what it does, who it's for, what it costs.",
+        blocks: [
+          { kind: "ul", items: [
+            "Each tile deep-links to its dedicated landing page.",
+            "Side-by-side capability matrix vs. ChatGPT, Claude, Gemini, Perplexity.",
+            "Live demo videos auto-play on hover (respect prefers-reduced-motion).",
+          ]},
+        ],
+      },
+      {
+        id: "comparison-deep",
+        title: "/vs/* — Comparison pages",
+        icon: ListTree,
+        accent: ACTION,
+        intro: "SEO-optimised head-to-head pages: Megsy vs ChatGPT, vs Claude, vs Gemini, vs Perplexity, vs Midjourney, vs Sora, vs Canva AI, vs Notion AI, vs v0, vs Cursor and more.",
+        blocks: [
+          { kind: "ul", items: [
+            "Feature matrix with verified-as-of dates.",
+            "Pricing comparison (per-MC vs per-message vs per-seat).",
+            "Switching guide — how to move chats / memory / settings to Megsy.",
+          ]},
+        ],
+      },
+      {
+        id: "service-landing-deep",
+        title: "/ai/* — Service landing pages",
+        icon: Rocket,
+        accent: MINT,
+        intro: "Single-purpose, SEO-targeted landings: AI image generator, AI video generator, AI slides maker, AI website builder, AI deep research, AI agent runner, etc.",
+        blocks: [
+          { kind: "ul", items: [
+            "Each landing has a hero demo, model picker preview, sample outputs gallery, FAQs, and a one-click CTA.",
+            "Schema.org SoftwareApplication markup for rich snippets.",
+            "Auto-translated into 25 languages and indexed per /docs i18n sitemap.",
+          ]},
+        ],
+      },
+      {
+        id: "blog-post-ux",
+        title: "/blog/:slug — Reading experience",
+        icon: ScrollText,
+        accent: BLUSH,
+        intro: "Article layout tuned for long-form reading: serif body, generous line-height, sticky TOC, reading-progress bar, copy-link on each heading.",
+        blocks: [
+          { kind: "ul", items: [
+            "Auto-translated to 25 languages — language switcher in the header.",
+            "Code blocks with copy button + syntax highlighting.",
+            "Related posts at the end based on tag + embedding similarity.",
+            "Comment via the linked X / LinkedIn thread (no native comments).",
+          ]},
+        ],
+      },
+    ],
+  },
 ];
+
 
 
 
