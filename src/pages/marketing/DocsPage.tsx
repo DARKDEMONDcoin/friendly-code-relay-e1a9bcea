@@ -3610,13 +3610,13 @@ export default function DocsPage() {
                           }}
                           className="hover:underline"
                         >
-                          {s.title}
+                          {tSectionTitle(group.id, s)}
                         </a>
-                        <CopyLinkButton sectionId={s.id} groupId={group.id} />
+                        <CopyLinkButton sectionId={s.id} groupId={group.id} pathPrefix={pathPrefix} />
                       </h3>
                     </div>
                     {s.intro && (
-                      <p className="text-[15px] leading-7 opacity-80 mb-4 max-w-3xl">{s.intro}</p>
+                      <p className="text-[15px] leading-7 opacity-80 mb-4 max-w-3xl">{tSectionIntro(group.id, s)}</p>
                     )}
                     <div className="space-y-4 max-w-3xl">
                       {s.blocks.map((b, i) => (
