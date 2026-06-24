@@ -1064,6 +1064,30 @@ async function handleCommand(chatId: number, text: string) {
     }
   }
 
+  // Manually grant a 1-month Pro subscription to an influencer by email.
+  // Usage: /grantpro influencer@example.com
+  if (cmd === "/grantpro" || cmd === "/grant_pro" || cmd === "/influencer") {
+    if (!(await isAdmin(chatId))) return tgSend(chatId, "⛔ Not authorized.");
+    const email = args.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return tgSend(chatId, "Usage: <code>/grantpro &lt;email&gt;</code>");
+    }
+    const { data, error } = await supabase.rpc("admin_grant_pro_monthly", { target_email: email });
+    if (error) return tgSend(chatId, "❌ " + error.message);
+    if (data && (data as any).ok) {
+      const periodEnd = new Date((data as any).period_end).toISOString().slice(0, 10);
+      await supabase.from("admin_notifications").insert({
+        type: "influencer_grant",
+        payload: { email, period_end: (data as any).period_end, granted_by: chatId },
+      });
+      return tgSend(
+        chatId,
+        `✅ تم تفعيل <b>Pro</b> للمؤثر <code>${email}</code> لمدة <b>30 يوم</b> (تنتهي <b>${periodEnd}</b>) — بدون تجديد تلقائي.`,
+      );
+    }
+    return tgSend(chatId, `❌ ${(data as any)?.error || "تعذر منح الاشتراك."}`);
+  }
+
   return tgSend(chatId, "Unknown command. /help");
 }
 
