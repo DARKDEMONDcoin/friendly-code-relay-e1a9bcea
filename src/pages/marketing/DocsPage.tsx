@@ -1900,31 +1900,45 @@ function buildAutoGroups(): DocGroup[] {
     });
   }
 
-  // — Pages (auto-detected via Vite glob from src/pages/**) —
+  // — Pages (auto-detected & described via docsRegistry) —
   // Adding a new page anywhere under src/pages automatically appears here.
-  const pageModules = import.meta.glob("/src/pages/**/*.tsx", { eager: false });
-  const pagePaths = Object.keys(pageModules)
-    .map((p) => p.replace("/src/pages/", "").replace(/\.tsx$/, ""))
-    .sort();
-  const pagesByFolder = pagePaths.reduce<Record<string, string[]>>((acc, p) => {
-    const folder = p.includes("/") ? p.split("/")[0] : "(root)";
-    (acc[folder] ||= []).push(p);
-    return acc;
-  }, {});
+  // Add `/** @doc Short description */` at the top of the file for a rich
+  // human-readable summary.
+  const pagesByFolder = groupPagesByFolder();
   const pagesBlocks: DocBlock[] = [];
-  for (const [folder, items] of Object.entries(pagesByFolder)) {
+  for (const [folder, items] of Object.entries(pagesByFolder).sort()) {
     pagesBlocks.push({ kind: "h", text: `${folder} (${items.length} pages)` });
-    pagesBlocks.push({ kind: "ul", items });
+    pagesBlocks.push({
+      kind: "kv",
+      rows: items.map((p) => ({ k: p.id, v: p.description })),
+    });
   }
 
-  // — Edge functions (auto-detected from supabase/functions/**) —
-  const edgeModules = import.meta.glob("/supabase/functions/*/index.ts", {
-    eager: false,
-  });
-  const edgeFns = Object.keys(edgeModules)
-    .map((p) => p.replace("/supabase/functions/", "").replace("/index.ts", ""))
-    .filter((n) => !n.startsWith("_"))
-    .sort();
+  // — Edge functions (auto-detected & described via docsRegistry) —
+  const edgeFnBlocks: DocBlock[] = [
+    {
+      kind: "kv",
+      rows: DOC_EDGE_FUNCTIONS.map((fn) => ({ k: fn.id, v: fn.description })),
+    },
+  ];
+
+  // — Integrations / connectors (auto from integrationsData) —
+  const integrationsByCategory = INTEGRATIONS_LIST.reduce<Record<string, typeof INTEGRATIONS_LIST>>(
+    (acc, i) => {
+      (acc[i.category] ||= []).push(i);
+      return acc;
+    },
+    {},
+  );
+  const integrationsBlocks: DocBlock[] = [];
+  for (const [cat, items] of Object.entries(integrationsByCategory).sort()) {
+    integrationsBlocks.push({ kind: "h", text: `${cat} (${items.length})` });
+    integrationsBlocks.push({
+      kind: "kv",
+      rows: items.map((i) => ({ k: i.name, v: `${i.description} — type: ${i.type}` })),
+    });
+  }
+
 
   return [
     {
