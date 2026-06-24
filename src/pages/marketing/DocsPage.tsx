@@ -2223,7 +2223,7 @@ export default function DocsPage() {
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest"
             style={{ backgroundColor: INK, color: PARCHMENT }}
           >
-            <Sparkles className="w-3.5 h-3.5" /> Documentation
+            <MegsyStar className="w-3.5 h-3.5" /> Documentation
           </div>
           <h1 className="mt-5 text-4xl md:text-6xl font-black tracking-tight leading-[1.02]">
             Every atom of Megsy AI, <br className="hidden md:block" />
