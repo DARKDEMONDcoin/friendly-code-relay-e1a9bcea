@@ -2708,19 +2708,28 @@ export default function DocsPage() {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2">
-            {GROUPS.slice(0, 6).map((g) => (
-              <a
-                key={g.id}
-                href={`#group-${g.id}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-bold transition active:translate-x-[1px] active:translate-y-[1px]"
-                style={{ backgroundColor: "#fff", border: `2px solid ${INK}`, color: INK, boxShadow: `2px 2px 0 ${INK}` }}
-              >
-                {g.label}
-              </a>
-            ))}
+            {GROUPS.slice(0, 8).map((g) => {
+              const isCurrent = g.id === currentGroup.id;
+              return (
+                <Link
+                  key={g.id}
+                  to={`/docs/${g.id}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-bold transition active:translate-x-[1px] active:translate-y-[1px]"
+                  style={{
+                    backgroundColor: isCurrent ? INK : "#fff",
+                    color: isCurrent ? PARCHMENT : INK,
+                    border: `2px solid ${INK}`,
+                    boxShadow: `2px 2px 0 ${INK}`,
+                  }}
+                >
+                  {g.label}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </header>
+
 
       {/* Body — 3-column on xl: left TOC · content · right mini TOC */}
       <main className="px-4 pb-24 mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_220px] gap-10">
