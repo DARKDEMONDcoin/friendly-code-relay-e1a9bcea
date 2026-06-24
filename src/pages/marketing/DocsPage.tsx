@@ -3988,7 +3988,7 @@ export default function DocsPage() {
       {/* Hero — cartoon sticker style */}
       <header className="relative px-4 pt-28 pb-10 mx-auto max-w-7xl">
         <div
-          className="rounded-[32px] p-8 md:p-14 relative overflow-hidden"
+          className="rounded-[32px] p-8 md:p-14 relative"
           style={{
             background: `linear-gradient(135deg, ${PARCHMENT} 0%, #FFE9D6 100%)`,
             border: `2.5px solid ${INK}`,
