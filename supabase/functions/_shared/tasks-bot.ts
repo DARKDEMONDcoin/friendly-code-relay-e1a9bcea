@@ -1348,6 +1348,31 @@ export async function handleTasksBotRequest(req: Request): Promise<Response> {
           const res = await insertProviderKey(chatId, pending.payload.provider, trimmed);
           await clearPendingAction(chatId);
           await tgSend(chatId, res.message);
+        } else if (pending?.action === "grant_pro") {
+          await clearPendingAction(chatId);
+          const email = trimmed.toLowerCase();
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            await tgSend(chatId, "❌ إيميل غير صالح. حاول تاني من زر «🎁 منح Pro لمؤثر».");
+          } else {
+            const { data, error } = await supabase.rpc("admin_grant_pro_monthly", { target_email: email });
+            if (error) {
+              await tgSend(chatId, "❌ فشل المنح: " + error.message);
+            } else if (data && (data as any).ok) {
+              const periodEnd = new Date((data as any).period_end).toISOString().slice(0, 10);
+              await tgSend(
+                chatId,
+                `✅ تم تفعيل <b>Pro</b> للمؤثر <code>${email}</code>\n` +
+                `⏳ المدة: <b>30 يوم</b> (تنتهي تلقائياً يوم <b>${periodEnd}</b>)\n` +
+                `🚫 لن يتم التجديد التلقائي — هذا اشتراك يدوي لمرة واحدة.`,
+              );
+              await supabase.from("admin_notifications").insert({
+                type: "influencer_grant",
+                payload: { email, period_end: (data as any).period_end, granted_by: chatId },
+              });
+            } else {
+              await tgSend(chatId, `❌ ${(data as any)?.error || "تعذر منح الاشتراك."}\nتأكد إن الإيميل ده فعلاً مسجّل بالموقع.`);
+            }
+          }
         } else {
           await handleCommand(chatId, text);
         }
