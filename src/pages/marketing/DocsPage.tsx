@@ -2534,8 +2534,20 @@ const SectionFallback = () => (
 );
 
 export default function DocsPage() {
+  const params = useParams<{ groupId?: string; sectionId?: string }>();
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [activeId, setActiveId] = useState<string>(GROUPS[0].sections[0].id);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Flat ordered list of every section across every group — used for prev/next.
+  const flatSections = useMemo(
+    () =>
+      GROUPS.flatMap((g) =>
+        g.sections.map((s) => ({ group: g, section: s })),
+      ),
+    [],
+  );
 
   const filteredGroups = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -2556,6 +2568,35 @@ export default function DocsPage() {
     })).filter((g) => g.sections.length > 0);
   }, [query]);
 
+  // ⌘K / Ctrl+K — focus search from anywhere.
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const isK = e.key === "k" || e.key === "K";
+      if (isK && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+      if (e.key === "Escape" && document.activeElement === searchInputRef.current) {
+        (document.activeElement as HTMLElement).blur();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  // Deep-link via /docs/:groupId/:sectionId — scroll the target into view.
+  useEffect(() => {
+    const targetId = params.sectionId || (params.groupId ? `group-${params.groupId}` : null);
+    if (!targetId) return;
+    // Wait one frame for the DOM to render.
+    const id = requestAnimationFrame(() => {
+      const el = document.getElementById(targetId);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [params.groupId, params.sectionId]);
+
   // Scroll-spy for the sidebar TOC.
   useEffect(() => {
     const ids = GROUPS.flatMap((g) => g.sections.map((s) => s.id));
@@ -2572,6 +2613,11 @@ export default function DocsPage() {
     });
     return () => io.disconnect();
   }, [filteredGroups]);
+
+  // Active group derived from active section, used by the right-side mini TOC.
+  const activeGroup = useMemo(() => {
+    return GROUPS.find((g) => g.sections.some((s) => s.id === activeId)) ?? GROUPS[0];
+  }, [activeId]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: INK, color: PARCHMENT }}>
