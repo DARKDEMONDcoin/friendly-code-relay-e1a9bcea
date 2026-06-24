@@ -66,6 +66,14 @@ import {
   Layers,
   Cpu,
   Pencil,
+  Link as LinkIcon,
+  Copy,
+  Check,
+  ChevronLeft,
+  History,
+  PlusCircle,
+  ShieldAlert,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 import LandingNavbar from "@/components/landing/LandingNavbar";
