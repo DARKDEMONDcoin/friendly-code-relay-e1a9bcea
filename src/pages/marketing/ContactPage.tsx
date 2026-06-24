@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Mail, MessageSquare, Building2, Twitter, Clock, ShieldCheck } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import LandingNavbar from "@/components/landing/LandingNavbar";
