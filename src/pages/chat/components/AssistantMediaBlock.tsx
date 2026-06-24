@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { runMediaPlan, regenerateScene } from "@/lib/mediaGeneration";
+import { updateMessageMetadata } from "../services/conversationApi";
 import { MediaPlanCard, MediaResultCard } from "../lazyComponents";
 import type { Message } from "../chatConstants";
 
