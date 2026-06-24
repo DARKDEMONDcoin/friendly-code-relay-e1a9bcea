@@ -57,7 +57,16 @@ export function ChatComposerSection(props: ChatComposerSectionProps) {
   } = props;
 
   const isEmpty = messagesLength === 0 && !loadingMessages;
-  const [modesShown, setModesShown] = useState(true);
+  // Auto-hide modes/templates bar once the user sends a first message. They can
+  // bring it back via the toggle on the composer.
+  const [userToggled, setUserToggled] = useState(false);
+  const [modesShown, setModesShownState] = useState(true);
+  const setModesShown = (v: boolean | ((prev: boolean) => boolean)) => {
+    setUserToggled(true);
+    setModesShownState(v);
+  };
+  const effectiveModesShown = userToggled ? modesShown : isEmpty;
+
 
   return (
     <div
@@ -89,12 +98,12 @@ export function ChatComposerSection(props: ChatComposerSectionProps) {
               />
             )}
 
-            <ComposerMobileModeBar {...(composerMobileModeBarProps as any)} forceHidden={!modesShown} />
+            <ComposerMobileModeBar {...(composerMobileModeBarProps as any)} forceHidden={!effectiveModesShown} />
 
             <ComposerAnimatedInput
               {...(composerAnimatedInputProps as any)}
               modesToggleVisible
-              modesShown={modesShown}
+              modesShown={effectiveModesShown}
               onToggleModes={() => setModesShown((v) => !v)}
             />
           </div>
@@ -105,6 +114,7 @@ export function ChatComposerSection(props: ChatComposerSectionProps) {
 
           <div
             className={`${messagesLength === 0 ? "hidden md:flex" : "hidden"} flex-wrap items-center justify-center gap-1.5 mt-2 px-1`}
+
           >
             <DesktopModeChips {...(desktopModeChipsProps as any)} />
           </div>
