@@ -151,7 +151,7 @@ const STATIC_GROUPS: DocGroup[] = [
       {
         id: "overview",
         title: "What is Megsy AI?",
-        icon: Sparkles,
+        icon: MegsyStar,
         accent: ACTION,
         intro:
           "Megsy AI is an all-in-one creative & productivity platform powered by a single shared credit balance called Megsy Credits (MC). One subscription unlocks chat, images, video, websites, code, slides, docs, deep research, voice, music, learning, autonomous agents and 1,000+ integrations — no tool-hopping, no extra logins.",
