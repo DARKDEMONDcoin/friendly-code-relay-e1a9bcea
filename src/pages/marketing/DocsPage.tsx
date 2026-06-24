@@ -2890,39 +2890,36 @@ export default function DocsPage() {
                         aria-label="Section navigation"
                       >
                         {prev ? (
-                          <a
-                            href={`#${prev.section.id}`}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              document.getElementById(prev.section.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-                            }}
+                          <Link
+                            to={`/docs/${prev.group.id}/${prev.section.id}`}
                             className="flex items-center gap-3 p-4 rounded-2xl transition hover:translate-x-[-2px]"
                             style={{ border: `1.5px solid hsl(var(--surface-4))`, backgroundColor: "hsl(var(--surface-2))" }}
                           >
                             <ChevronLeft className="w-4 h-4 opacity-60 shrink-0" />
                             <div className="min-w-0">
-                              <div className="text-[11px] font-black uppercase tracking-widest opacity-60">Previous</div>
+                              <div className="text-[11px] font-black uppercase tracking-widest opacity-60">
+                                Previous{prev.group.id !== group.id ? ` · ${prev.group.label}` : ""}
+                              </div>
                               <div className="text-[14px] font-bold truncate">{prev.section.title}</div>
                             </div>
-                          </a>
+                          </Link>
                         ) : <span />}
                         {next ? (
-                          <a
-                            href={`#${next.section.id}`}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              document.getElementById(next.section.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-                            }}
+                          <Link
+                            to={`/docs/${next.group.id}/${next.section.id}`}
                             className="flex items-center gap-3 p-4 rounded-2xl transition text-right hover:translate-x-[2px] justify-end"
                             style={{ border: `1.5px solid hsl(var(--surface-4))`, backgroundColor: "hsl(var(--surface-2))" }}
                           >
                             <div className="min-w-0">
-                              <div className="text-[11px] font-black uppercase tracking-widest opacity-60">Next</div>
+                              <div className="text-[11px] font-black uppercase tracking-widest opacity-60">
+                                Next{next.group.id !== group.id ? ` · ${next.group.label}` : ""}
+                              </div>
                               <div className="text-[14px] font-bold truncate">{next.section.title}</div>
                             </div>
                             <ChevronRight className="w-4 h-4 opacity-60 shrink-0" />
-                          </a>
+                          </Link>
                         ) : <span />}
+
                       </nav>
                     )}
                   </article>
