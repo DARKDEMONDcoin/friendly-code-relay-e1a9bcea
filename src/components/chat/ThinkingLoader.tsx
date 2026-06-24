@@ -40,7 +40,7 @@ const ThinkingLoader = ({ searchStatus }: ThinkingLoaderProps) => {
       <div className="flex items-center gap-2 py-1" aria-live="polite">
         <MegsyStar size={16} />
         <span className="ai-shimmer text-[13px] font-medium motion-reduce:animate-none">
-          {ar ? "يفكر…" : "Thinking…"}
+          {"Thinking…"}
         </span>
       </div>
     );
@@ -51,7 +51,7 @@ const ThinkingLoader = ({ searchStatus }: ThinkingLoaderProps) => {
       <MegsyStar size={16} />
       <Brain className="w-4 h-4 text-foreground/80 animate-pulse" />
       <span className="ai-shimmer text-[13px] font-medium motion-reduce:animate-none">
-        {ar ? "يفكر بعمق…" : "Thinking deeply…"}
+        {"Thinking deeply…"}
       </span>
     </div>
   );
