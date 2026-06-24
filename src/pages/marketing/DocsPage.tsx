@@ -3490,7 +3490,7 @@ export default function DocsPage() {
                       opacity: isCurrentGroup ? 1 : 0.55,
                     }}
                   >
-                    {group.label}
+                    {tGroupLabel(group)}
                   </Link>
                   <ul className="space-y-0.5">
                     {group.sections.map((s) => {
