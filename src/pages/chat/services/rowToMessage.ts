@@ -68,5 +68,7 @@ export function rowToMessage(
     mediaResults: hasMedia ? meta.mediaResults : undefined,
     mediaFinalVideoUrl: hasMedia ? meta.mediaFinalVideoUrl : undefined,
     mediaMergeStatus: hasMedia ? meta.mediaMergeStatus : undefined,
+    // Restore website build card.
+    siteBuild: meta.siteBuild || (meta.kind === "siteBuild" && meta.siteId ? { siteId: meta.siteId } : undefined),
   } as Message;
 }
