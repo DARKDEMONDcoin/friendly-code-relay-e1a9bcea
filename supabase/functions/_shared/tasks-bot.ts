@@ -208,6 +208,7 @@ function mainMenu(): IKBtn[][] {
     [{ text: "🎯 المهام", callback_data: "m:tasks" }, { text: "🤖 الوكلاء", callback_data: "m:agents" }],
     [{ text: "📋 الاقتراحات", callback_data: "m:proposals" }, { text: "🚨 الحوادث", callback_data: "m:incidents" }],
     [{ text: "🔑 مفاتيح API", callback_data: "m:keys" }, { text: "✍️ مدونة جديدة", callback_data: "m:blog_new" }],
+    [{ text: "🎁 منح Pro لمؤثر (شهر)", callback_data: "m:grant_pro" }],
     [{ text: "❓ المساعدة الكاملة", callback_data: "m:help" }],
   ];
 }
@@ -270,6 +271,7 @@ async function setMyCommands() {
     { command: "delkey",     description: "🗑️ حذف مفتاح" },
     { command: "setquota",   description: "⚙️ ضبط حصة موديل" },
     { command: "addadmin",   description: "👤 إضافة مشرف" },
+    { command: "grantpro",   description: "🎁 منح Pro لمؤثر (شهر)" },
     { command: "help",       description: "❓ كل الأوامر" },
   ];
   await fetch(`https://api.telegram.org/bot${TG_TOKEN}/setMyCommands`, {
@@ -1063,6 +1065,30 @@ async function handleCommand(chatId: number, text: string) {
     }
   }
 
+  // Manually grant a 1-month Pro subscription to an influencer by email.
+  // Usage: /grantpro influencer@example.com
+  if (cmd === "/grantpro" || cmd === "/grant_pro" || cmd === "/influencer") {
+    if (!(await isAdmin(chatId))) return tgSend(chatId, "⛔ Not authorized.");
+    const email = args.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return tgSend(chatId, "Usage: <code>/grantpro &lt;email&gt;</code>");
+    }
+    const { data, error } = await supabase.rpc("admin_grant_pro_monthly", { target_email: email });
+    if (error) return tgSend(chatId, "❌ " + error.message);
+    if (data && (data as any).ok) {
+      const periodEnd = new Date((data as any).period_end).toISOString().slice(0, 10);
+      await supabase.from("admin_notifications").insert({
+        type: "influencer_grant",
+        payload: { email, period_end: (data as any).period_end, granted_by: chatId },
+      });
+      return tgSend(
+        chatId,
+        `✅ تم تفعيل <b>Pro</b> للمؤثر <code>${email}</code> لمدة <b>30 يوم</b> (تنتهي <b>${periodEnd}</b>) — بدون تجديد تلقائي.`,
+      );
+    }
+    return tgSend(chatId, `❌ ${(data as any)?.error || "تعذر منح الاشتراك."}`);
+  }
+
   return tgSend(chatId, "Unknown command. /help");
 }
 
@@ -1299,6 +1325,16 @@ export async function handleTasksBotRequest(req: Request): Promise<Response> {
             await setPendingAction(chatId, "add_key", { provider: slug });
             await tgSend(chatId, `📩 ابعت دلوقتي مفتاح <b>${label}</b> في رساله واحده.\nلو عايز تلغي اكتب /cancel`);
           }
+          else if (key === "grant_pro") {
+            await setPendingAction(chatId, "grant_pro", {});
+            await tgSend(
+              chatId,
+              "🎁 <b>منح اشتراك Pro لمؤثر (شهر واحد)</b>\n\n" +
+              "ابعت الإيميل المسجّل بحساب المؤثر دلوقتي في رساله واحده.\n" +
+              "هيتم تفعيل خطة <b>Pro</b> لمدة <b>30 يوم فقط</b> ومش هتتجدد تلقائياً.\n\n" +
+              "لو عايز تلغي اكتب /cancel"
+            );
+          }
           else await tgSend(chatId, "غير معروف.");
         } catch (e) {
           await tgSend(chatId, "❌ " + String(e));
@@ -1337,6 +1373,31 @@ export async function handleTasksBotRequest(req: Request): Promise<Response> {
           const res = await insertProviderKey(chatId, pending.payload.provider, trimmed);
           await clearPendingAction(chatId);
           await tgSend(chatId, res.message);
+        } else if (pending?.action === "grant_pro") {
+          await clearPendingAction(chatId);
+          const email = trimmed.toLowerCase();
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            await tgSend(chatId, "❌ إيميل غير صالح. حاول تاني من زر «🎁 منح Pro لمؤثر».");
+          } else {
+            const { data, error } = await supabase.rpc("admin_grant_pro_monthly", { target_email: email });
+            if (error) {
+              await tgSend(chatId, "❌ فشل المنح: " + error.message);
+            } else if (data && (data as any).ok) {
+              const periodEnd = new Date((data as any).period_end).toISOString().slice(0, 10);
+              await tgSend(
+                chatId,
+                `✅ تم تفعيل <b>Pro</b> للمؤثر <code>${email}</code>\n` +
+                `⏳ المدة: <b>30 يوم</b> (تنتهي تلقائياً يوم <b>${periodEnd}</b>)\n` +
+                `🚫 لن يتم التجديد التلقائي — هذا اشتراك يدوي لمرة واحدة.`,
+              );
+              await supabase.from("admin_notifications").insert({
+                type: "influencer_grant",
+                payload: { email, period_end: (data as any).period_end, granted_by: chatId },
+              });
+            } else {
+              await tgSend(chatId, `❌ ${(data as any)?.error || "تعذر منح الاشتراك."}\nتأكد إن الإيميل ده فعلاً مسجّل بالموقع.`);
+            }
+          }
         } else {
           await handleCommand(chatId, text);
         }
