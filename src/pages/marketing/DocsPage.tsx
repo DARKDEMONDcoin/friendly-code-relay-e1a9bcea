@@ -2629,10 +2629,23 @@ export default function DocsPage() {
     return () => io.disconnect();
   }, [filteredGroups]);
 
-  // Active group derived from active section, used by the right-side mini TOC.
-  const activeGroup = useMemo(() => {
-    return GROUPS.find((g) => g.sections.some((s) => s.id === activeId)) ?? GROUPS[0];
-  }, [activeId]);
+  // When the user is searching, show every matching group; otherwise only
+  // render the current group as its own dedicated page (Stripe-style).
+  const displayedGroups = useMemo(
+    () =>
+      query.trim()
+        ? filteredGroups
+        : filteredGroups.filter((g) => g.id === currentGroup.id),
+    [query, filteredGroups, currentGroup.id],
+  );
+
+  // Index of the current group (for top-level Prev / Next page nav).
+  const currentGroupIdx = GROUPS.findIndex((g) => g.id === currentGroup.id);
+  const prevGroup = currentGroupIdx > 0 ? GROUPS[currentGroupIdx - 1] : null;
+  const nextGroup =
+    currentGroupIdx >= 0 && currentGroupIdx < GROUPS.length - 1
+      ? GROUPS[currentGroupIdx + 1]
+      : null;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: INK, color: PARCHMENT }}>
