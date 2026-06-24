@@ -2459,6 +2459,75 @@ export type Database = {
         }
         Relationships: []
       }
+      i18n_sync_runs: {
+        Row: {
+          entries_scanned: number
+          entries_skipped: number
+          entries_translated: number
+          errors: Json | null
+          finished_at: string | null
+          id: string
+          namespace: string
+          started_at: string
+          trigger: string
+        }
+        Insert: {
+          entries_scanned?: number
+          entries_skipped?: number
+          entries_translated?: number
+          errors?: Json | null
+          finished_at?: string | null
+          id?: string
+          namespace: string
+          started_at?: string
+          trigger?: string
+        }
+        Update: {
+          entries_scanned?: number
+          entries_skipped?: number
+          entries_translated?: number
+          errors?: Json | null
+          finished_at?: string | null
+          id?: string
+          namespace?: string
+          started_at?: string
+          trigger?: string
+        }
+        Relationships: []
+      }
+      i18n_translations: {
+        Row: {
+          created_at: string
+          entry_key: string
+          language: string
+          namespace: string
+          source_hash: string
+          source_value: Json | null
+          translated_value: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          entry_key: string
+          language: string
+          namespace?: string
+          source_hash: string
+          source_value?: Json | null
+          translated_value: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          entry_key?: string
+          language?: string
+          namespace?: string
+          source_hash?: string
+          source_value?: Json | null
+          translated_value?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       image_models: {
         Row: {
           api_version: string
