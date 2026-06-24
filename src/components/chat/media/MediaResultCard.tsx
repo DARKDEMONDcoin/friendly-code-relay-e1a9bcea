@@ -153,16 +153,21 @@ export default function MediaResultCard({
             <div className="p-2 flex items-center justify-between gap-1">
               <span className="text-[11px] font-medium truncate flex-1 min-w-0">{r.title}</span>
               {r.status === "done" && r.url && (
-                <a
-                  href={r.url}
-                  download
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-muted-foreground hover:text-foreground p-1 -m-1 transition-colors"
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-[11px] gap-1"
+                  onClick={() =>
+                    forceDownload(
+                      r.url!,
+                      `${r.title.replace(/[^\w-]+/g, "_") || `scene-${r.index}`}.${r.type === "video" ? "mp4" : "png"}`,
+                    )
+                  }
                   title="Download"
                 >
                   <Download className="w-3.5 h-3.5" />
-                </a>
+                  Download
+                </Button>
               )}
               {r.status === "error" && (
                 <Button
