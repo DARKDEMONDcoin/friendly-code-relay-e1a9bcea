@@ -2657,10 +2657,12 @@ export default function DocsPage() {
           <div className="mt-7 relative max-w-xl">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: INK, opacity: 0.6 }} />
             <input
+              ref={searchInputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search the docs — try ‘install’, ‘credits’, ‘slides’, ‘operator’…"
-              className="w-full h-12 pl-11 pr-4 rounded-2xl outline-none text-[15px] font-semibold"
+              aria-label="Search documentation"
+              className="w-full h-12 pl-11 pr-20 rounded-2xl outline-none text-[15px] font-semibold"
               style={{
                 backgroundColor: "#fff",
                 border: `2px solid ${INK}`,
@@ -2668,6 +2670,13 @@ export default function DocsPage() {
                 color: INK,
               }}
             />
+            <kbd
+              className="hidden sm:inline-flex absolute right-3 top-1/2 -translate-y-1/2 items-center gap-1 px-2 py-1 rounded-md text-[11px] font-black"
+              style={{ backgroundColor: INK, color: PARCHMENT }}
+              aria-hidden
+            >
+              ⌘K
+            </kbd>
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2">
