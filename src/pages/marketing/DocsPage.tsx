@@ -2793,15 +2793,42 @@ export default function DocsPage() {
             </div>
           )}
 
-          {filteredGroups.map((group) => (
+          {/* When NOT searching, show a clear "page header" for the current group
+              so each group reads like its own dedicated docs page. */}
+          {!query.trim() && (
+            <header className="space-y-3">
+              <div
+                className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest"
+                style={{
+                  backgroundColor: PARCHMENT,
+                  color: INK,
+                  border: `1.5px solid ${INK}`,
+                }}
+              >
+                <MegsyStar className="w-3 h-3" /> {currentGroup.label}
+              </div>
+              <h2
+                className="text-3xl md:text-[34px] font-black tracking-tight"
+                style={{ color: PARCHMENT }}
+              >
+                {currentGroup.label}
+              </h2>
+              <p className="text-[15px] opacity-70 max-w-3xl">
+                {currentGroup.sections.length} section{currentGroup.sections.length === 1 ? "" : "s"} · everything you need to know about {currentGroup.label.toLowerCase()} in Megsy AI.
+              </p>
+            </header>
+          )}
+
+          {displayedGroups.map((group) => (
             <section key={group.id} aria-labelledby={`group-${group.id}`} className="space-y-10">
               <h2
                 id={`group-${group.id}`}
-                className="text-[11px] md:text-[12px] font-black uppercase tracking-[0.2em] scroll-mt-28"
+                className={`text-[11px] md:text-[12px] font-black uppercase tracking-[0.2em] scroll-mt-28 ${query.trim() ? "" : "sr-only"}`}
                 style={{ color: PARCHMENT, opacity: 0.55 }}
               >
                 {group.label}
               </h2>
+
 
               {group.sections.map((s) => {
                 const Icon = s.icon;
