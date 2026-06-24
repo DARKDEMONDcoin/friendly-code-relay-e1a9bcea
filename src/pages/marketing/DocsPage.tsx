@@ -80,6 +80,8 @@ import LandingNavbar from "@/components/landing/LandingNavbar";
 import MegsyStar from "@/components/branding/MegsyStar";
 import SEOHead from "@/components/common/SEOHead";
 import { Helmet } from "react-helmet-async";
+import { SITE_LANGS, getSiteLang, langPrefix } from "@/lib/siteLangs";
+import { useI18nTranslations } from "@/hooks/useI18nTranslations";
 
 import pwaIos from "@/assets/docs/pwa-ios.png";
 import pwaAndroid from "@/assets/docs/pwa-android.png";
@@ -3089,10 +3091,19 @@ const SectionFallback = () => (
 );
 
 export default function DocsPage() {
-  const params = useParams<{ groupId?: string; sectionId?: string }>();
+  const params = useParams<{ lang?: string; groupId?: string; sectionId?: string }>();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Resolve the active locale. If the URL contains an unknown :lang segment
+  // we treat it as part of the path (default = English).
+  const activeLang = useMemo(() => {
+    const code = params.lang && getSiteLang(params.lang) ? params.lang! : "en";
+    return code;
+  }, [params.lang]);
+  const langDir = getSiteLang(activeLang)?.dir ?? "ltr";
+  const pathPrefix = langPrefix(activeLang); // "" for en, "/{code}" otherwise
 
   // Resolve the active group from the URL (defaults to the first group).
   const currentGroup = useMemo(
@@ -3102,6 +3113,36 @@ export default function DocsPage() {
   const [activeId, setActiveId] = useState<string>(
     () => params.sectionId || currentGroup.sections[0]?.id || GROUPS[0].sections[0].id,
   );
+
+  // ── Auto-translation (Qwen-Max via DashScope, cached in i18n_translations) ──
+  // We translate the navigation-level strings for ALL groups (so the sidebar &
+  // page header are localized) plus the active group's section titles+intros.
+  // Body blocks remain in English for now (translated lazily as the user
+  // navigates — keeps the first paint fast and cost bounded).
+  const i18nEntries = useMemo(() => {
+    const entries: Array<{ key: string; value: unknown }> = [];
+    for (const g of GROUPS) {
+      entries.push({ key: `docs:group:${g.id}:label`, value: g.label });
+      for (const s of g.sections) {
+        entries.push({ key: `docs:section:${g.id}:${s.id}:title`, value: s.title });
+        if (s.intro) {
+          entries.push({ key: `docs:section:${g.id}:${s.id}:intro`, value: s.intro });
+        }
+      }
+    }
+    return entries;
+  }, []);
+  const { t } = useI18nTranslations({
+    namespace: "docs",
+    language: activeLang,
+    entries: i18nEntries,
+  });
+  const tGroupLabel = (g: { id: string; label: string }) =>
+    t<string>(`docs:group:${g.id}:label`, g.label);
+  const tSectionTitle = (gid: string, s: { id: string; title: string }) =>
+    t<string>(`docs:section:${gid}:${s.id}:title`, s.title);
+  const tSectionIntro = (gid: string, s: { id: string; intro?: string }) =>
+    s.intro ? t<string>(`docs:section:${gid}:${s.id}:intro`, s.intro) : undefined;
 
   // Flat ordered list of every section across every group — used for prev/next.
   const flatSections = useMemo(
@@ -3209,15 +3250,21 @@ export default function DocsPage() {
   // separately and surface rich results in SERP.
   const isDocsRoot = !params.groupId;
   const SITE_URL = "https://megsyai.com";
-  const groupPath = isDocsRoot ? "/docs" : `/docs/${currentGroup.id}`;
+  // Canonical English path (used as x-default + the hreflang="en" alternate).
+  const enPath = isDocsRoot ? "/docs" : `/docs/${currentGroup.id}`;
+  // The current locale's path — also used for canonical of this page.
+  const groupPath = `${pathPrefix}${enPath}`;
+  const localizedGroupLabel = tGroupLabel(currentGroup);
   const groupTitle = isDocsRoot
-    ? "Megsy AI Docs — The Complete Product Guide & PWA Install"
-    : `${currentGroup.label} — Megsy AI Docs`;
+    ? activeLang === "en"
+      ? "Megsy AI Docs — The Complete Product Guide & PWA Install"
+      : `Megsy AI Docs · ${getSiteLang(activeLang)?.nativeName ?? activeLang}`
+    : `${localizedGroupLabel} — Megsy AI Docs`;
   const groupDescription = isDocsRoot
     ? "The complete Megsy AI documentation: every feature, every agent, every setting, every page — explained in full. Plus step-by-step PWA install for iPhone, Android, Mac, Windows and Linux."
-    : `${currentGroup.label} in Megsy AI: ${currentGroup.sections
+    : `${localizedGroupLabel} in Megsy AI: ${currentGroup.sections
         .slice(0, 4)
-        .map((s) => s.title)
+        .map((s) => tSectionTitle(currentGroup.id, s))
         .join(" · ")}${currentGroup.sections.length > 4 ? ` and ${currentGroup.sections.length - 4} more sections` : ""}. Part of the full Megsy AI documentation.`;
 
   const breadcrumbsLd = {
@@ -3225,14 +3272,14 @@ export default function DocsPage() {
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
-      { "@type": "ListItem", position: 2, name: "Docs", item: `${SITE_URL}/docs` },
+      { "@type": "ListItem", position: 2, name: "Docs", item: `${SITE_URL}${pathPrefix}/docs` },
       ...(isDocsRoot
         ? []
         : [
             {
               "@type": "ListItem",
               position: 3,
-              name: currentGroup.label,
+              name: localizedGroupLabel,
               item: `${SITE_URL}${groupPath}`,
             },
           ]),
@@ -3244,14 +3291,14 @@ export default function DocsPage() {
     "@type": "TechArticle",
     headline: groupTitle,
     description: groupDescription,
-    inLanguage: "en",
+    inLanguage: activeLang,
     url: `${SITE_URL}${groupPath}`,
     isPartOf: { "@type": "WebSite", name: "Megsy AI", url: SITE_URL },
     author: { "@type": "Organization", name: "Megsy AI", url: SITE_URL },
     publisher: { "@type": "Organization", name: "Megsy AI", url: SITE_URL },
     hasPart: currentGroup.sections.map((s) => ({
       "@type": "WebPageElement",
-      name: s.title,
+      name: tSectionTitle(currentGroup.id, s),
       url: `${SITE_URL}${groupPath}/${s.id}`,
     })),
   };
@@ -3286,10 +3333,22 @@ export default function DocsPage() {
     <div className="min-h-screen" style={{ backgroundColor: INK, color: PARCHMENT }}>
       <SEOHead title={groupTitle} description={groupDescription} path={groupPath} />
       <Helmet>
-        {/* English-only docs — signal en self + x-default so Google serves this URL
-            to every locale instead of guessing. */}
-        <link rel="alternate" hrefLang="en" href={`${SITE_URL}${groupPath}`} />
-        <link rel="alternate" hrefLang="x-default" href={`${SITE_URL}${groupPath}`} />
+        <html lang={activeLang} dir={langDir} />
+        {/* Full hreflang matrix — one alternate per supported locale, plus
+            x-default pointing at the English version. Tells Google to serve
+            each user the docs in their own language. */}
+        {SITE_LANGS.map((l) => {
+          const prefix = l.code === "en" ? "" : `/${l.code}`;
+          return (
+            <link
+              key={l.code}
+              rel="alternate"
+              hrefLang={l.code}
+              href={`${SITE_URL}${prefix}${enPath}`}
+            />
+          );
+        })}
+        <link rel="alternate" hrefLang="x-default" href={`${SITE_URL}${enPath}`} />
         <script type="application/ld+json">{JSON.stringify(breadcrumbsLd)}</script>
         <script type="application/ld+json">{JSON.stringify(techArticleLd)}</script>
         {faqLd && (
@@ -3396,7 +3455,7 @@ export default function DocsPage() {
               return (
                 <Link
                   key={g.id}
-                  to={`/docs/${g.id}`}
+                  to={`${pathPrefix}/docs/${g.id}`}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-bold transition active:translate-x-[1px] active:translate-y-[1px]"
                   style={{
                     backgroundColor: isCurrent ? INK : "#fff",
@@ -3424,14 +3483,14 @@ export default function DocsPage() {
               return (
                 <div key={group.id}>
                   <Link
-                    to={`/docs/${group.id}`}
+                    to={`${pathPrefix}/docs/${group.id}`}
                     className="block text-[11px] font-black uppercase tracking-widest mb-2 px-2 transition"
                     style={{
                       color: isCurrentGroup ? PARCHMENT : PARCHMENT,
                       opacity: isCurrentGroup ? 1 : 0.55,
                     }}
                   >
-                    {group.label}
+                    {tGroupLabel(group)}
                   </Link>
                   <ul className="space-y-0.5">
                     {group.sections.map((s) => {
@@ -3440,7 +3499,7 @@ export default function DocsPage() {
                       return (
                         <li key={s.id}>
                           <Link
-                            to={`/docs/${group.id}/${s.id}`}
+                            to={`${pathPrefix}/docs/${group.id}/${s.id}`}
                             className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[13.5px] transition"
                             style={
                               active
@@ -3455,7 +3514,7 @@ export default function DocsPage() {
                             }
                           >
                             <Icon className="w-3.5 h-3.5 shrink-0" />
-                            <span className="truncate">{s.title}</span>
+                            <span className="truncate">{tSectionTitle(group.id, s)}</span>
                           </Link>
                         </li>
                       );
@@ -3488,16 +3547,16 @@ export default function DocsPage() {
                   border: `1.5px solid ${INK}`,
                 }}
               >
-                <MegsyStar className="w-3 h-3" /> {currentGroup.label}
+                <MegsyStar className="w-3 h-3" /> {localizedGroupLabel}
               </div>
               <h2
                 className="text-3xl md:text-[34px] font-black tracking-tight"
                 style={{ color: PARCHMENT }}
               >
-                {currentGroup.label}
+                {localizedGroupLabel}
               </h2>
               <p className="text-[15px] opacity-70 max-w-3xl">
-                {currentGroup.sections.length} section{currentGroup.sections.length === 1 ? "" : "s"} · everything you need to know about {currentGroup.label.toLowerCase()} in Megsy AI.
+                {currentGroup.sections.length} section{currentGroup.sections.length === 1 ? "" : "s"} · everything you need to know about {localizedGroupLabel.toLowerCase()} in Megsy AI.
               </p>
             </header>
           )}
@@ -3509,7 +3568,7 @@ export default function DocsPage() {
                 className={`text-[11px] md:text-[12px] font-black uppercase tracking-[0.2em] scroll-mt-28 ${query.trim() ? "" : "sr-only"}`}
                 style={{ color: PARCHMENT, opacity: 0.55 }}
               >
-                {group.label}
+                {tGroupLabel(group)}
               </h2>
 
 
@@ -3546,18 +3605,18 @@ export default function DocsPage() {
                           href={`#${s.id}`}
                           onClick={(e) => {
                             e.preventDefault();
-                            navigate(`/docs/${group.id}/${s.id}`);
+                            navigate(`${pathPrefix}/docs/${group.id}/${s.id}`);
                             history.replaceState(null, "", `#${s.id}`);
                           }}
                           className="hover:underline"
                         >
-                          {s.title}
+                          {tSectionTitle(group.id, s)}
                         </a>
-                        <CopyLinkButton sectionId={s.id} groupId={group.id} />
+                        <CopyLinkButton sectionId={s.id} groupId={group.id} pathPrefix={pathPrefix} />
                       </h3>
                     </div>
                     {s.intro && (
-                      <p className="text-[15px] leading-7 opacity-80 mb-4 max-w-3xl">{s.intro}</p>
+                      <p className="text-[15px] leading-7 opacity-80 mb-4 max-w-3xl">{tSectionIntro(group.id, s)}</p>
                     )}
                     <div className="space-y-4 max-w-3xl">
                       {s.blocks.map((b, i) => (
@@ -3574,7 +3633,7 @@ export default function DocsPage() {
                       >
                         {prev ? (
                           <Link
-                            to={`/docs/${prev.group.id}/${prev.section.id}`}
+                            to={`${pathPrefix}/docs/${prev.group.id}/${prev.section.id}`}
                             className="flex items-center gap-3 p-4 rounded-2xl transition hover:translate-x-[-2px]"
                             style={{ border: `1.5px solid hsl(var(--surface-4))`, backgroundColor: "hsl(var(--surface-2))" }}
                           >
@@ -3589,7 +3648,7 @@ export default function DocsPage() {
                         ) : <span />}
                         {next ? (
                           <Link
-                            to={`/docs/${next.group.id}/${next.section.id}`}
+                            to={`${pathPrefix}/docs/${next.group.id}/${next.section.id}`}
                             className="flex items-center gap-3 p-4 rounded-2xl transition text-right hover:translate-x-[2px] justify-end"
                             style={{ border: `1.5px solid hsl(var(--surface-4))`, backgroundColor: "hsl(var(--surface-2))" }}
                           >
@@ -3619,7 +3678,7 @@ export default function DocsPage() {
             >
               {prevGroup ? (
                 <Link
-                  to={`/docs/${prevGroup.id}`}
+                  to={`${pathPrefix}/docs/${prevGroup.id}`}
                   className="flex items-center gap-3 p-5 rounded-[24px] transition hover:translate-x-[-2px]"
                   style={{
                     backgroundColor: PARCHMENT,
@@ -3637,7 +3696,7 @@ export default function DocsPage() {
               ) : <span />}
               {nextGroup ? (
                 <Link
-                  to={`/docs/${nextGroup.id}`}
+                  to={`${pathPrefix}/docs/${nextGroup.id}`}
                   className="flex items-center gap-3 p-5 rounded-[24px] transition text-right hover:translate-x-[2px] justify-end"
                   style={{
                     backgroundColor: PARCHMENT,
@@ -3847,10 +3906,10 @@ function BlockView({ block, accent }: { block: DocBlock; accent: string }) {
 
 /* ───────────────────────── Helpers ───────────────────────── */
 
-function CopyLinkButton({ sectionId, groupId }: { sectionId: string; groupId: string }) {
+function CopyLinkButton({ sectionId, groupId, pathPrefix = "" }: { sectionId: string; groupId: string; pathPrefix?: string }) {
   const [copied, setCopied] = useState(false);
   const onCopy = async () => {
-    const url = `${window.location.origin}/docs/${groupId}/${sectionId}`;
+    const url = `${window.location.origin}${pathPrefix}/docs/${groupId}/${sectionId}`;
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
