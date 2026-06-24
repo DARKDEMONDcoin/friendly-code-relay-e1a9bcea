@@ -79,25 +79,38 @@ import { getDashscopeKey } from "../_shared/llm-router.ts";
 async function callGateway(system: string, user: string): Promise<PlanResult> {
   const dash = await getDashscopeKey();
   if (!dash) throw new Error("no_alibaba_key: add DASHSCOPE/QWEN key in api_keys");
-  const res = await fetch(dash.url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${dash.key}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "qwen-plus",
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.8,
-    }),
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Gateway ${res.status}: ${text.slice(0, 400)}`);
+  // Try paid-tier model first; fall back through alternates if the key is
+  // limited to free tier or that specific model's free quota is exhausted.
+  const MODELS = ["qwen-plus-latest", "qwen-turbo-latest", "qwen-plus", "qwen-turbo"];
+  let res: Response | null = null;
+  let lastText = "";
+  for (const model of MODELS) {
+    res = await fetch(dash.url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${dash.key}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.8,
+      }),
+    });
+    if (res.ok) break;
+    lastText = await res.text();
+    // Retry only on free-tier exhaustion; otherwise fail fast.
+    if (!/FreeTierOnly|free tier/i.test(lastText)) {
+      throw new Error(`Gateway ${res.status}: ${lastText.slice(0, 400)}`);
+    }
+    console.warn(`[media-plan] ${model} free tier exhausted, trying next…`);
+  }
+  if (!res || !res.ok) {
+    throw new Error(`Gateway ${res?.status ?? 0}: ${lastText.slice(0, 400)}`);
   }
   const data = await res.json();
   const content = data.choices?.[0]?.message?.content ?? "{}";
