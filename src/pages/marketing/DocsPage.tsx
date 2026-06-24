@@ -3547,16 +3547,16 @@ export default function DocsPage() {
                   border: `1.5px solid ${INK}`,
                 }}
               >
-                <MegsyStar className="w-3 h-3" /> {currentGroup.label}
+                <MegsyStar className="w-3 h-3" /> {localizedGroupLabel}
               </div>
               <h2
                 className="text-3xl md:text-[34px] font-black tracking-tight"
                 style={{ color: PARCHMENT }}
               >
-                {currentGroup.label}
+                {localizedGroupLabel}
               </h2>
               <p className="text-[15px] opacity-70 max-w-3xl">
-                {currentGroup.sections.length} section{currentGroup.sections.length === 1 ? "" : "s"} · everything you need to know about {currentGroup.label.toLowerCase()} in Megsy AI.
+                {currentGroup.sections.length} section{currentGroup.sections.length === 1 ? "" : "s"} · everything you need to know about {localizedGroupLabel.toLowerCase()} in Megsy AI.
               </p>
             </header>
           )}
