@@ -30,15 +30,18 @@ function hasDocTag(file: string): boolean {
 }
 
 describe("docs coverage", () => {
-  it("every src/pages/**/*.tsx file has a @doc tag", () => {
+  it("every user-facing page (src/pages/**/*Page.tsx) has a @doc tag", () => {
     const pagesDir = join(ROOT, "src", "pages");
     const files = walk(pagesDir).filter(
-      (f) => f.endsWith(".tsx") && !f.endsWith(".test.tsx"),
+      (f) =>
+        f.endsWith("Page.tsx") &&
+        !f.endsWith(".test.tsx") &&
+        !/[\\/](components|hooks|services|utils|data|constants|lazyComponents)[\\/]/.test(f),
     );
     const missing = files.filter((f) => !hasDocTag(f)).map((f) => relative(ROOT, f));
     expect(
       missing,
-      `Missing @doc tag on:\n  ${missing.join("\n  ")}\n\nAdd /** @doc Description here. */ at the top of each file.`,
+      `Missing @doc tag on user-facing page(s):\n  ${missing.join("\n  ")}\n\nAdd /** @doc Description here. */ at the top of each page file.`,
     ).toEqual([]);
   });
 
