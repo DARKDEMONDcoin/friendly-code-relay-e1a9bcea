@@ -1,99 +1,48 @@
-## الوضع الحالي
-- الموقع يحتوي على **116 صفحة** و **27 Edge Function** و عشرات المكوّنات (شات، وسائط، إعدادات، فوترة، تكاملات…).
-- ملف `DocsPage.tsx` حالياً 2472 سطر ويحتوي محتوى مكتوب يدوياً + استخدام واحد فقط لـ `import.meta.glob` لاكتشاف edge functions.
-- لا يوجد نظام يضمن مزامنة الـ Docs مع الموقع تلقائياً عند أي تغيير.
+## Goal
+Make "Create Website" in chat work end-to-end: real progress, public URL, downloadable files list with code viewer — using the existing `build_website` pipeline.
 
-## الهدف
-1. تغطية كل صفحة وكل ميزة وكل edge function وكل تكامل بشرح واضح ومفصّل.
-2. تنقّل احترافي على مستوى أفضل docs بالعالم (Stripe / Linear / Vercel).
-3. **التحديث التلقائي للأبد**: أي صفحة/ميزة/edge function جديدة أو محذوفة تظهر/تختفي من الـ Docs بدون تدخّل يدوي.
+## What already exists (no rebuild needed)
+- `supabase/functions/_shared/odysseus/build-website.ts` — async builder that plans files, runs Vite build in an E2B sandbox, and uploads the dist to the `published-sites` storage bucket.
+- `generated_sites` table (id, status, progress, tasks jsonb, preview_url, …) with realtime hookup.
+- `chat-alibaba` detects website intent and forces the `build_website` tool call.
 
----
+## What's missing → what this plan ships
 
-## التصميم المقترح (تقني)
+### 1. Database
+Add two columns to `generated_sites`:
+- `files jsonb` — array of `{ path, content }` so the chat can show the source.
+- `published_url text` — final public URL (the `dist/index.html` after upload). Today only `preview_url` exists and it's the same thing, but we'll set this on the row once the upload succeeds so the frontend can flip the UI to "done".
 
-### 1) طبقة اكتشاف تلقائي (Auto-Discovery)
-ملف جديد `src/lib/docs-registry.ts` يستخدم `import.meta.glob` لمسح:
-- `src/pages/**/*.tsx` → كل المسارات الموجودة فعلاً
-- `supabase/functions/*/index.ts` → كل الـ edge functions
-- `src/components/chat/**`, `src/components/media/**` → الميزات الكبرى
-- `src/data/**` → القوالب والإعدادات
+### 2. Backend persistence
+Update `build-website.ts`:
+- After the plan step, write `files` to the row (truncate any single file's content to 200 KB; cap total to ~2 MB).
+- After the storage upload succeeds, write `published_url` and set `status = "done"`, `progress = 100`.
 
-كل ملف يُقرأ خامًا، يُستخرج منه:
-- العنوان (من `<title>` أو `export const meta`)
-- وصف قصير (من تعليق `/** @doc ... */` في أعلى الملف)
-- المسار (path) إن وُجد
+### 3. New assistant card: `SiteBuildCard.tsx`
+- Accepts `siteId`. Subscribes to `generated_sites` realtime updates.
+- Shows: spinner + current task label + progress bar while `status = "building"`.
+- When done: large "🌐 Open website" link, secondary "⬇️ Download ZIP" (built client-side from `files` via JSZip), and a collapsible **Files** panel listing every path; clicking a file opens a code viewer (simple `<pre>` with mono font + line numbers, no heavy syntax highlighter to keep bundle small).
+- If `status = "error"`, shows `error_message` and a "Try again" hint.
 
-### 2) ميتاداتا داخل كل ملف (مصدر الحقيقة الوحيد)
-نضيف في أعلى كل صفحة/مكوّن/edge function بلوك موحّد:
-```ts
-/**
- * @doc-title اسم الميزة بالعربية
- * @doc-category chat | media | billing | integrations | legal | settings
- * @doc-summary جملة واحدة
- * @doc-description شرح مفصّل بأي طول
- */
-```
-هذا يجعل الـ Docs تلقائياً تعكس الحقيقة: لو حذفت ملفاً، يختفي. لو غيّرت العنوان، يتغيّر. لو أضفت ملفاً جديداً وكتبت البلوك، يظهر فوراً.
+### 4. Chat wiring
+- Extend `Message` type with `siteBuild?: { siteId: string }`.
+- In `runChatStreamTurn.ts` (or the central tool-result interceptor in the stream), when a `build_website` tool result arrives, parse `site_id` from the JSON result and attach it to the assistant message + persist into the saved row's metadata.
+- Fallback: if the stream parser misses it, regex-extract the `site_id` from the `preview_url` pattern `/published-sites/<user>/<siteId>/index.html` in the assistant text.
+- `rowToMessage.ts` already handles metadata — add `siteBuild` restore so reloading the chat brings the card back identically to the media card persistence I just shipped.
 
-### 3) إعادة بناء `DocsPage.tsx`
-- شريط جانبي (Sidebar) بالأقسام: Getting Started · Features · Chat · Media · Integrations · API · Edge Functions · Pages · Legal · FAQ.
-- بحث فوري (Cmd+K) فوق كل المحتوى المكتشف.
-- جدول محتويات (TOC) يميني داخل كل قسم.
-- روابط Anchor دائمة لكل عنوان.
-- تنقّل "Previous / Next" أسفل كل صفحة.
-- دعم RTL كامل والثيمين فاتح/داكن.
+### 5. Rendering
+- In `ChatMessageItem.tsx`, if `msg.siteBuild?.siteId`, render `<SiteBuildCard siteId={…} />` instead of (or above) the markdown body.
 
-### 4) محتوى مكتوب يدوياً (Hand-Written) للأقسام الإستراتيجية
-الاكتشاف التلقائي يغطي الفهرس والميتاداتا، لكن نضيف شرحاً عميقاً مكتوباً للأقسام التالية (لأنها لا تُستخرج من الكود):
-- **مقدّمة Megsy**: ما هو، لمن، الفلسفة، نموذج التسعير، الاعتمادات (credits).
-- **البدء السريع**: إنشاء حساب، أول محادثة، أول صورة، أول فيديو، أول شرائح.
-- **الشات**: الأوضاع (modes)، الـ agents، الـ tools، الـ mentions، الـ attachments، parallel agents، deep research.
-- **الوسائط**: قائمة كل provider (Flux, BFL, OpenAI, Gemini, NanoBanana, Ideogram, Recraft, ByteDance, Doubao, Alibaba, Kling, Minimax, Runway, Stability, xAI, Fal) — متى يُستخدم، الفروقات، التكلفة.
-- **المستندات والشرائح**: docs agent، slides agent، التصدير (PDF/PPTX/XLSX).
-- **التكاملات**: كل connector في `connectors`.
-- **الفوترة**: الخطط، الترقية، الاسترداد، نظام الـ credits.
-- **API & Webhooks**: edge functions العامة، التوثيق، التوقيع الأمني.
-- **الخصوصية والقانونية**: روابط لكل صفحة موجودة.
+## Non-goals (skip for now)
+- Editing files in-chat or re-deploying after edits.
+- Custom domain on each generated site.
+- Server-side ZIP packaging (client-side JSZip is enough for a few-MB site).
 
-### 5) ضمان "للأبد بدون تدخّل"
-- الاكتشاف يعمل **وقت التشغيل** عبر `import.meta.glob` (مدمج في Vite) — لا scripts خارجية، لا cron.
-- نضيف `vitest` بسيط: `docs-registry.test.ts` يفشل البناء لو ملف صفحة بدون `@doc-title` → يجبر أي مساهم مستقبلاً على توثيق ميزته.
-- نضيف ESLint rule (أو تعليق في `AGENTS.md`) يُذكّر الـ AI agent أن أي ملف جديد في `src/pages/**` يحتاج بلوك التوثيق.
+## Technical details
+- Realtime: standard `supabase.channel('site:'+id).on('postgres_changes', { table:'generated_sites', filter:'id=eq.'+id }).subscribe()` inside `useEffect` with cleanup.
+- ZIP: `bun add jszip` (small, ~30 KB gz).
+- The `files` column write happens via the service role inside the edge function, so no new RLS needed; reads use existing user-owned `SELECT` policy on `generated_sites`.
 
----
-
-## مراحل التنفيذ
-
-**المرحلة 1 — البنية التحتية (ملف واحد)**
-- إنشاء `src/lib/docs-registry.ts` مع منطق الاكتشاف.
-- إنشاء `src/components/docs/` مع: `DocsLayout`, `DocsSidebar`, `DocsSearch`, `DocsTOC`, `DocsPager`, `DocsContent`.
-
-**المرحلة 2 — ميتاداتا الملفات**
-- إضافة بلوك `@doc-*` لكل ملف في `src/pages/**` (116 ملف) و `supabase/functions/**` (27 ملف).
-- البلوك قصير لمعظم الملفات، مفصّل للميزات الكبرى.
-
-**المرحلة 3 — إعادة كتابة `DocsPage.tsx`**
-- استبدال الـ 2472 سطر بهيكل قائم على الـ registry + المحتوى اليدوي العميق.
-- 10–15 قسم رئيسي، كل قسم له صفحة فرعية في URL (`/docs/getting-started`, `/docs/chat/modes`, …).
-
-**المرحلة 4 — اختبار**
-- جولة على كل صفحة Docs، التحقق من الروابط والـ anchors والبحث.
-- اختبار إضافة ملف وهمي والتحقق من ظهوره تلقائياً.
-- اختبار حذف ملف والتحقق من اختفائه.
-
-**المرحلة 5 — توثيق المساهمة**
-- تحديث `AGENTS.md` بقاعدة: "أي ملف جديد في `src/pages/**` أو `supabase/functions/**` يجب أن يبدأ ببلوك `@doc-*`".
-
----
-
-## حجم العمل المتوقّع
-- ملفات جديدة: ~8
-- ملفات معدّلة: ~150 (إضافة بلوك توثيق قصير)
-- ملف معاد كتابته بالكامل: 1 (`DocsPage.tsx`)
-- وقت: عملية كبيرة على عدة جولات
-
-## أسئلة قبل البدء
-1. **هل تريد الـ Docs على مسار واحد `/docs` بتبويبات، أم مسارات متعدّدة `/docs/chat`, `/docs/media`…؟** الثاني أفضل لـ SEO والمشاركة.
-2. **اللغة الأساسية للمحتوى المكتوب: عربي فقط، إنجليزي فقط، أم ثنائي؟**
-3. **هل أبدأ المرحلة 1+3 (البنية + إعادة كتابة الصفحة) أولاً وأترك إضافة بلوكات التوثيق للملفات على جولات تالية؟** هذا يعطيك نتيجة مرئية بسرعة.
+## Verify before shipping
+- Trigger "ابني لي موقع landing لمطعم" → see card appear → progress ticks → final URL opens a real site → files list shows ~15-30 files → clicking `App.tsx` shows the JSX source → ZIP downloads and unzips cleanly.
+- Refresh the chat tab → card returns with the same state.
