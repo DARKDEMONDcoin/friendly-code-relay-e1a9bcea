@@ -19,6 +19,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCredits } from "@/hooks/useCredits";
 import { toast } from "sonner";
 import { buildSupportSystemPrompt } from "@/data/supportKnowledge";
+import {
+  INK, SURFACE, BORDER, TEXT, MUTED, PAGE_BG, YELLOW, MINT,
+} from "@/pages/billing/ReferralsPage";
+import { PEACH, LAVENDER, PINK } from "@/pages/billing/ReferralsPage";
+import supportSticker from "@/assets/settings/support-sticker.png";
 
 const SUPPORT_VERSION = "v6";
 const STORAGE_KEY = `megsy_support_chat_${SUPPORT_VERSION}`;
