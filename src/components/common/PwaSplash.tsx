@@ -21,13 +21,14 @@ export default function PwaSplash() {
 
   useEffect(() => {
     if (!show) return;
-    const fadeT = window.setTimeout(() => setFading(true), 1200);
-    const hideT = window.setTimeout(() => setShow(false), 1700);
+    const fadeT = window.setTimeout(() => setFading(true), 2000);
+    const hideT = window.setTimeout(() => setShow(false), 2500);
     return () => {
       window.clearTimeout(fadeT);
       window.clearTimeout(hideT);
     };
   }, [show]);
+
 
   if (!show) return null;
 
