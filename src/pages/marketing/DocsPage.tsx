@@ -1978,7 +1978,207 @@ const STATIC_GROUPS: DocGroup[] = [
       },
     ],
   },
+
+  /* ─────────────── Power workflows & creative recipes ─────────────── */
+  {
+    id: "power-recipes",
+    label: "Power workflows & creative recipes",
+    sections: [
+      {
+        id: "keyboard-shortcuts",
+        title: "Every keyboard shortcut",
+        icon: MegsyStar as unknown as LucideIcon,
+        accent: ACTION,
+        intro:
+          "Megsy is built so a power user never needs the mouse. Every shortcut works on macOS (⌘) and Windows/Linux (Ctrl).",
+        blocks: [
+          { kind: "h", text: "Global" },
+          { kind: "kv", rows: [
+            { k: "⌘ / Ctrl + K", v: "Open the command palette — jump to any conversation, page, model or setting." },
+            { k: "⌘ / Ctrl + /", v: "Toggle the sidebar." },
+            { k: "⌘ / Ctrl + Shift + L", v: "Switch light / dark theme." },
+            { k: "⌘ / Ctrl + ,", v: "Open Settings." },
+            { k: "G then H", v: "Go home (landing / chat depending on auth)." },
+            { k: "?", v: "Show this shortcut cheat-sheet from any page." },
+          ]},
+          { kind: "h", text: "Inside a conversation" },
+          { kind: "kv", rows: [
+            { k: "Enter", v: "Send the message." },
+            { k: "Shift + Enter", v: "New line inside the composer." },
+            { k: "↑ (in empty composer)", v: "Edit your last message." },
+            { k: "⌘ / Ctrl + Enter", v: "Send and force-cancel the previous streaming reply." },
+            { k: "Esc", v: "Cancel the current streaming reply." },
+            { k: "⌘ / Ctrl + U", v: "Upload a file." },
+            { k: "⌘ / Ctrl + Shift + M", v: "Open the model picker." },
+            { k: "@", v: "Mention an integration, skill or workspace member." },
+            { k: "/", v: "Insert a slash command (mode switch, template, skill)." },
+            { k: "⌘ / Ctrl + B / I / E", v: "Bold / italic / inline-code on selected text." },
+          ]},
+        ],
+      },
+      {
+        id: "command-palette",
+        title: "The command palette (⌘K)",
+        icon: MegsyStar as unknown as LucideIcon,
+        accent: MINT,
+        intro:
+          "The command palette is the fastest way to navigate Megsy. It searches across every conversation, every page, every model, every setting, every integration and every doc section in real time.",
+        blocks: [
+          { kind: "h", text: "What you can do from ⌘K" },
+          { kind: "ul", items: [
+            "Jump to any conversation by title, content snippet or member name.",
+            "Open any page in the app (Settings, Billing, Integrations, Docs, etc.).",
+            "Switch the active model without leaving the keyboard.",
+            "Run a skill or trigger a saved automation.",
+            "Search this entire documentation — results are highlighted with the matching snippet.",
+            "Toggle theme, language or any boolean setting.",
+          ]},
+          { kind: "note", text: "The palette respects recency — your most-used commands float to the top automatically." },
+        ],
+      },
+      {
+        id: "share-and-export",
+        title: "Sharing & exporting your work",
+        icon: MegsyStar as unknown as LucideIcon,
+        accent: BLUSH,
+        intro:
+          "Anything you create in Megsy can be shared with a link or exported to a real file. We never lock you into proprietary formats — your data is yours.",
+        blocks: [
+          { kind: "h", text: "Shareable links" },
+          { kind: "ul", items: [
+            "Chats → public read-only URL with optional password and expiry.",
+            "Documents → live preview link that updates as you edit.",
+            "Slide decks → presentation URL with speaker-notes view (?notes=1).",
+            "Research reports → article-style page with table of contents and citations.",
+            "Operator runs → audit-trail page showing every step the agent took.",
+            "Workspaces → invite links scoped to a single role (viewer / editor / admin).",
+          ]},
+          { kind: "h", text: "Export formats" },
+          { kind: "kv", rows: [
+            { k: "Slides", v: "PPTX (real PowerPoint, themes preserved), PDF, and PNG per slide." },
+            { k: "Documents", v: "PDF, DOCX, Markdown and HTML." },
+            { k: "Spreadsheets", v: "XLSX (formulas preserved) and CSV." },
+            { k: "Chats", v: "Markdown transcript or JSON (for programmatic processing)." },
+            { k: "Images", v: "Original WebP/PNG/JPEG + downloadable in any of the three." },
+            { k: "Videos", v: "MP4 (H.264) and WebM (VP9)." },
+            { k: "Research", v: "PDF (article layout) or Markdown with inline citation links." },
+          ]},
+        ],
+      },
+      {
+        id: "notifications-deep",
+        title: "Notifications — where, when, how",
+        icon: MegsyStar as unknown as LucideIcon,
+        accent: ACTION,
+        intro:
+          "Megsy can reach you in three places: in-app, by email, and by push (if you installed the PWA and granted permission). Every category is independently toggleable in Settings → Notifications.",
+        blocks: [
+          { kind: "h", text: "Categories" },
+          { kind: "ul", items: [
+            "Long jobs (research, video, slides) finishing — high signal, on by default.",
+            "Workspace invites and role changes — on by default.",
+            "Mentions in shared conversations — on by default.",
+            "Credit balance warnings (50%, 10%, exhausted) — on by default.",
+            "Operator run results (Megsy OS) — on by default.",
+            "Referral rewards and withdrawals — on by default.",
+            "Product updates and tips — off by default; opt in if you want them.",
+          ]},
+          { kind: "h", text: "Quiet hours" },
+          { kind: "p", text: "Set a do-not-disturb window per timezone. Email and push are queued until your quiet hours end; in-app notifications still show but never make a sound." },
+          { kind: "link", href: "/settings/notifications", label: "Open notification settings →" },
+        ],
+      },
+      {
+        id: "credits-math",
+        title: "How Megsy Credits (MC) actually work",
+        icon: MegsyStar as unknown as LucideIcon,
+        accent: MINT,
+        intro:
+          "Every Megsy plan grants a monthly bucket of Megsy Credits (MC). Different actions cost different amounts — there are no hidden surcharges, and your remaining balance is shown on every relevant button before you commit.",
+        blocks: [
+          { kind: "h", text: "Cost guide (approximate)" },
+          { kind: "kv", rows: [
+            { k: "Chat turn (Megsy Lite)", v: "Free on every paid plan — unlimited." },
+            { k: "Chat turn (Megsy AI / Max)", v: "1–5 MC depending on output length and tool usage." },
+            { k: "Frontier model turn (GPT-5, Claude Opus, Gemini Ultra…)", v: "10–30 MC per turn." },
+            { k: "Image (standard)", v: "5–15 MC per image." },
+            { k: "Image (premium: Flux Pro, Recraft v3, Ideogram v3…)", v: "20–50 MC per image." },
+            { k: "Video (5s, standard)", v: "30–80 MC." },
+            { k: "Video (10s, premium: Kling 2.0, Veo 3, Sora…)", v: "150–400 MC." },
+            { k: "Deep research run", v: "50–200 MC depending on depth." },
+            { k: "Slide deck (10 slides)", v: "30–80 MC including images." },
+            { k: "Long document (5k words)", v: "20–60 MC." },
+            { k: "Operator autonomous run", v: "Variable — billed per browser-minute and tool call, capped per run." },
+          ]},
+          { kind: "note", text: "Exact costs are always shown live next to every generate button — what you see is what you pay. Free tier and yearly plans get bonus MC." },
+          { kind: "link", href: "/pricing", label: "Compare plans and credit allowances →" },
+        ],
+      },
+      {
+        id: "creative-recipes",
+        title: "Creative recipes — what Megsy users actually do",
+        icon: MegsyStar as unknown as LucideIcon,
+        accent: BLUSH,
+        intro:
+          "Quick, opinionated workflows that show what's possible when you combine modes. Each recipe takes under 5 minutes.",
+        blocks: [
+          { kind: "h", text: "Recipe 1 — Brand kit in one chat" },
+          { kind: "ol", items: [
+            "Describe your brand in plain language (audience, vibe, three competitor names).",
+            "Ask Megsy to generate a logo (uses Recraft/Ideogram for vector quality).",
+            "In the same chat: 'Now make a colour palette and a Google Fonts pairing that match.'",
+            "Then: 'Render a hero image and three social posts using the palette.'",
+            "Export — every asset downloads with your brand name as filename prefix.",
+          ]},
+          { kind: "h", text: "Recipe 2 — Research → slides → PDF" },
+          { kind: "ol", items: [
+            "Switch to Research mode, type your topic, choose depth 'Standard'.",
+            "When the report finishes, click 'Turn into slides' — Megsy converts the outline.",
+            "Pick a template, hit Generate, then Export → PPTX or PDF.",
+            "Total time: ~7 minutes for a 12-slide investor-grade brief." ,
+          ]},
+          { kind: "h", text: "Recipe 3 — Long video from a single prompt" },
+          { kind: "ol", items: [
+            "Switch to Video → Cinema mode.",
+            "Describe the full 30-second story in one paragraph; Megsy auto-splits into shots.",
+            "Pick your video model and aspect ratio; Megsy plans, dispatches, polls and merges into a single MP4 via ffmpeg.wasm.",
+            "Add a music track from the Music agent or upload your own; download the final cut." ,
+          ]},
+          { kind: "h", text: "Recipe 4 — Always-on Operator" },
+          { kind: "ol", items: [
+            "Open Megsy OS, click 'New run', describe the goal: 'Every morning at 8am, summarise my Notion inbox and email me the top 5 action items.'",
+            "Connect Notion and Gmail when prompted; pick the schedule.",
+            "Done — the agent runs autonomously, with a full audit log in Settings → Operator audit.",
+          ]},
+        ],
+      },
+      {
+        id: "tips-and-tricks",
+        title: "Tips, easter eggs & power moves",
+        icon: MegsyStar as unknown as LucideIcon,
+        accent: ACTION,
+        intro:
+          "Small touches Megsy users discover over time. Not strictly necessary — but they make the experience faster, friendlier and a little more fun.",
+        blocks: [
+          { kind: "ul", items: [
+            "Type `/clear` in any conversation to start fresh without losing the title.",
+            "Drag an image directly from another browser tab into the composer — no save-to-disk needed.",
+            "Paste a URL → Megsy auto-fetches the page and shows a preview card you can attach.",
+            "Paste a YouTube URL → Megsy extracts the transcript and lets you ask questions about it.",
+            "Triple-click any AI reply to copy the entire message (works on desktop and mobile long-press).",
+            "Add `?reduce_motion=1` to any URL to disable animations even if your OS setting says otherwise.",
+            "Add `?theme=dark` (or `light`) to any URL to override your theme for this session only.",
+            "Tap the Megsy logo 7 times in the sidebar — there's a tiny surprise.",
+            "Hold ⌥ / Alt while clicking a model badge to pin it to your favourites bar.",
+            "Right-click any conversation in the sidebar for advanced actions (export, fork, rename, archive, delete).",
+          ]},
+          { kind: "note", text: "We keep adding these — check back monthly or watch the blog for 'Megsy Tips' posts." },
+        ],
+      },
+    ],
+  },
 ];
+
 
 
 
