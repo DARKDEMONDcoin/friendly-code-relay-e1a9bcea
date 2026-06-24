@@ -889,6 +889,17 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
           );
         }
         if (aId) ownInsertedIdsRef.current.add(aId);
+        const siteIdB = detectSiteBuildId(contentToSave);
+        if (siteIdB && aId) {
+          void updateMessageMetadata(aId, { siteBuild: { siteId: siteIdB }, kind: "siteBuild" });
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === aId || m.clientId === `assistant-${localTurnId}`
+                ? { ...m, siteBuild: { siteId: siteIdB } }
+                : m,
+            ),
+          );
+        }
         if (isDeepResearch && chatUserId) {
           await supabase.from("research_reports").upsert(
             {
