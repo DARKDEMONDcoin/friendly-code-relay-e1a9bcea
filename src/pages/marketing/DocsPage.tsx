@@ -3514,7 +3514,7 @@ export default function DocsPage() {
                             }
                           >
                             <Icon className="w-3.5 h-3.5 shrink-0" />
-                            <span className="truncate">{s.title}</span>
+                            <span className="truncate">{tSectionTitle(group.id, s)}</span>
                           </Link>
                         </li>
                       );
