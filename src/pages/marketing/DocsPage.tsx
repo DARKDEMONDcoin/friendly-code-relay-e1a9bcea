@@ -2928,6 +2928,53 @@ export default function DocsPage() {
             </section>
           ))}
 
+          {/* Page-level prev / next group (Stripe-style). */}
+          {!query.trim() && (prevGroup || nextGroup) && (
+            <nav
+              className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+              aria-label="Page navigation"
+            >
+              {prevGroup ? (
+                <Link
+                  to={`/docs/${prevGroup.id}`}
+                  className="flex items-center gap-3 p-5 rounded-[24px] transition hover:translate-x-[-2px]"
+                  style={{
+                    backgroundColor: PARCHMENT,
+                    color: INK,
+                    border: `2px solid ${INK}`,
+                    boxShadow: `4px 4px 0 ${INK}`,
+                  }}
+                >
+                  <ChevronLeft className="w-5 h-5 shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-black uppercase tracking-widest opacity-70">Previous page</div>
+                    <div className="text-[16px] font-black truncate">{prevGroup.label}</div>
+                  </div>
+                </Link>
+              ) : <span />}
+              {nextGroup ? (
+                <Link
+                  to={`/docs/${nextGroup.id}`}
+                  className="flex items-center gap-3 p-5 rounded-[24px] transition text-right hover:translate-x-[2px] justify-end"
+                  style={{
+                    backgroundColor: PARCHMENT,
+                    color: INK,
+                    border: `2px solid ${INK}`,
+                    boxShadow: `4px 4px 0 ${INK}`,
+                  }}
+                >
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-black uppercase tracking-widest opacity-70">Next page</div>
+                    <div className="text-[16px] font-black truncate">{nextGroup.label}</div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 shrink-0" />
+                </Link>
+              ) : <span />}
+            </nav>
+          )}
+
+
+
           {/* Closing CTA */}
           <section
             className="mt-10 rounded-[28px] p-8 md:p-12"
