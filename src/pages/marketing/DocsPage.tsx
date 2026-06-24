@@ -69,6 +69,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import LandingNavbar from "@/components/landing/LandingNavbar";
+import MegsyStar from "@/components/branding/MegsyStar";
 import SEOHead from "@/components/common/SEOHead";
 
 import pwaIos from "@/assets/docs/pwa-ios.png";
