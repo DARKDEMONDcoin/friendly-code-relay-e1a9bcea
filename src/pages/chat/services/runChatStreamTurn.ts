@@ -718,6 +718,7 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
         if (siteIdA && aId) {
           void updateMessageMetadata(aId, { siteBuild: { siteId: siteIdA }, kind: "siteBuild" });
         }
+        if (isDeepResearch) {
           const user = await getCachedUser();
           if (user) {
             await supabase.from("research_reports").upsert(
