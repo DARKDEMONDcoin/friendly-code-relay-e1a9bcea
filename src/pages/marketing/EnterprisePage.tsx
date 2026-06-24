@@ -310,8 +310,39 @@ const EnterprisePage = () => {
         </div>
       </section>
 
-      {/* Contact Form */}
-      <section className="py-16 md:py-24 border-t border-border/50">
+      {/* YEARLY / CONTRACT BAND */}
+      <section className="border-t border-border/30 py-16 md:py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background p-8 md:p-12"
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">Annual & multi-year</p>
+            <h2 className="mt-3 font-display text-3xl uppercase leading-tight md:text-5xl">
+              Lock pricing. <span className="text-primary">Save up to 30%.</span>
+            </h2>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
+              Every paid plan can be billed yearly (2 months free + bonus MC upfront). Enterprise contracts add custom MC pools, NET-30 invoicing, POs, multi-year price locks and volume discounts that scale with your team.
+            </p>
+            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              {[
+                { k: "Pro / Elite / Business yearly", v: "≈17% off + 480 / 1,000 / 2,400 bonus MC upfront. Self-serve from /pricing." },
+                { k: "Enterprise annual contract", v: "Custom MC volume, single invoice, NET-30, PO support, tax-compliant globally." },
+                { k: "Multi-year contracts", v: "Lock today's per-MC price for 2–3 years with additional volume discount." },
+              ].map((row) => (
+                <div key={row.k} className="rounded-2xl border border-border/30 bg-background/40 p-5">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-primary">{row.k}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{row.v}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+
         <div className="mx-auto max-w-2xl px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
