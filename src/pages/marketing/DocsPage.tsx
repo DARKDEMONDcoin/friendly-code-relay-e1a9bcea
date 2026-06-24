@@ -3188,6 +3188,20 @@ export default function DocsPage() {
     })).filter((g) => g.sections.length > 0);
   }, [query]);
 
+  // Flat list of matched sections (for the live dropdown + result count).
+  const matchedFlat = useMemo(() => {
+    if (!query.trim()) return [] as Array<{ groupId: string; groupLabel: string; sectionId: string; sectionTitle: string }>;
+    const out: Array<{ groupId: string; groupLabel: string; sectionId: string; sectionTitle: string }> = [];
+    for (const g of filteredGroups) {
+      for (const s of g.sections) {
+        out.push({ groupId: g.id, groupLabel: g.label, sectionId: s.id, sectionTitle: s.title });
+      }
+    }
+    return out;
+  }, [filteredGroups, query]);
+  const matchCount = matchedFlat.length;
+  const [searchFocused, setSearchFocused] = useState(false);
+
   // ⌘K / Ctrl+K — focus search from anywhere.
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
