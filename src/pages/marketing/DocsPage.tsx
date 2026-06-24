@@ -80,6 +80,8 @@ import LandingNavbar from "@/components/landing/LandingNavbar";
 import MegsyStar from "@/components/branding/MegsyStar";
 import SEOHead from "@/components/common/SEOHead";
 import { Helmet } from "react-helmet-async";
+import { SITE_LANGS, getSiteLang, langPrefix } from "@/lib/siteLangs";
+import { useI18nTranslations } from "@/hooks/useI18nTranslations";
 
 import pwaIos from "@/assets/docs/pwa-ios.png";
 import pwaAndroid from "@/assets/docs/pwa-android.png";
