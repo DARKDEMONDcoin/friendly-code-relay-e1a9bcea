@@ -2501,6 +2501,18 @@ function buildAutoGroups(): DocGroup[] {
         },
       ],
     },
+    {
+      id: "live-changelog",
+      label: "Changelog (auto-sync)",
+      sections: CHANGELOG.map((entry, i) => ({
+        id: `changelog-${entry.date}-${i}`,
+        title: `${entry.date} · ${entry.title}`,
+        icon: entry.tag === "fixed" ? Wrench : entry.tag === "security" ? ShieldAlert : entry.tag === "improved" ? RefreshCw : PlusCircle,
+        accent: entry.tag === "fixed" ? BLUSH : entry.tag === "security" ? ACTION : entry.tag === "improved" ? MINT : ACTION,
+        intro: entry.tag ? `Tag: ${entry.tag.toUpperCase()}` : undefined,
+        blocks: [{ kind: "ul" as const, items: entry.bullets }],
+      })),
+    },
   ];
 }
 
