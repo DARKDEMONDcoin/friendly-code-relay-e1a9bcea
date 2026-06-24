@@ -422,7 +422,7 @@ const ResearchPreviewPage = () => {
                 goBackOr(navigate, "/chat");
               }
             }}
-            className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/20 text-foreground shadow-[0_4px_16px_rgba(0,0,0,0.08)] backdrop-blur-xl transition hover:bg-white/30 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/20"
+            className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/90 text-foreground shadow-lg ring-1 ring-black/5 backdrop-blur-xl transition hover:bg-background dark:border-white/15 dark:bg-background/80 dark:hover:bg-background/95"
             aria-label="Back to conversation"
           >
             <ArrowLeft className={`h-[18px] w-[18px] ${isRtl ? "rotate-180" : ""}`} />
@@ -432,7 +432,7 @@ const ResearchPreviewPage = () => {
             <Sheet open={tocOpen} onOpenChange={setTocOpen}>
               <SheetTrigger asChild>
                 <button
-                  className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/20 text-foreground shadow-[0_4px_16px_rgba(0,0,0,0.08)] backdrop-blur-xl transition hover:bg-white/30 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/20"
+                  className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/90 text-foreground shadow-lg ring-1 ring-black/5 backdrop-blur-xl transition hover:bg-background dark:border-white/15 dark:bg-background/80 dark:hover:bg-background/95"
                   aria-label={"Contents"}
                 >
                   <List className="h-[18px] w-[18px]" />
@@ -480,7 +480,7 @@ const ResearchPreviewPage = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/20 text-foreground shadow-[0_4px_16px_rgba(0,0,0,0.08)] backdrop-blur-xl transition hover:bg-white/30 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/20"
+                className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/90 text-foreground shadow-lg ring-1 ring-black/5 backdrop-blur-xl transition hover:bg-background dark:border-white/15 dark:bg-background/80 dark:hover:bg-background/95"
                 aria-label={"Options"}
               >
                 <MoreHorizontal className="h-[18px] w-[18px]" />
