@@ -69,6 +69,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import LandingNavbar from "@/components/landing/LandingNavbar";
+import MegsyStar from "@/components/branding/MegsyStar";
 import SEOHead from "@/components/common/SEOHead";
 
 import pwaIos from "@/assets/docs/pwa-ios.png";
@@ -150,7 +151,7 @@ const STATIC_GROUPS: DocGroup[] = [
       {
         id: "overview",
         title: "What is Megsy AI?",
-        icon: Sparkles,
+        icon: MegsyStar as unknown as LucideIcon,
         accent: ACTION,
         intro:
           "Megsy AI is an all-in-one creative & productivity platform powered by a single shared credit balance called Megsy Credits (MC). One subscription unlocks chat, images, video, websites, code, slides, docs, deep research, voice, music, learning, autonomous agents and 1,000+ integrations — no tool-hopping, no extra logins.",
@@ -2222,7 +2223,7 @@ export default function DocsPage() {
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest"
             style={{ backgroundColor: INK, color: PARCHMENT }}
           >
-            <Sparkles className="w-3.5 h-3.5" /> Documentation
+            <MegsyStar className="w-3.5 h-3.5" /> Documentation
           </div>
           <h1 className="mt-5 text-4xl md:text-6xl font-black tracking-tight leading-[1.02]">
             Every atom of Megsy AI, <br className="hidden md:block" />
