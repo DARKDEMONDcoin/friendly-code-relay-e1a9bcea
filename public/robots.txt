@@ -28,4 +28,5 @@ Sitemap: https://megsyai.com/sitemap.xml
 Sitemap: https://megsyai.com/sitemap-media.xml
 Sitemap: https://megsyai.com/sitemap-index.xml
 Sitemap: https://ltgampdtawuefwwayncx.supabase.co/functions/v1/sitemap-blog
+Sitemap: https://ltgampdtawuefwwayncx.supabase.co/functions/v1/sitemap-docs-i18n
 
