@@ -1826,7 +1826,160 @@ const STATIC_GROUPS: DocGroup[] = [
       },
     ],
   },
+
+  /* ─────────────── Realtime, mobile & resilience ─────────────── */
+  {
+    id: "realtime-mobile",
+    label: "Realtime, mobile & resilience",
+    sections: [
+      {
+        id: "realtime-chat",
+        title: "Realtime collaboration",
+        icon: MegsyStar as unknown as LucideIcon,
+        accent: MINT,
+        intro:
+          "Every conversation in Megsy is a live, multiplayer room. When you invite a teammate or join a shared workspace, presence, typing indicators, reactions and read-receipts stream through Supabase Realtime channels in milliseconds.",
+        blocks: [
+          { kind: "h", text: "What syncs live" },
+          { kind: "ul", items: [
+            "Messages — new turns, edits and deletions appear instantly without refresh.",
+            "Typing indicators — see exactly who in the room is composing right now.",
+            "Member presence — coloured dots show who is online; each member gets a stable colour.",
+            "Reactions — emoji reactions propagate to every viewer the moment they're added.",
+            "Read receipts — know which teammates have seen each message.",
+            "Tool activity — long-running tools (research, video, slides) broadcast their step changes.",
+          ]},
+          { kind: "h", text: "How it works under the hood" },
+          { kind: "ul", items: [
+            "Each conversation subscribes to a dedicated Supabase Realtime channel keyed by conversation id.",
+            "Subscriptions live inside React `useEffect` hooks and are torn down on unmount — no leaked channels.",
+            "Row-Level Security still applies: you only receive rows you're allowed to read.",
+            "Reconnection is automatic — if your network drops, the channel resumes where it left off.",
+          ]},
+          { kind: "note", text: "Realtime requires being logged in. Anonymous shared chats render statically from a snapshot URL." },
+        ],
+      },
+      {
+        id: "mobile-experience",
+        title: "The mobile experience",
+        icon: MegsyStar as unknown as LucideIcon,
+        accent: BLUSH,
+        intro:
+          "Megsy on a phone is not a shrunken desktop — it's its own carefully built surface with native-feeling gestures, safe-area handling and haptics. Install the PWA and you get a real app icon, splash screen and offline shell.",
+        blocks: [
+          { kind: "h", text: "Mobile-first details" },
+          { kind: "ul", items: [
+            "Bottom composer dock with sticky safe-area padding for iPhone home-bar and Android gesture nav.",
+            "Pull-to-refresh anywhere a list is rendered (conversations, notifications, integrations).",
+            "Swipe gestures: swipe a conversation row to archive; long-press a message for reactions.",
+            "Haptic feedback on every primary action (send, react, save, delete) via the Web Vibration API.",
+            "Glass sheets and bottom drawers replace desktop dropdowns for one-thumb reach.",
+            "Mobile mode-bar at the top switches between Chat, Image, Video, Slides, Docs, Research, Operator.",
+            "Auto-scroll-to-bottom that respects the user — stops following if you scroll up to read history.",
+          ]},
+          { kind: "h", text: "Installing as a real app (PWA)" },
+          { kind: "p", text: "See the dedicated 'Install as an app' group for iPhone, Android, macOS, Windows and Linux walk-throughs. Once installed, Megsy launches full-screen with its own splash and shows up in the system app switcher." },
+        ],
+      },
+      {
+        id: "offline-and-errors",
+        title: "Offline mode & error handling",
+        icon: MegsyStar as unknown as LucideIcon,
+        accent: ACTION,
+        intro:
+          "Megsy keeps working when your connection is shaky. We cache the shell, queue safe actions, surface friendly errors and never leak technical details to end users.",
+        blocks: [
+          { kind: "h", text: "Offline behaviour" },
+          { kind: "ul", items: [
+            "Offline banner: a slim notice appears the moment the browser reports the network is down, and disappears when it returns.",
+            "Service worker caches the app shell — opening Megsy with no connection still loads instantly.",
+            "Already-loaded conversations, settings pages and docs remain readable offline.",
+            "Sending messages, generating media or saving settings requires connectivity — these actions show an inline 'You're offline' state instead of failing silently.",
+          ]},
+          { kind: "h", text: "Error boundaries" },
+          { kind: "ul", items: [
+            "A global ErrorBoundary catches React crashes and shows a friendly recovery screen with a single 'Reload' button — your session and draft are preserved.",
+            "Each lazy-loaded route has its own fallback, so a broken route never takes down the rest of the app.",
+            "All thrown errors are sanitised via `sanitizeError` before display — no stack traces, no internal paths, no secrets.",
+            "Retries with exponential backoff are built into network calls (`guards/retry.ts`); transient failures self-heal.",
+          ]},
+          { kind: "note", text: "Crashes are reported privately to the `report-error` edge function so we can fix them, but no personal data, prompts or outputs are ever included in the report." },
+        ],
+      },
+      {
+        id: "performance",
+        title: "Performance & loading philosophy",
+        icon: MegsyStar as unknown as LucideIcon,
+        accent: MINT,
+        intro:
+          "Megsy is built to feel instant on a 5-year-old phone over a 3G connection. Every route is code-split, every image is lazy-loaded and converted to WebP, and the shell loads from cache on second visit.",
+        blocks: [
+          { kind: "h", text: "Techniques we use everywhere" },
+          { kind: "ul", items: [
+            "Route-level code splitting — only the page you're on gets shipped to your device.",
+            "`lazyWithRetry` — lazy imports auto-retry on transient chunk-load failures (common after a deploy).",
+            "Images converted to WebP client-side before upload to cut bandwidth ~40% vs PNG/JPEG.",
+            "Smart image component lazily loads off-screen images and serves a tiny blurred placeholder.",
+            "Videos use `<video preload=\"metadata\">` and only buffer when in viewport.",
+            "Local cache (`useLocalCache`) memoises expensive computations across sessions.",
+            "Edge-function responses are streamed token-by-token where possible — you read while the model writes.",
+          ]},
+          { kind: "h", text: "What you can do" },
+          { kind: "p", text: "Nothing — performance is automatic. But if a page ever feels slow, the System Status page shows current latency for every region and provider in real time." },
+          { kind: "link", href: "/settings/system-status", label: "Open System Status →" },
+        ],
+      },
+      {
+        id: "i18n-deep",
+        title: "Languages, RTL & dialects",
+        icon: MegsyStar as unknown as LucideIcon,
+        accent: BLUSH,
+        intro:
+          "Megsy speaks every major language and respects your dialect. The interface mirrors right-to-left for Arabic, Hebrew and Persian automatically; the AI mirrors your exact dialect so Egyptian Arabic stays Egyptian and never gets 'translated' to MSA.",
+        blocks: [
+          { kind: "h", text: "Languages the marketing site is fully translated into" },
+          { kind: "p", text: "Arabic · English · Spanish · French · German · Italian · Portuguese · Dutch · Polish · Czech · Greek · Romanian · Swedish · Russian · Ukrainian · Turkish · Hebrew · Persian · Hindi · Chinese · Japanese · Korean · Thai · Vietnamese · Indonesian — 25+ locales, with full RTL support where the script requires it." },
+          { kind: "h", text: "Dialect mirroring in chat" },
+          { kind: "ul", items: [
+            "We detect language and dialect on every turn (`detectLang`, `detectLanguage`).",
+            "Egyptian Arabic, Levantine Arabic, Gulf Arabic, Maghrebi Arabic, MSA — Megsy replies in the same.",
+            "Same for European vs Brazilian Portuguese, European vs Latin Spanish, Simplified vs Traditional Chinese, etc.",
+            "If you switch language mid-conversation, Megsy switches with you and never reverts.",
+          ]},
+          { kind: "h", text: "RTL details" },
+          { kind: "ul", items: [
+            "Layout, icons, gradients and scroll directions all flip automatically when the document direction is `rtl`.",
+            "Code blocks and math always render LTR even inside an RTL page — code is universal.",
+            "Mixed-direction text (e.g. an English brand name inside Arabic prose) uses Unicode bidi marks for correct rendering.",
+          ]},
+          { kind: "link", href: "/settings/language", label: "Change your language →" },
+        ],
+      },
+      {
+        id: "accessibility-deep",
+        title: "Accessibility commitments",
+        icon: MegsyStar as unknown as LucideIcon,
+        accent: ACTION,
+        intro:
+          "Megsy aims for WCAG 2.2 AA across every page. Keyboard-only navigation, screen-reader labels, visible focus rings, sufficient contrast in both themes and respect for the user's reduce-motion preference are non-negotiable.",
+        blocks: [
+          { kind: "h", text: "What we guarantee" },
+          { kind: "ul", items: [
+            "Every interactive element is reachable by keyboard, with a clearly visible focus ring.",
+            "Every icon-only button has an `aria-label` or `title` describing its action.",
+            "Dialogs, sheets and dropdowns are real ARIA dialogs — focus is trapped while open and restored on close.",
+            "Live regions announce streaming AI replies and tool-status changes to screen readers.",
+            "All animations honour `prefers-reduced-motion: reduce` — they instantly become non-animated.",
+            "Color contrast meets AA in both light and dark themes; never relies on colour alone to convey meaning.",
+            "Forms have associated `<label>`s, inline error text and `aria-describedby` for help text.",
+          ]},
+          { kind: "link", href: "/accessibility", label: "Read our full accessibility statement →" },
+        ],
+      },
+    ],
+  },
 ];
+
 
 
 /* ────────────── ⭐ AUTO-GENERATED GROUPS (live from data files) ────────────── */
