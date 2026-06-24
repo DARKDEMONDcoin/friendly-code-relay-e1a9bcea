@@ -3906,10 +3906,10 @@ function BlockView({ block, accent }: { block: DocBlock; accent: string }) {
 
 /* ───────────────────────── Helpers ───────────────────────── */
 
-function CopyLinkButton({ sectionId, groupId }: { sectionId: string; groupId: string }) {
+function CopyLinkButton({ sectionId, groupId, pathPrefix = "" }: { sectionId: string; groupId: string; pathPrefix?: string }) {
   const [copied, setCopied] = useState(false);
   const onCopy = async () => {
-    const url = `${window.location.origin}/docs/${groupId}/${sectionId}`;
+    const url = `${window.location.origin}${pathPrefix}/docs/${groupId}/${sectionId}`;
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
