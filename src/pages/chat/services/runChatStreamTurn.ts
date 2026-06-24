@@ -16,6 +16,17 @@ import {
 } from "../chatUtils";
 import type { Message, ProductResult, ChatMode } from "../chatConstants";
 import { runDeepResearchPlan } from "./runDeepResearchPlan";
+import { updateMessageMetadata } from "./conversationApi";
+
+/** Extracts the generated_sites UUID from a `build_website` preview URL embedded
+ *  in assistant text. Returns undefined when no match. */
+function detectSiteBuildId(text: string): string | undefined {
+  if (!text) return undefined;
+  const m = text.match(
+    /\/published-sites\/[0-9a-f-]{36}\/([0-9a-f-]{36})\/index\.html/i,
+  );
+  return m?.[1];
+}
 
 type SaveMessageFn = (
   conversationId: string,
@@ -703,6 +714,10 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
           );
         }
         if (aId) ownInsertedIdsRef.current.add(aId);
+        const siteIdA = detectSiteBuildId(assistantContent);
+        if (siteIdA && aId) {
+          void updateMessageMetadata(aId, { siteBuild: { siteId: siteIdA }, kind: "siteBuild" });
+        }
         if (isDeepResearch) {
           const user = await getCachedUser();
           if (user) {
@@ -730,6 +745,7 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
             id: aId || last.id,
             images: searchImages.length > 0 ? searchImages : last.images,
             products: streamedProducts.length > 0 ? streamedProducts : last.products,
+            siteBuild: siteIdA ? { siteId: siteIdA } : last.siteBuild,
           };
           return next;
         });
@@ -874,6 +890,17 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
           );
         }
         if (aId) ownInsertedIdsRef.current.add(aId);
+        const siteIdB = detectSiteBuildId(contentToSave);
+        if (siteIdB && aId) {
+          void updateMessageMetadata(aId, { siteBuild: { siteId: siteIdB }, kind: "siteBuild" });
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === aId || m.clientId === `assistant-${localTurnId}`
+                ? { ...m, siteBuild: { siteId: siteIdB } }
+                : m,
+            ),
+          );
+        }
         if (isDeepResearch && chatUserId) {
           await supabase.from("research_reports").upsert(
             {

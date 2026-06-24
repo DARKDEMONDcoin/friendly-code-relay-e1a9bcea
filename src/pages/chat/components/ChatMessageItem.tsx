@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 import { motion } from "framer-motion";
 import ChatMessage from "@/components/chat/ChatMessage";
 import ResearchJobBubble from "@/components/research/ResearchJobBubble";
@@ -10,6 +10,7 @@ import {
   DocsArtifactCard,
 } from "../lazyComponents";
 import AssistantMediaBlock from "./AssistantMediaBlock";
+const SiteBuildCard = lazy(() => import("@/components/chat/site/SiteBuildCard"));
 import AssistantDocsClarifyBlock from "./AssistantDocsClarifyBlock";
 import { type Message, EMPTY_READERS, EMPTY_REACTIONS } from "../chatConstants";
 
@@ -223,6 +224,13 @@ export const ChatMessageItem = ({
               slideCount={msg.imageSlides.slideCount}
               chatName={conversationTitle}
             />
+          </Suspense>
+        </div>
+      )}
+      {msg.role === "assistant" && msg.siteBuild?.siteId && (
+        <div className="px-3 md:px-12">
+          <Suspense fallback={null}>
+            <SiteBuildCard siteId={msg.siteBuild.siteId} />
           </Suspense>
         </div>
       )}

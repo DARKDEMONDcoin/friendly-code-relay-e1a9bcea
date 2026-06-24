@@ -200,8 +200,28 @@ Output JSON only. No prose.`;
   if (files.length < 5) { await emit("plan", "خطة الملفات غير مكتملة", "error", 5); throw new Error("too few files"); }
   await emit("plan", `تم التخطيط (${files.length} ملف)`, "done", 20);
 
-  // Update title from planner
-  try { await sb.from("generated_sites").update({ title: String(plan?.title || "Generated Website").slice(0, 200) }).eq("id", site_id); } catch { /* noop */ }
+  // Persist the planned source files so the chat can list & view them.
+  // Truncate per-file at 200 KB, cap total at ~2 MB to keep the row small.
+  try {
+    const MAX_FILE = 200 * 1024;
+    const MAX_TOTAL = 2 * 1024 * 1024;
+    let used = 0;
+    const slim: Array<{ path: string; content: string; truncated?: boolean }> = [];
+    for (const f of files) {
+      const raw = String(f.content ?? "");
+      const trimmed = raw.length > MAX_FILE ? raw.slice(0, MAX_FILE) : raw;
+      if (used + trimmed.length > MAX_TOTAL) {
+        slim.push({ path: f.path, content: "// [truncated — file too large to preview]", truncated: true });
+      } else {
+        slim.push(raw.length > MAX_FILE ? { path: f.path, content: trimmed, truncated: true } : { path: f.path, content: raw });
+        used += trimmed.length;
+      }
+    }
+    await sb.from("generated_sites").update({
+      files: slim as any,
+      title: String(plan?.title || "Generated Website").slice(0, 200),
+    }).eq("id", site_id);
+  } catch { /* noop */ }
 
   // ── 2. Boot E2B sandbox ──────────────────────────────────────────────────
   await emit("sandbox", "تشغيل بيئة البناء (E2B)", "running", 25);
@@ -330,6 +350,7 @@ Output JSON only. No prose.`;
         status: "published",
         progress: 100,
         preview_url,
+        published_url: preview_url,
       }).eq("id", site_id);
     } catch { /* noop */ }
     ctx.emitProgress?.({ step: "done", label: "الموقع جاهز", status: "done", detail: preview_url });
