@@ -3256,13 +3256,47 @@ export default function DocsPage() {
     })),
   };
 
+  // FAQPage JSON-LD — emitted whenever the current group contains FAQ Q&A
+  // pairs. Wins rich "People also ask" snippets in Google SERP.
+  const faqLd = (() => {
+    const faqPairs: { q: string; a: string }[] = [];
+    for (const s of currentGroup.sections) {
+      const blocks = s.blocks as Array<{ kind: string; text?: string }>;
+      for (let i = 0; i < blocks.length - 1; i++) {
+        const cur = blocks[i];
+        const nxt = blocks[i + 1];
+        if (cur.kind === "h" && nxt.kind === "p" && cur.text && nxt.text && /\?/.test(cur.text)) {
+          faqPairs.push({ q: cur.text, a: nxt.text });
+        }
+      }
+    }
+    if (faqPairs.length === 0) return null;
+    return {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqPairs.slice(0, 30).map((p) => ({
+        "@type": "Question",
+        name: p.q,
+        acceptedAnswer: { "@type": "Answer", text: p.a },
+      })),
+    };
+  })();
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: INK, color: PARCHMENT }}>
       <SEOHead title={groupTitle} description={groupDescription} path={groupPath} />
       <Helmet>
+        {/* English-only docs — signal en self + x-default so Google serves this URL
+            to every locale instead of guessing. */}
+        <link rel="alternate" hrefLang="en" href={`${SITE_URL}${groupPath}`} />
+        <link rel="alternate" hrefLang="x-default" href={`${SITE_URL}${groupPath}`} />
         <script type="application/ld+json">{JSON.stringify(breadcrumbsLd)}</script>
         <script type="application/ld+json">{JSON.stringify(techArticleLd)}</script>
+        {faqLd && (
+          <script type="application/ld+json">{JSON.stringify(faqLd)}</script>
+        )}
       </Helmet>
+      <ReadingProgressBar />
       <LandingNavbar />
 
       {/* Hero — cartoon sticker style */}
@@ -3887,3 +3921,37 @@ function CodeBlock({ text, lang }: { text: string; lang?: string }) {
     </div>
   );
 }
+
+/* ───────────────────────── Reading progress bar ─────────────────────────
+   Thin top bar that fills as the user scrolls — same trick the best docs
+   sites (Stripe, Vercel, Linear) use to give a sense of length & position. */
+function ReadingProgressBar() {
+  const [pct, setPct] = useState(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      setPct(max > 0 ? Math.min(100, Math.max(0, (h.scrollTop / max) * 100)) : 0);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+  return (
+    <div
+      aria-hidden
+      className="fixed top-0 left-0 right-0 z-[60] h-[3px] pointer-events-none"
+      style={{ backgroundColor: "transparent" }}
+    >
+      <div
+        className="h-full transition-[width] duration-100"
+        style={{ width: `${pct}%`, backgroundColor: ACTION, boxShadow: `0 0 8px ${ACTION}` }}
+      />
+    </div>
+  );
+}
+
