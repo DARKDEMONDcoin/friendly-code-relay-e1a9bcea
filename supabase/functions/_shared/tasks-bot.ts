@@ -1300,6 +1300,16 @@ export async function handleTasksBotRequest(req: Request): Promise<Response> {
             await setPendingAction(chatId, "add_key", { provider: slug });
             await tgSend(chatId, `📩 ابعت دلوقتي مفتاح <b>${label}</b> في رساله واحده.\nلو عايز تلغي اكتب /cancel`);
           }
+          else if (key === "grant_pro") {
+            await setPendingAction(chatId, "grant_pro", {});
+            await tgSend(
+              chatId,
+              "🎁 <b>منح اشتراك Pro لمؤثر (شهر واحد)</b>\n\n" +
+              "ابعت الإيميل المسجّل بحساب المؤثر دلوقتي في رساله واحده.\n" +
+              "هيتم تفعيل خطة <b>Pro</b> لمدة <b>30 يوم فقط</b> ومش هتتجدد تلقائياً.\n\n" +
+              "لو عايز تلغي اكتب /cancel"
+            );
+          }
           else await tgSend(chatId, "غير معروف.");
         } catch (e) {
           await tgSend(chatId, "❌ " + String(e));
