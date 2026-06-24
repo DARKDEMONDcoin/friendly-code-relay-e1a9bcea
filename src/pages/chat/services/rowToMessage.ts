@@ -22,6 +22,13 @@ export function rowToMessage(
 ): Message | null {
   const role = row.role as "user" | "assistant";
   const content = role === "assistant" ? sanitizeLeakedToolText(row.content) : row.content;
+  const meta = (row.metadata || {}) as any;
+  const hasMedia = !!meta.mediaPlan;
+  if (role === "assistant" && !content && !row.images?.length && !row.metadata) {
+    return null;
+  }
+  const role = row.role as "user" | "assistant";
+  const content = role === "assistant" ? sanitizeLeakedToolText(row.content) : row.content;
   if (role === "assistant" && !content && !row.images?.length && !row.metadata) {
     return null;
   }
