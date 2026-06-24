@@ -271,6 +271,7 @@ async function setMyCommands() {
     { command: "delkey",     description: "🗑️ حذف مفتاح" },
     { command: "setquota",   description: "⚙️ ضبط حصة موديل" },
     { command: "addadmin",   description: "👤 إضافة مشرف" },
+    { command: "grantpro",   description: "🎁 منح Pro لمؤثر (شهر)" },
     { command: "help",       description: "❓ كل الأوامر" },
   ];
   await fetch(`https://api.telegram.org/bot${TG_TOKEN}/setMyCommands`, {
