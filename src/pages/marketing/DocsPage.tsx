@@ -2936,7 +2936,7 @@ export default function DocsPage() {
             On this page
           </div>
           <ul className="space-y-1.5 border-l-2 pl-3" style={{ borderColor: "hsl(var(--surface-4))" }}>
-            {activeGroup.sections.map((s) => {
+            {currentGroup.sections.map((s) => {
               const active = s.id === activeId;
               return (
                 <li key={s.id}>
