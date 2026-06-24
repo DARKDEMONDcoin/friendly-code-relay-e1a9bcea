@@ -50,8 +50,16 @@ const countries = [
 const companySizes = ["1-10", "11-50", "51-200", "201-1000", "1000+"];
 
 const ContactPage = () => {
+  const navigate = useNavigate();
   const [tab, setTab] = useState<"support" | "enterprise">("support");
   const [submitting, setSubmitting] = useState(false);
+
+  const channels = [
+    { icon: MessageSquare, title: "Instant AI support", desc: "24/7 chat — answers in seconds, handles 95% of questions.", cta: "Open chat", onClick: () => navigate("/support"), tone: "from-blue-500/20 to-cyan-500/10" },
+    { icon: Mail, title: "Email a human", desc: "Write us at support@megsyai.com — reply within 24h.", cta: "Copy email", onClick: () => { navigator.clipboard?.writeText("support@megsyai.com"); toast.success("Email copied"); }, tone: "from-violet-500/20 to-fuchsia-500/10" },
+    { icon: Building2, title: "Enterprise sales", desc: "Custom MC, SSO, SLA, annual contracts & dedicated success.", cta: "Talk to sales", onClick: () => navigate("/enterprise"), tone: "from-amber-500/20 to-orange-500/10" },
+    { icon: Twitter, title: "Follow us", desc: "Product updates, model drops & behind-the-scenes on X.", cta: "@megsyai", onClick: () => window.open("https://twitter.com/megsyai", "_blank"), tone: "from-emerald-500/20 to-teal-500/10" },
+  ];
 
   const supportForm = useForm<SupportData>({ resolver: zodResolver(supportSchema) });
   const enterpriseForm = useForm<EnterpriseData>({ resolver: zodResolver(enterpriseSchema) });
