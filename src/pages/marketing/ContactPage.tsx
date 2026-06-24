@@ -1,16 +1,31 @@
 /** @doc Contact form for sales, partnerships and press inquiries. */
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, MessageSquare, Building2, Twitter, Clock, ShieldCheck } from "lucide-react";
+import { Mail, MessageSquare, Building2, Twitter, Clock, ShieldCheck, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import LandingNavbar from "@/components/landing/LandingNavbar";
-import LandingFooter from "@/components/landing/LandingFooter";
 import SEOHead from "@/components/common/SEOHead";
+import {
+  CartoonMarketingPage,
+  CartoonHero,
+  CartoonContainer,
+  CartoonCard,
+  PillButton,
+  SectionEyebrow,
+  SectionTitle,
+  INK,
+  MUTED,
+  TEXT,
+  SURFACE,
+  BORDER,
+  YELLOW,
+  MINT,
+} from "@/components/marketing/CartoonMarketingShell";
+import { PEACH, LAVENDER, PINK, BLUE } from "@/pages/billing/ReferralsPage";
+import contactSticker from "@/assets/settings/contact-sticker.png";
 
 const supportSchema = z.object({
   username: z.string().trim().min(1, "Username is required").max(100),
@@ -32,34 +47,25 @@ type SupportData = z.infer<typeof supportSchema>;
 type EnterpriseData = z.infer<typeof enterpriseSchema>;
 
 const countries = [
-  "Egypt",
-  "United States",
-  "United Kingdom",
-  "Germany",
-  "France",
-  "Saudi Arabia",
-  "UAE",
-  "Canada",
-  "Australia",
-  "Japan",
-  "India",
-  "Brazil",
-  "South Korea",
-  "Other",
+  "Egypt", "United States", "United Kingdom", "Germany", "France",
+  "Saudi Arabia", "UAE", "Canada", "Australia", "Japan", "India",
+  "Brazil", "South Korea", "Other",
 ];
 const companySizes = ["1-10", "11-50", "51-200", "201-1000", "1000+"];
+
+const fieldStyle = {
+  backgroundColor: "hsl(var(--surface-3))",
+  border: `2px solid ${BORDER}`,
+  color: TEXT,
+  fontWeight: 600,
+} as const;
+const fieldClass =
+  "w-full px-4 py-3 rounded-2xl text-[14px] outline-none transition placeholder:opacity-60 focus:border-[color:hsl(var(--brand-action))]";
 
 const ContactPage = () => {
   const navigate = useNavigate();
   const [tab, setTab] = useState<"support" | "enterprise">("support");
   const [submitting, setSubmitting] = useState(false);
-
-  const channels = [
-    { icon: MessageSquare, title: "Instant AI support", desc: "24/7 chat — answers in seconds, handles 95% of questions.", cta: "Open chat", onClick: () => navigate("/support"), tone: "from-blue-500/20 to-cyan-500/10" },
-    { icon: Mail, title: "Email a human", desc: "Write us at support@megsyai.com — reply within 24h.", cta: "Copy email", onClick: () => { navigator.clipboard?.writeText("support@megsyai.com"); toast.success("Email copied"); }, tone: "from-violet-500/20 to-fuchsia-500/10" },
-    { icon: Building2, title: "Enterprise sales", desc: "Custom MC, SSO, SLA, annual contracts & dedicated success.", cta: "Talk to sales", onClick: () => navigate("/enterprise"), tone: "from-amber-500/20 to-orange-500/10" },
-    { icon: Twitter, title: "Follow us", desc: "Product updates, model drops & behind-the-scenes on X.", cta: "@megsyai", onClick: () => window.open("https://twitter.com/megsyai", "_blank"), tone: "from-emerald-500/20 to-teal-500/10" },
-  ];
 
   const supportForm = useForm<SupportData>({ resolver: zodResolver(supportSchema) });
   const enterpriseForm = useForm<EnterpriseData>({ resolver: zodResolver(enterpriseSchema) });
@@ -68,19 +74,14 @@ const ContactPage = () => {
     setSubmitting(true);
     try {
       const { error } = await supabase.from("contact_submissions").insert({
-        name: data.username,
-        email: data.email,
-        message: data.message,
-        form_type: "support",
+        name: data.username, email: data.email, message: data.message, form_type: "support",
       });
       if (error) throw error;
-      toast.success("Request submitted successfully!");
+      toast.success("Request submitted!");
       supportForm.reset();
     } catch {
       toast.error("Something went wrong. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
+    } finally { setSubmitting(false); }
   };
 
   const onEnterpriseSubmit = async (data: EnterpriseData) => {
@@ -94,331 +95,157 @@ const ContactPage = () => {
         form_type: "enterprise",
       });
       if (error) throw error;
-      toast.success("Inquiry submitted successfully!");
+      toast.success("Inquiry submitted!");
       enterpriseForm.reset();
     } catch {
       toast.error("Something went wrong. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
+    } finally { setSubmitting(false); }
   };
 
-  const inputClass =
-    "w-full rounded-xl border border-white/10 bg-white/[0.02] px-5 py-4 text-sm text-foreground placeholder:text-foreground/30 outline-none transition-colors focus:border-white/40 focus:bg-white/[0.04] selectable";
+  const channels = [
+    { icon: MessageSquare, title: "Instant AI support", desc: "24/7 chat — answers in seconds.", cta: "Open chat", onClick: () => navigate("/support"), tone: MINT },
+    { icon: Mail, title: "Email a human", desc: "support@megsyai.com — reply within 24h.", cta: "Copy email", onClick: () => { navigator.clipboard?.writeText("support@megsyai.com"); toast.success("Email copied"); }, tone: LAVENDER },
+    { icon: Building2, title: "Enterprise sales", desc: "Custom MC, SSO, SLA, annual contracts.", cta: "Talk to sales", onClick: () => navigate("/enterprise"), tone: YELLOW },
+    { icon: Twitter, title: "Follow @megsyai", desc: "Product updates & behind-the-scenes.", cta: "Open X", onClick: () => window.open("https://twitter.com/megsyai", "_blank"), tone: PEACH },
+  ];
 
   return (
-    <div data-theme="dark" className="min-h-dvh overflow-x-hidden bg-background text-foreground">
+    <CartoonMarketingPage>
       <SEOHead
         title="Contact Megsy AI — Support & Enterprise"
         description="Reach Megsy AI support or talk to our enterprise team for custom plans, SSO, and dedicated onboarding."
         path="/contact"
       />
-      <LandingNavbar />
 
-      {/* HERO — landing style */}
-      <section className="relative overflow-hidden bg-background pb-12 pt-32 text-center md:pt-44">
-        <div className="mx-auto w-full max-w-4xl px-4">
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-muted-foreground"
-          >
-            Contact
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="font-display text-[9vw] uppercase leading-[0.95] tracking-tight text-foreground md:text-[5.5vw]"
-          >
-            Talk to <span className="text-primary">a real human.</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mx-auto mt-4 max-w-xl text-[13px] leading-snug text-muted-foreground md:mt-6 md:text-lg"
-          >
-            Pick the form that fits — we read every message and reply ourselves.
-          </motion.p>
+      <CartoonHero
+        sticker={contactSticker}
+        bg={PEACH}
+        eyebrow="Contact"
+        title={<>Talk to <span style={{ color: "hsl(var(--brand-action))" }}>a real human.</span></>}
+        subtitle="Pick the form that fits — we read every message and reply ourselves."
+      />
+
+      {/* Channels grid */}
+      <CartoonContainer>
+        <SectionEyebrow>Pick a channel</SectionEyebrow>
+        <SectionTitle className="mb-6">The fastest route to a real answer.</SectionTitle>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {channels.map((c) => (
+            <button
+              key={c.title}
+              onClick={c.onClick}
+              className="text-left rounded-[24px] p-5 transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+              style={{ backgroundColor: c.tone, border: `2.5px solid ${INK}`, boxShadow: `4px 4px 0 ${INK}`, color: INK }}
+            >
+              <div
+                className="mb-3 grid h-11 w-11 place-items-center rounded-2xl"
+                style={{ backgroundColor: "rgba(255,255,255,0.55)", border: `2px solid ${INK}` }}
+              >
+                <c.icon className="w-5 h-5" strokeWidth={2.5} />
+              </div>
+              <p className="text-[15px]" style={{ fontWeight: 900 }}>{c.title}</p>
+              <p className="mt-1 text-[12.5px] leading-relaxed" style={{ opacity: 0.78, fontWeight: 600 }}>{c.desc}</p>
+              <p className="mt-3 text-[11.5px] uppercase tracking-[0.16em]" style={{ fontWeight: 900 }}>{c.cta} →</p>
+            </button>
+          ))}
         </div>
-      </section>
 
-      {/* CHANNELS GRID — pick the fastest path */}
-      <section className="border-t border-border/30 py-16 md:py-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="mb-10 max-w-3xl"
-          >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">Pick a channel</p>
-            <h2 className="mt-4 font-display text-3xl uppercase leading-[0.95] tracking-tight md:text-5xl">
-              The fastest route <span className="text-primary">to a real answer.</span>
-            </h2>
-          </motion.div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {channels.map((c, i) => (
-              <motion.button
-                key={c.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.06 }}
-                onClick={c.onClick}
-                className={`group relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-br ${c.tone} p-6 text-left transition-all hover:border-primary/40 hover:-translate-y-0.5`}
-              >
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-border/40 bg-background/60">
-                  <c.icon className="h-5 w-5 text-foreground" />
-                </div>
-                <h3 className="text-base font-semibold">{c.title}</h3>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">{c.desc}</p>
-                <p className="mt-4 text-[12px] font-semibold uppercase tracking-wider text-primary">{c.cta} →</p>
-              </motion.button>
-            ))}
-          </div>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> Replies within 24h</span>
-            <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5" /> GDPR & DPA-ready</span>
-            <span className="inline-flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" /> support@megsyai.com</span>
-          </div>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11.5px]" style={{ color: MUTED, fontWeight: 700 }}>
+          <span className="inline-flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Replies within 24h</span>
+          <span className="inline-flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" /> GDPR & DPA-ready</span>
+          <span className="inline-flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" /> support@megsyai.com</span>
         </div>
-      </section>
+      </CartoonContainer>
 
-      <section className="py-16 md:py-24">
+      {/* Tabs + form */}
+      <CartoonContainer>
+        <SectionEyebrow>Write us</SectionEyebrow>
+        <SectionTitle className="mb-6">Open a ticket.</SectionTitle>
 
-        <div className="mx-auto max-w-2xl px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="mb-10 inline-flex items-center rounded-full bg-white/5 p-1">
-              <button
-                onClick={() => setTab("support")}
-                className={`rounded-full px-6 py-2.5 text-sm font-semibold transition-all ${
-                  tab === "support"
-                    ? "bg-white text-foreground shadow-lg"
-                    : "text-foreground/50 hover:text-foreground/80"
-                }`}
-              >
-                Support and billing
-              </button>
-              <button
-                onClick={() => setTab("enterprise")}
-                className={`rounded-full px-6 py-2.5 text-sm font-semibold transition-all ${
-                  tab === "enterprise"
-                    ? "bg-white text-foreground shadow-lg"
-                    : "text-foreground/50 hover:text-foreground/80"
-                }`}
-              >
-                Enterprise sales
-              </button>
-            </div>
+        <div
+          className="inline-flex items-center rounded-full p-1 mb-6"
+          style={{ backgroundColor: SURFACE, border: `2px solid ${BORDER}` }}
+        >
+          {(["support", "enterprise"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className="rounded-full px-5 py-2 text-[13px] transition"
+              style={{
+                backgroundColor: tab === t ? YELLOW : "transparent",
+                color: tab === t ? INK : TEXT,
+                fontWeight: 800,
+                border: tab === t ? `2px solid ${INK}` : "2px solid transparent",
+              }}
+            >
+              {t === "support" ? "Support & billing" : "Enterprise sales"}
+            </button>
+          ))}
+        </div>
 
-            {tab === "support" && (
-              <motion.form
-                key="support"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35 }}
-                onSubmit={supportForm.handleSubmit(onSupportSubmit)}
-                className="space-y-5"
-              >
-                <div className="grid gap-5 md:grid-cols-2">
-                  <div>
-                    <input
-                      {...supportForm.register("username")}
-                      placeholder="Your Megsy username *"
-                      className={inputClass}
-                    />
-                    {supportForm.formState.errors.username && (
-                      <p className="mt-1.5 text-xs text-red-400">
-                        {supportForm.formState.errors.username.message}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <input
-                      {...supportForm.register("email")}
-                      placeholder="Email address *"
-                      className={inputClass}
-                    />
-                    {supportForm.formState.errors.email && (
-                      <p className="mt-1.5 text-xs text-red-400">
-                        {supportForm.formState.errors.email.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
+        <CartoonCard className="space-y-4">
+          {tab === "support" ? (
+            <form onSubmit={supportForm.handleSubmit(onSupportSubmit)} className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <textarea
-                    {...supportForm.register("message")}
-                    placeholder="Describe your issue *"
-                    rows={6}
-                    className={`${inputClass} resize-none`}
-                  />
-                  {supportForm.formState.errors.message && (
-                    <p className="mt-1.5 text-xs text-red-400">
-                      {supportForm.formState.errors.message.message}
-                    </p>
+                  <input {...supportForm.register("username")} placeholder="Your Megsy username *" className={fieldClass} style={fieldStyle} />
+                  {supportForm.formState.errors.username && (
+                    <p className="mt-1.5 text-[12px]" style={{ color: PINK, fontWeight: 700 }}>{supportForm.formState.errors.username.message}</p>
                   )}
                 </div>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="rounded-full bg-white px-8 py-3 text-sm font-bold text-foreground transition-all hover:scale-[1.02] disabled:opacity-50"
-                >
-                  {submitting ? "Submitting..." : "Submit request"}
-                </button>
-              </motion.form>
-            )}
-
-            {tab === "enterprise" && (
-              <motion.form
-                key="enterprise"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35 }}
-                onSubmit={enterpriseForm.handleSubmit(onEnterpriseSubmit)}
-                className="space-y-5"
-              >
-                <div className="grid gap-5 md:grid-cols-2">
-                  <div>
-                    <input
-                      {...enterpriseForm.register("firstName")}
-                      placeholder="First Name *"
-                      className={inputClass}
-                    />
-                    {enterpriseForm.formState.errors.firstName && (
-                      <p className="mt-1.5 text-xs text-red-400">
-                        {enterpriseForm.formState.errors.firstName.message}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <input
-                      {...enterpriseForm.register("lastName")}
-                      placeholder="Last Name *"
-                      className={inputClass}
-                    />
-                    {enterpriseForm.formState.errors.lastName && (
-                      <p className="mt-1.5 text-xs text-red-400">
-                        {enterpriseForm.formState.errors.lastName.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="grid gap-5 md:grid-cols-2">
-                  <div>
-                    <input
-                      {...enterpriseForm.register("workEmail")}
-                      placeholder="Work Email *"
-                      className={inputClass}
-                    />
-                    {enterpriseForm.formState.errors.workEmail && (
-                      <p className="mt-1.5 text-xs text-red-400">
-                        {enterpriseForm.formState.errors.workEmail.message}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <input
-                      {...enterpriseForm.register("company")}
-                      placeholder="Company Name *"
-                      className={inputClass}
-                    />
-                    {enterpriseForm.formState.errors.company && (
-                      <p className="mt-1.5 text-xs text-red-400">
-                        {enterpriseForm.formState.errors.company.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="grid gap-5 md:grid-cols-2">
-                  <div>
-                    <select
-                      {...enterpriseForm.register("country")}
-                      className={`${inputClass} appearance-none`}
-                      defaultValue=""
-                    >
-                      <option value="" disabled className="bg-black text-foreground/30">
-                        Country *
-                      </option>
-                      {countries.map((c) => (
-                        <option key={c} value={c} className="bg-black text-foreground">
-                          {c}
-                        </option>
-                      ))}
-                    </select>
-                    {enterpriseForm.formState.errors.country && (
-                      <p className="mt-1.5 text-xs text-red-400">
-                        {enterpriseForm.formState.errors.country.message}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <select
-                      {...enterpriseForm.register("companySize")}
-                      className={`${inputClass} appearance-none`}
-                      defaultValue=""
-                    >
-                      <option value="" disabled className="bg-black text-foreground/30">
-                        Company size *
-                      </option>
-                      {companySizes.map((s) => (
-                        <option key={s} value={s} className="bg-black text-foreground">
-                          {s}
-                        </option>
-                      ))}
-                    </select>
-                    {enterpriseForm.formState.errors.companySize && (
-                      <p className="mt-1.5 text-xs text-red-400">
-                        {enterpriseForm.formState.errors.companySize.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
                 <div>
-                  <textarea
-                    {...enterpriseForm.register("needs")}
-                    placeholder="Tell us about your needs *"
-                    rows={5}
-                    className={`${inputClass} resize-none`}
-                  />
-                  {enterpriseForm.formState.errors.needs && (
-                    <p className="mt-1.5 text-xs text-red-400">
-                      {enterpriseForm.formState.errors.needs.message}
-                    </p>
+                  <input {...supportForm.register("email")} placeholder="Email address *" className={fieldClass} style={fieldStyle} />
+                  {supportForm.formState.errors.email && (
+                    <p className="mt-1.5 text-[12px]" style={{ color: PINK, fontWeight: 700 }}>{supportForm.formState.errors.email.message}</p>
                   )}
                 </div>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="rounded-full bg-white px-8 py-3 text-sm font-bold text-foreground transition-all hover:scale-[1.02] disabled:opacity-50"
-                >
-                  {submitting ? "Submitting..." : "Submit inquiry"}
-                </button>
-              </motion.form>
-            )}
+              </div>
+              <div>
+                <textarea {...supportForm.register("message")} placeholder="Describe your issue *" rows={6} className={`${fieldClass} resize-none`} style={fieldStyle} />
+                {supportForm.formState.errors.message && (
+                  <p className="mt-1.5 text-[12px]" style={{ color: PINK, fontWeight: 700 }}>{supportForm.formState.errors.message.message}</p>
+                )}
+              </div>
+              <PillButton type="submit" disabled={submitting} tone={MINT} className="w-full">
+                <Send className="w-4 h-4" strokeWidth={2.5} />
+                {submitting ? "Submitting…" : "Submit request"}
+              </PillButton>
+            </form>
+          ) : (
+            <form onSubmit={enterpriseForm.handleSubmit(onEnterpriseSubmit)} className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <input {...enterpriseForm.register("firstName")} placeholder="First name *" className={fieldClass} style={fieldStyle} />
+                <input {...enterpriseForm.register("lastName")} placeholder="Last name *" className={fieldClass} style={fieldStyle} />
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <input {...enterpriseForm.register("workEmail")} placeholder="Work email *" className={fieldClass} style={fieldStyle} />
+                <input {...enterpriseForm.register("company")} placeholder="Company name *" className={fieldClass} style={fieldStyle} />
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <select {...enterpriseForm.register("country")} className={`${fieldClass} appearance-none`} style={fieldStyle} defaultValue="">
+                  <option value="" disabled>Country *</option>
+                  {countries.map((c) => <option key={c} value={c} style={{ background: "hsl(var(--brand-ink))" }}>{c}</option>)}
+                </select>
+                <select {...enterpriseForm.register("companySize")} className={`${fieldClass} appearance-none`} style={fieldStyle} defaultValue="">
+                  <option value="" disabled>Company size *</option>
+                  {companySizes.map((s) => <option key={s} value={s} style={{ background: "hsl(var(--brand-ink))" }}>{s}</option>)}
+                </select>
+              </div>
+              <textarea {...enterpriseForm.register("needs")} placeholder="Tell us about your needs *" rows={5} className={`${fieldClass} resize-none`} style={fieldStyle} />
+              <PillButton type="submit" disabled={submitting} tone={YELLOW} className="w-full">
+                <Send className="w-4 h-4" strokeWidth={2.5} />
+                {submitting ? "Submitting…" : "Submit inquiry"}
+              </PillButton>
+            </form>
+          )}
 
-            <p className="mt-8 text-xs leading-relaxed text-foreground/30">
-              By submitting this form, I agree to receive updates and marketing communications from
-              Megsy, as outlined in the{" "}
-              <a href="/privacy" className="text-foreground/50 underline hover:text-foreground/80">
-                Privacy & Cookie Policy
-              </a>
-              .
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      <LandingFooter />
-    </div>
+          <p className="text-[11px] leading-relaxed" style={{ color: MUTED, fontWeight: 600 }}>
+            By submitting this form, I agree to receive updates and communications from Megsy, as outlined in the{" "}
+            <a href="/privacy" className="underline" style={{ color: BLUE }}>Privacy & Cookie Policy</a>.
+          </p>
+        </CartoonCard>
+      </CartoonContainer>
+    </CartoonMarketingPage>
   );
 };
 
