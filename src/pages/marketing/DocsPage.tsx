@@ -79,6 +79,7 @@ import {
 import LandingNavbar from "@/components/landing/LandingNavbar";
 import MegsyStar from "@/components/branding/MegsyStar";
 import SEOHead from "@/components/common/SEOHead";
+import { Helmet } from "react-helmet-async";
 
 import pwaIos from "@/assets/docs/pwa-ios.png";
 import pwaAndroid from "@/assets/docs/pwa-android.png";
@@ -2647,13 +2648,67 @@ export default function DocsPage() {
       ? GROUPS[currentGroupIdx + 1]
       : null;
 
+  // ── Per-group SEO (title, description, canonical, JSON-LD) ──────────────
+  // Each /docs/:groupId becomes its own indexable, deep-linkable page with a
+  // unique <title>, <meta description>, canonical, TechArticle JSON-LD and
+  // BreadcrumbList JSON-LD — so Google can index every section of the docs
+  // separately and surface rich results in SERP.
+  const isDocsRoot = !params.groupId;
+  const SITE_URL = "https://megsyai.com";
+  const groupPath = isDocsRoot ? "/docs" : `/docs/${currentGroup.id}`;
+  const groupTitle = isDocsRoot
+    ? "Megsy AI Docs — The Complete Product Guide & PWA Install"
+    : `${currentGroup.label} — Megsy AI Docs`;
+  const groupDescription = isDocsRoot
+    ? "The complete Megsy AI documentation: every feature, every agent, every setting, every page — explained in full. Plus step-by-step PWA install for iPhone, Android, Mac, Windows and Linux."
+    : `${currentGroup.label} in Megsy AI: ${currentGroup.sections
+        .slice(0, 4)
+        .map((s) => s.title)
+        .join(" · ")}${currentGroup.sections.length > 4 ? ` and ${currentGroup.sections.length - 4} more sections` : ""}. Part of the full Megsy AI documentation.`;
+
+  const breadcrumbsLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
+      { "@type": "ListItem", position: 2, name: "Docs", item: `${SITE_URL}/docs` },
+      ...(isDocsRoot
+        ? []
+        : [
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: currentGroup.label,
+              item: `${SITE_URL}${groupPath}`,
+            },
+          ]),
+    ],
+  };
+
+  const techArticleLd = {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: groupTitle,
+    description: groupDescription,
+    inLanguage: "en",
+    url: `${SITE_URL}${groupPath}`,
+    isPartOf: { "@type": "WebSite", name: "Megsy AI", url: SITE_URL },
+    author: { "@type": "Organization", name: "Megsy AI", url: SITE_URL },
+    publisher: { "@type": "Organization", name: "Megsy AI", url: SITE_URL },
+    hasPart: currentGroup.sections.map((s) => ({
+      "@type": "WebPageElement",
+      name: s.title,
+      url: `${SITE_URL}${groupPath}/${s.id}`,
+    })),
+  };
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: INK, color: PARCHMENT }}>
-      <SEOHead
-        title="Megsy AI Docs — The Complete Product Guide & PWA Install"
-        description="The complete Megsy AI documentation: every feature, every agent, every setting, every page — explained in full. Plus step-by-step PWA install for iPhone, Android, Mac, Windows and Linux."
-        path="/docs"
-      />
+      <SEOHead title={groupTitle} description={groupDescription} path={groupPath} />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbsLd)}</script>
+        <script type="application/ld+json">{JSON.stringify(techArticleLd)}</script>
+      </Helmet>
       <LandingNavbar />
 
       {/* Hero — cartoon sticker style */}
@@ -2667,6 +2722,32 @@ export default function DocsPage() {
             color: INK,
           }}
         >
+          {/* Visible breadcrumbs — Home › Docs › <Group> */}
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-4 text-[12px] font-bold opacity-70"
+          >
+            <ol className="flex flex-wrap items-center gap-1.5">
+              <li>
+                <Link to="/" className="hover:underline">Home</Link>
+              </li>
+              <li aria-hidden>›</li>
+              <li>
+                {isDocsRoot ? (
+                  <span aria-current="page">Docs</span>
+                ) : (
+                  <Link to="/docs" className="hover:underline">Docs</Link>
+                )}
+              </li>
+              {!isDocsRoot && (
+                <>
+                  <li aria-hidden>›</li>
+                  <li aria-current="page">{currentGroup.label}</li>
+                </>
+              )}
+            </ol>
+          </nav>
+
           <div
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest"
             style={{ backgroundColor: INK, color: PARCHMENT }}
@@ -2674,12 +2755,26 @@ export default function DocsPage() {
             <MegsyStar className="w-3.5 h-3.5" /> Documentation
           </div>
           <h1 className="mt-5 text-4xl md:text-6xl font-black tracking-tight leading-[1.02]">
-            Every atom of Megsy AI, <br className="hidden md:block" />
-            in one beautiful place.
+            {isDocsRoot ? (
+              <>
+                Every atom of Megsy AI, <br className="hidden md:block" />
+                in one beautiful place.
+              </>
+            ) : (
+              <>
+                {currentGroup.label}
+                <span className="block text-2xl md:text-3xl font-bold opacity-70 mt-2">
+                  Megsy AI Documentation
+                </span>
+              </>
+            )}
           </h1>
           <p className="mt-5 max-w-2xl text-[16px] md:text-[18px] font-semibold opacity-80">
-            Search, browse and install — a complete, deeply detailed reference for every feature, every agent, every model, every setting, every page and every policy on megsyai.com. Updated continuously.
+            {isDocsRoot
+              ? "Search, browse and install — a complete, deeply detailed reference for every feature, every agent, every model, every setting, every page and every policy on megsyai.com. Updated continuously."
+              : groupDescription}
           </p>
+
 
           {/* Search */}
           <div className="mt-7 relative max-w-xl">
