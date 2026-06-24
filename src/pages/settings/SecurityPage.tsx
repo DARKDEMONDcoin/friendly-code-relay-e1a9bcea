@@ -1,3 +1,4 @@
+/** @doc Security overview — sessions, MFA, recovery codes. */
 // Security — cartoon redesign. Public marketing page with cartoon hero + cards.
 import { motion } from "framer-motion";
 import LandingNavbar from "@/components/landing/LandingNavbar";

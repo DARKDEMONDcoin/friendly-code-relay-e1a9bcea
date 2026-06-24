@@ -1,3 +1,4 @@
+/** @doc Generates the JSON schema for a Doc builder (resume, report, letter, etc). */
 // Generate structured JSON for the file builders (docs, resume, report, …).
 // Called by src/lib/builders/aiSchema.ts via supabase.functions.invoke.
 

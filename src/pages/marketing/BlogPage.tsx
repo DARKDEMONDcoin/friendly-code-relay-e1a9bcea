@@ -1,3 +1,4 @@
+/** @doc The Megsy blog index — long-form articles plus 3 fresh AI-published posts per day. */
 import { Link, useParams, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LandingNavbar from "@/components/landing/LandingNavbar";

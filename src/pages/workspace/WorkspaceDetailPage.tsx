@@ -1,3 +1,4 @@
+/** @doc Workspace home — members, billing, brand, integrations, danger zone. */
 // Workspace detail layout — Cartoon / neo-brutalist shell.
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";

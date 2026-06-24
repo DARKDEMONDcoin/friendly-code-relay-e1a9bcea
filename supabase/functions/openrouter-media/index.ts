@@ -1,3 +1,4 @@
+/** @doc Bridges Megsy media generation calls through OpenRouter providers. */
 import { buildCors } from "../_shared/cors.ts";
 // Unified media generation: Alibaba DashScope (Singapore) + BytePlus Ark.
 // Keys are rotated from public.media_provider_keys via acquire_media_key RPC.

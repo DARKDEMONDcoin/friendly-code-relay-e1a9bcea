@@ -1,3 +1,4 @@
+/** @doc Regulatory compliance overview (GDPR, CCPA, SOC 2 path). */
 import LegalPageLayout, { LegalSection } from "@/components/landing/LegalPageLayout";
 
 const sections: LegalSection[] = [

@@ -1,3 +1,4 @@
+/** @doc Plans, yearly toggle, MC top-up packs and the official pricing FAQ. */
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Check, Loader2, Info, ChevronDown } from "lucide-react";

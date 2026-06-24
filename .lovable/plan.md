@@ -1,117 +1,99 @@
-# خطة حماية التطبيق من تصرفات المستخدمين
+## الوضع الحالي
+- الموقع يحتوي على **116 صفحة** و **27 Edge Function** و عشرات المكوّنات (شات، وسائط، إعدادات، فوترة، تكاملات…).
+- ملف `DocsPage.tsx` حالياً 2472 سطر ويحتوي محتوى مكتوب يدوياً + استخدام واحد فقط لـ `import.meta.glob` لاكتشاف edge functions.
+- لا يوجد نظام يضمن مزامنة الـ Docs مع الموقع تلقائياً عند أي تغيير.
 
-## النطاق
+## الهدف
+1. تغطية كل صفحة وكل ميزة وكل edge function وكل تكامل بشرح واضح ومفصّل.
+2. تنقّل احترافي على مستوى أفضل docs بالعالم (Stripe / Linear / Vercel).
+3. **التحديث التلقائي للأبد**: أي صفحة/ميزة/edge function جديدة أو محذوفة تظهر/تختفي من الـ Docs بدون تدخّل يدوي.
 
-4 أنواع حماية × 3 أولويات صفحات (Billing/Settings, Auth, Chat). شغل وقائي بدون تغيير منطق الأعمال.
+---
 
-## الإصلاحات
+## التصميم المقترح (تقني)
 
-### 1. Input Validation (zod schemas + تكامل في الفورمز)
+### 1) طبقة اكتشاف تلقائي (Auto-Discovery)
+ملف جديد `src/lib/docs-registry.ts` يستخدم `import.meta.glob` لمسح:
+- `src/pages/**/*.tsx` → كل المسارات الموجودة فعلاً
+- `supabase/functions/*/index.ts` → كل الـ edge functions
+- `src/components/chat/**`, `src/components/media/**` → الميزات الكبرى
+- `src/data/**` → القوالب والإعدادات
 
-ملف جديد `src/lib/validation/schemas.ts` يحتوي:
+كل ملف يُقرأ خامًا، يُستخرج منه:
+- العنوان (من `<title>` أو `export const meta`)
+- وصف قصير (من تعليق `/** @doc ... */` في أعلى الملف)
+- المسار (path) إن وُجد
 
-- `emailSchema` — trim + email + max 254
-- `passwordSchema` — min 8, max 128, يحوي حرف ورقم
-- `displayNameSchema` — trim, 1-50, بدون HTML tags
-- `chatMessageSchema` — trim, 1-8000 chars
-- `attachmentSchema` — max 25MB، أنواع mime مسموح بها فقط
-- `referralCodeSchema` — alphanumeric, 3-20
-
-**تطبيق:**
-- `AuthPage.tsx` — استخدام schemas قبل `handleCheckEmail`, `handleSubmitPassword`, تظهر error inline
-- composer الشات — التحقق قبل send، رفض الرسائل الفاضية أو > 8000 char، رفض المرفقات الكبيرة بـtoast واضح
-- صفحات الإعدادات (Profile, ChangeEmail, ChangePassword) — نفس الـschemas
-
-### 2. Confirmations على الـDestructive Actions
-
-ملف جديد `src/components/common/ConfirmDialog.tsx` (يستخدم `AlertDialog` من shadcn) + hook `useConfirm()` يرجع promise.
-
-**تطبيق:**
-- حذف محادثة (chat sidebar) — "Delete this conversation? This cannot be undone"
-- حذف رسالة
-- Sign out من كل الأجهزة
-- Cancel subscription
-- Delete account (موجود غالباً — نتأكد)
-- Clear chat history / memory
-- Remove workspace member
-- إلغاء job قيد التشغيل (research/video)
-
-كل dialog يطلب الضغط مرتين، والـconfirm button احمر فيه نص يكتبه المستخدم للحذف الخطير (account, workspace).
-
-### 3. Rate Limiting / Spam Guards (client-side)
-
-ملف جديد `src/lib/guards/rateLimiter.ts`:
-
+### 2) ميتاداتا داخل كل ملف (مصدر الحقيقة الوحيد)
+نضيف في أعلى كل صفحة/مكوّن/edge function بلوك موحّد:
 ```ts
-- useDebouncedAction(fn, ms)  // للأزرار اللي ممكن تتدبل-كليك
-- useRateLimit(key, max, windowMs)  // sliding window في memory
-- inflightGuard(key)  // منع نفس الـrequest مرتين بالتوازي
+/**
+ * @doc-title اسم الميزة بالعربية
+ * @doc-category chat | media | billing | integrations | legal | settings
+ * @doc-summary جملة واحدة
+ * @doc-description شرح مفصّل بأي طول
+ */
 ```
+هذا يجعل الـ Docs تلقائياً تعكس الحقيقة: لو حذفت ملفاً، يختفي. لو غيّرت العنوان، يتغيّر. لو أضفت ملفاً جديداً وكتبت البلوك، يظهر فوراً.
 
-**تطبيق:**
-- Send button في الشات — debounce 250ms + منع send لو في رسالة قيد الإرسال (موجود غالباً — نتأكد)
-- Auth submit (login/signup) — منع double-submit + cooldown 1s
-- "Resend OTP/email verification" — cooldown 30s مع countdown مرئي
-- "Forgot password" — cooldown 60s
-- Create new chat — debounce 500ms
-- Like/feedback buttons — debounce
-- Pricing checkout buttons — منع double-click (ممكن يخلق checkout مرتين)
-- Save settings — منع spam save
+### 3) إعادة بناء `DocsPage.tsx`
+- شريط جانبي (Sidebar) بالأقسام: Getting Started · Features · Chat · Media · Integrations · API · Edge Functions · Pages · Legal · FAQ.
+- بحث فوري (Cmd+K) فوق كل المحتوى المكتشف.
+- جدول محتويات (TOC) يميني داخل كل قسم.
+- روابط Anchor دائمة لكل عنوان.
+- تنقّل "Previous / Next" أسفل كل صفحة.
+- دعم RTL كامل والثيمين فاتح/داكن.
 
-### 4. Error Recovery & Retries
+### 4) محتوى مكتوب يدوياً (Hand-Written) للأقسام الإستراتيجية
+الاكتشاف التلقائي يغطي الفهرس والميتاداتا، لكن نضيف شرحاً عميقاً مكتوباً للأقسام التالية (لأنها لا تُستخرج من الكود):
+- **مقدّمة Megsy**: ما هو، لمن، الفلسفة، نموذج التسعير، الاعتمادات (credits).
+- **البدء السريع**: إنشاء حساب، أول محادثة، أول صورة، أول فيديو، أول شرائح.
+- **الشات**: الأوضاع (modes)، الـ agents، الـ tools، الـ mentions، الـ attachments، parallel agents، deep research.
+- **الوسائط**: قائمة كل provider (Flux, BFL, OpenAI, Gemini, NanoBanana, Ideogram, Recraft, ByteDance, Doubao, Alibaba, Kling, Minimax, Runway, Stability, xAI, Fal) — متى يُستخدم، الفروقات، التكلفة.
+- **المستندات والشرائح**: docs agent، slides agent، التصدير (PDF/PPTX/XLSX).
+- **التكاملات**: كل connector في `connectors`.
+- **الفوترة**: الخطط، الترقية، الاسترداد، نظام الـ credits.
+- **API & Webhooks**: edge functions العامة، التوثيق، التوقيع الأمني.
+- **الخصوصية والقانونية**: روابط لكل صفحة موجودة.
 
-ملف جديد `src/lib/guards/retry.ts`:
+### 5) ضمان "للأبد بدون تدخّل"
+- الاكتشاف يعمل **وقت التشغيل** عبر `import.meta.glob` (مدمج في Vite) — لا scripts خارجية، لا cron.
+- نضيف `vitest` بسيط: `docs-registry.test.ts` يفشل البناء لو ملف صفحة بدون `@doc-title` → يجبر أي مساهم مستقبلاً على توثيق ميزته.
+- نضيف ESLint rule (أو تعليق في `AGENTS.md`) يُذكّر الـ AI agent أن أي ملف جديد في `src/pages/**` يحتاج بلوك التوثيق.
 
-```ts
-- withRetry(fn, {retries, baseMs, shouldRetry})  // exponential backoff
-- isTransientError(err)  // network/5xx/timeout
-```
+---
 
-ملف جديد `src/components/common/NetworkStatus.tsx` — toast لما النت يقطع/يرجع (موجود OfflineBanner — نوسعه).
+## مراحل التنفيذ
 
-**تطبيق:**
-- Supabase queries المهمة (load conversation, send message) — retry تلقائي 2 مرات للأخطاء العابرة
-- Upload المرفقات — retry + رسالة "Retry" واضحة للمستخدم
-- AI chat send — لو فشل، يحتفظ بالـdraft + زر "Retry"
-- Auth submit — retry للـnetwork errors فقط (مش للـinvalid credentials)
-- Error boundary موجود — نتأكد إنه fallback مفيد + زر "Try again" + "Go home"
-- منع فقدان draft الرسالة لو حصل error — حفظ في sessionStorage
+**المرحلة 1 — البنية التحتية (ملف واحد)**
+- إنشاء `src/lib/docs-registry.ts` مع منطق الاكتشاف.
+- إنشاء `src/components/docs/` مع: `DocsLayout`, `DocsSidebar`, `DocsSearch`, `DocsTOC`, `DocsPager`, `DocsContent`.
 
-## ملفات جديدة
+**المرحلة 2 — ميتاداتا الملفات**
+- إضافة بلوك `@doc-*` لكل ملف في `src/pages/**` (116 ملف) و `supabase/functions/**` (27 ملف).
+- البلوك قصير لمعظم الملفات، مفصّل للميزات الكبرى.
 
-```text
-src/lib/validation/schemas.ts
-src/lib/guards/rateLimiter.ts
-src/lib/guards/retry.ts
-src/components/common/ConfirmDialog.tsx
-src/hooks/useConfirm.tsx
-```
+**المرحلة 3 — إعادة كتابة `DocsPage.tsx`**
+- استبدال الـ 2472 سطر بهيكل قائم على الـ registry + المحتوى اليدوي العميق.
+- 10–15 قسم رئيسي، كل قسم له صفحة فرعية في URL (`/docs/getting-started`, `/docs/chat/modes`, …).
 
-## ملفات معدلة (تقريباً)
+**المرحلة 4 — اختبار**
+- جولة على كل صفحة Docs، التحقق من الروابط والـ anchors والبحث.
+- اختبار إضافة ملف وهمي والتحقق من ظهوره تلقائياً.
+- اختبار حذف ملف والتحقق من اختفائه.
 
-```text
-src/pages/auth/AuthPage.tsx                   → zod, cooldowns, retry
-src/pages/auth/ChangeEmailPage.tsx            → validation + confirm
-src/pages/auth/ChangePasswordPage.tsx         → validation + confirm
-src/pages/auth/DeleteAccountPage.tsx          → typed-confirm
-src/pages/chat/ChatPage.tsx                   → schema + debounce + retry
-src/components/chat/sidebar/* (delete convo)  → confirm
-src/components/promo/* / pricing buttons      → inflight guard
-src/pages/settings/SettingsPage.tsx           → save throttle
-src/components/common/OfflineBanner.tsx       → expand for transient retry
-```
+**المرحلة 5 — توثيق المساهمة**
+- تحديث `AGENTS.md` بقاعدة: "أي ملف جديد في `src/pages/**` أو `supabase/functions/**` يجب أن يبدأ ببلوك `@doc-*`".
 
-## ما لن أعمله
+---
 
-- لن أضيف backend rate limiting (مش متاح كـprimitive حالياً — موضح في الـguidelines)
-- لن أغير business logic أو UI styling
-- لن ألمس Supabase tables أو RLS
+## حجم العمل المتوقّع
+- ملفات جديدة: ~8
+- ملفات معدّلة: ~150 (إضافة بلوك توثيق قصير)
+- ملف معاد كتابته بالكامل: 1 (`DocsPage.tsx`)
+- وقت: عملية كبيرة على عدة جولات
 
-## ترتيب التنفيذ
-
-1. الـbuilding blocks (schemas + guards + ConfirmDialog) — أساس لكل اللي بعده
-2. Auth (أعلى أثر أمني)
-3. Chat composer (الأكثر استخداماً)
-4. Billing/Settings (الأكثر خطورة على الفلوس والبيانات)
-
-تأكد علشان أبدأ التنفيذ.
+## أسئلة قبل البدء
+1. **هل تريد الـ Docs على مسار واحد `/docs` بتبويبات، أم مسارات متعدّدة `/docs/chat`, `/docs/media`…؟** الثاني أفضل لـ SEO والمشاركة.
+2. **اللغة الأساسية للمحتوى المكتوب: عربي فقط، إنجليزي فقط، أم ثنائي؟**
+3. **هل أبدأ المرحلة 1+3 (البنية + إعادة كتابة الصفحة) أولاً وأترك إضافة بلوكات التوثيق للملفات على جولات تالية؟** هذا يعطيك نتيجة مرئية بسرعة.

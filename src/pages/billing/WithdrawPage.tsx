@@ -1,3 +1,4 @@
+/** @doc Withdraw earned affiliate commission to PayPal or bank. */
 // Withdraw — cartoon redesign.
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";

@@ -1,3 +1,4 @@
+/** @doc Data Processing Agreement for GDPR-regulated customers. */
 import LegalPageLayout, { LegalSection } from "@/components/landing/LegalPageLayout";
 
 const sections: LegalSection[] = [

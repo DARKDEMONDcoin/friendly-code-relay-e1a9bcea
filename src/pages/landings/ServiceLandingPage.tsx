@@ -1,3 +1,4 @@
+/** @doc Renders any localized service-feature landing from the SERVICE_LANDINGS data. */
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate, useParams, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";

@@ -1,3 +1,4 @@
+/** @doc Generates a dynamic sitemap for /blog and its translations. */
 // Public dynamic sitemap for blog posts — multilingual, with full
 // hreflang alternates inline. Google's recommended format:
 // https://developers.google.com/search/docs/specialty/international/localized-versions

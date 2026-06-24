@@ -1,3 +1,4 @@
+/** @doc Refund policy and money-back guarantee details. */
 import LegalPageLayout, { type LegalSection } from "@/components/landing/LegalPageLayout";
 
 const sections: LegalSection[] = [

@@ -1,3 +1,4 @@
+/** @doc Public read-only view of a shared chat conversation. */
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";

@@ -1,3 +1,4 @@
+/** @doc REST API for creating, listing and updating slide decks. */
 import { buildCors } from "../_shared/cors.ts";
 // slides-api — Unified public API for all slide operations.
 //

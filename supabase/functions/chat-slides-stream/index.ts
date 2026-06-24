@@ -1,3 +1,4 @@
+/** @doc Streams a slide deck (premium HTML or standard) from prompts, with image agent. */
 // Streaming slides generation with live narrative.
 // Tells the user — in their own language — what it's doing as it does it,
 // then streams a final React deck JSON.

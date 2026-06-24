@@ -1,3 +1,4 @@
+/** @doc Plans a multi-step media generation pipeline before execution. */
 import { corsHeaders } from "../_shared/cors.ts";
 // Media Plan — analyzes a user's image/video generation prompt and returns a
 // structured scene-by-scene plan that the chat UI can review before kicking

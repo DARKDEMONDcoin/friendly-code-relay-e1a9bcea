@@ -1,3 +1,4 @@
+/** @doc OAuth consent screen for third-party apps requesting Megsy access. */
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";

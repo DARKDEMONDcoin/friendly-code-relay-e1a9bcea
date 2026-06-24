@@ -1,3 +1,4 @@
+/** @doc Age policy — minimum age and parental consent rules. */
 import LegalPageLayout, { LegalSection } from "@/components/landing/LegalPageLayout";
 
 const sections: LegalSection[] = [

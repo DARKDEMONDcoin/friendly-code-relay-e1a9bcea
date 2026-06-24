@@ -1,3 +1,4 @@
+/** @doc Shared tasks and assignments inside a workspace. */
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {

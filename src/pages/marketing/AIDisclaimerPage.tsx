@@ -1,3 +1,4 @@
+/** @doc AI accuracy disclaimer — limitations and responsible-use guidance. */
 import LegalPageLayout, { LegalSection } from "@/components/landing/LegalPageLayout";
 
 const sections: LegalSection[] = [

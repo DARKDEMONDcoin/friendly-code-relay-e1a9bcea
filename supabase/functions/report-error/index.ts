@@ -1,3 +1,4 @@
+/** @doc Receives client-side error reports for triage and alerting. */
 import { buildCors } from "../_shared/cors.ts";
 // Multi-route Supabase Edge Function.
 // Hosts: report-error (default), notify-user, workspace-notify, check-cf-secrets, github-import.

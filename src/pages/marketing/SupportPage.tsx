@@ -1,3 +1,4 @@
+/** @doc 24/7 AI support center — searchable knowledge base and live ticketing. */
 import { useState, useRef, useEffect, useCallback } from "react";
 import {
   ArrowUp,

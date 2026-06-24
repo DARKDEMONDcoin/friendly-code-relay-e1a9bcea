@@ -1,3 +1,4 @@
+/** @doc Create a new shared workspace and invite teammates. */
 // New workspace — cartoon redesign full-screen.
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";

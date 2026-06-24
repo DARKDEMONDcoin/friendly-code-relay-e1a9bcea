@@ -1,3 +1,4 @@
+/** @doc Open a support ticket from within settings. */
 // Support hub — cartoon redesign on mobile.
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";

@@ -1,3 +1,4 @@
+/** @doc How Megsy moderates harmful content and handles appeals. */
 import LegalPageLayout, { LegalSection } from "@/components/landing/LegalPageLayout";
 
 const sections: LegalSection[] = [

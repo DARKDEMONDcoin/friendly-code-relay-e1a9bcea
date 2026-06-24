@@ -1,3 +1,4 @@
+/** @doc Routes video-generation requests to the right provider (Kling, Sora, Veo, ...). */
 import { corsHeaders } from "../_shared/cors.ts";
 // Thin adapter that translates the StudioPage / MediaHub video contract
 // into the unified `openrouter-media` edge function.

@@ -1,3 +1,4 @@
+/** @doc Edit profile name, avatar, bio and public details. */
 import { useState, useEffect, useRef } from "react";
 import {
   MailCheck,

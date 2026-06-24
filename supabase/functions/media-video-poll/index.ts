@@ -1,3 +1,4 @@
+/** @doc Polls async video-generation jobs for progress and final URL. */
 import { corsHeaders } from "../_shared/cors.ts";
 // Thin adapter — checks an Alibaba/BytePlus/Vercel video task once and returns
 // a non-blocking status for the frontend's poll loop.

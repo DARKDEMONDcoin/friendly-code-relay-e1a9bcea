@@ -1,3 +1,4 @@
+/** @doc Settings home — entry to every personalization sub-page. */
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronRight, LogOut, Gift } from "lucide-react";

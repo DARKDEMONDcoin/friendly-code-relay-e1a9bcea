@@ -1,3 +1,4 @@
+/** @doc Cookie usage, analytics and how to opt out. */
 import LegalPageLayout, { type LegalSection } from "@/components/landing/LegalPageLayout";
 
 const sections: LegalSection[] = [

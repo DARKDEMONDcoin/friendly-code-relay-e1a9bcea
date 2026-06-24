@@ -1,3 +1,4 @@
+/** @doc Server-side helper for uploading assets (images, videos, files) to storage. */
 import { corsHeaders } from "../_shared/cors.ts";
 // Upload assets to Cloudflare R2 and track in user_assets table.
 // Client sends already-compressed file (WebP for images) via FormData.

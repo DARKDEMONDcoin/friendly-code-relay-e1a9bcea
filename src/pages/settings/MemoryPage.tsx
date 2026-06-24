@@ -1,3 +1,4 @@
+/** @doc Manage what Megsy remembers across conversations. */
 // Memory — what Megsy remembers about you.
 // Source of truth = `user_memory_entries` (written by chat-alibaba's background
 // memory extractor) + `user_memory_profiles.preferences.enabled` toggle, which

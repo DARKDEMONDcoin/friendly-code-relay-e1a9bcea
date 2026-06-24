@@ -1,3 +1,4 @@
+/** @doc Create a new custom skill with tools and a base model. */
 // New skill — cartoon redesign.
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
