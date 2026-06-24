@@ -57,7 +57,16 @@ export function ChatComposerSection(props: ChatComposerSectionProps) {
   } = props;
 
   const isEmpty = messagesLength === 0 && !loadingMessages;
-  const [modesShown, setModesShown] = useState(true);
+  // Auto-hide modes/templates bar once the user sends a first message. They can
+  // bring it back via the toggle on the composer.
+  const [userToggled, setUserToggled] = useState(false);
+  const [modesShown, setModesShownState] = useState(true);
+  const setModesShown = (v: boolean | ((prev: boolean) => boolean)) => {
+    setUserToggled(true);
+    setModesShownState(v);
+  };
+  const effectiveModesShown = userToggled ? modesShown : isEmpty;
+
 
   return (
     <div
