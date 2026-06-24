@@ -2130,7 +2130,7 @@ function buildAutoGroups(): DocGroup[] {
             "Auto-synced catalog of every tool a custom Skill can call, and every base model a Skill can be wired to. Source of truth: src/lib/skillTools.ts.",
           blocks: [
             { kind: "h", text: "Tools available to skills" },
-            { kind: "kv", rows: SKILL_TOOLS.map((t) => ({ k: t.id, v: t.label })) },
+            { kind: "kv", rows: SKILL_TOOLS.map((t) => ({ k: t.name, v: `${t.label} — ${t.description}` })) },
             { kind: "h", text: "Base models available to skills" },
             { kind: "kv", rows: SKILL_MODELS.map((m) => ({ k: m.id, v: m.label })) },
           ],
