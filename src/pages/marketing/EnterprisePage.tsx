@@ -341,8 +341,8 @@ const EnterprisePage = () => {
           </motion.div>
         </div>
       </section>
-
-
+      {/* Contact Form */}
+      <section className="py-16 md:py-24 border-t border-border/50">
         <div className="mx-auto max-w-2xl px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
