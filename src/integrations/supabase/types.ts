@@ -8103,6 +8103,7 @@ export type Database = {
         }
         Returns: string
       }
+      admin_grant_pro_monthly: { Args: { target_email: string }; Returns: Json }
       block_v0_key: {
         Args: { p_id: string; p_reason: string }
         Returns: undefined

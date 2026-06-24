@@ -208,6 +208,7 @@ function mainMenu(): IKBtn[][] {
     [{ text: "🎯 المهام", callback_data: "m:tasks" }, { text: "🤖 الوكلاء", callback_data: "m:agents" }],
     [{ text: "📋 الاقتراحات", callback_data: "m:proposals" }, { text: "🚨 الحوادث", callback_data: "m:incidents" }],
     [{ text: "🔑 مفاتيح API", callback_data: "m:keys" }, { text: "✍️ مدونة جديدة", callback_data: "m:blog_new" }],
+    [{ text: "🎁 منح Pro لمؤثر (شهر)", callback_data: "m:grant_pro" }],
     [{ text: "❓ المساعدة الكاملة", callback_data: "m:help" }],
   ];
 }
