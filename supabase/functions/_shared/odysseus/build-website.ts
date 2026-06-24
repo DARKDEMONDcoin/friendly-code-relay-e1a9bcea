@@ -350,6 +350,7 @@ Output JSON only. No prose.`;
         status: "published",
         progress: 100,
         preview_url,
+        published_url: preview_url,
       }).eq("id", site_id);
     } catch { /* noop */ }
     ctx.emitProgress?.({ step: "done", label: "الموقع جاهز", status: "done", detail: preview_url });
