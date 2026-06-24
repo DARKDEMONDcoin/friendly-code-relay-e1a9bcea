@@ -3045,3 +3045,80 @@ function BlockView({ block, accent }: { block: DocBlock; accent: string }) {
       );
   }
 }
+
+/* ───────────────────────── Helpers ───────────────────────── */
+
+function CopyLinkButton({ sectionId, groupId }: { sectionId: string; groupId: string }) {
+  const [copied, setCopied] = useState(false);
+  const onCopy = async () => {
+    const url = `${window.location.origin}/docs/${groupId}/${sectionId}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1400);
+    } catch {
+      // Older browsers — fall back to a temporary text area.
+      const ta = document.createElement("textarea");
+      ta.value = url;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch { /* noop */ }
+      document.body.removeChild(ta);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1400);
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={onCopy}
+      aria-label={copied ? "Link copied" : "Copy link to this section"}
+      title={copied ? "Copied!" : "Copy link"}
+      className="opacity-0 group-hover/heading:opacity-100 focus:opacity-100 transition inline-flex items-center justify-center w-7 h-7 rounded-lg shrink-0"
+      style={{ border: `1.5px solid hsl(var(--surface-4))`, backgroundColor: "hsl(var(--surface-2))" }}
+    >
+      {copied ? <Check className="w-3.5 h-3.5" /> : <LinkIcon className="w-3.5 h-3.5" />}
+    </button>
+  );
+}
+
+function CodeBlock({ text, lang }: { text: string; lang?: string }) {
+  const [copied, setCopied] = useState(false);
+  const onCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1400);
+    } catch {
+      /* noop */
+    }
+  };
+  return (
+    <div className="relative group/code">
+      {lang && (
+        <div
+          className="absolute left-3 top-2 text-[10px] font-black uppercase tracking-widest opacity-60"
+          aria-hidden
+        >
+          {lang}
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={onCopy}
+        aria-label={copied ? "Code copied" : "Copy code"}
+        className="absolute right-2 top-2 inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-bold opacity-0 group-hover/code:opacity-100 focus:opacity-100 transition"
+        style={{ backgroundColor: "hsl(var(--surface-2))", border: `1.5px solid hsl(var(--surface-4))` }}
+      >
+        {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+        {copied ? "Copied" : "Copy"}
+      </button>
+      <pre
+        className={`rounded-xl p-4 ${lang ? "pt-7" : ""} overflow-x-auto text-[13px] leading-6`}
+        style={{ backgroundColor: "hsl(var(--surface-3))", border: `1px solid hsl(var(--surface-4))` }}
+      >
+        <code>{text}</code>
+      </pre>
+    </div>
+  );
+}
