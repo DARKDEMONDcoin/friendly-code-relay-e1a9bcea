@@ -132,6 +132,12 @@ export default function AssistantMediaBlock({ msg, setMessages, setInput }: Prop
                       : mm,
                   ),
                 );
+                if (msg.id) {
+                  void updateMessageMetadata(msg.id, {
+                    mediaMergeStatus: "done",
+                    mediaFinalVideoUrl: data.final_url,
+                  });
+                }
                 toast.success("Final video ready");
               } catch (e) {
                 const m = e instanceof Error ? e.message : "Merge failed";
