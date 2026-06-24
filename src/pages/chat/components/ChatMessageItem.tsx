@@ -227,6 +227,13 @@ export const ChatMessageItem = ({
           </Suspense>
         </div>
       )}
+      {msg.role === "assistant" && msg.siteBuild?.siteId && (
+        <div className="px-3 md:px-12">
+          <Suspense fallback={null}>
+            <SiteBuildCard siteId={msg.siteBuild.siteId} />
+          </Suspense>
+        </div>
+      )}
       {msg.role === "assistant" && msg.mediaPlan && (
         <AssistantMediaBlock
           msg={msg as any}
