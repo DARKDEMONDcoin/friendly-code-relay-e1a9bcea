@@ -3,8 +3,8 @@
 // Cartoon / brand-ink design system, matching the landing page + settings.
 // One long, fully-indexed reference for EVERY feature, page, agent, setting,
 // integration, plan, policy, route and shortcut on megsyai.com.
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   Sparkles,
   MessageSquare,
