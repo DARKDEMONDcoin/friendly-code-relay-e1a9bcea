@@ -3921,3 +3921,37 @@ function CodeBlock({ text, lang }: { text: string; lang?: string }) {
     </div>
   );
 }
+
+/* ───────────────────────── Reading progress bar ─────────────────────────
+   Thin top bar that fills as the user scrolls — same trick the best docs
+   sites (Stripe, Vercel, Linear) use to give a sense of length & position. */
+function ReadingProgressBar() {
+  const [pct, setPct] = useState(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      setPct(max > 0 ? Math.min(100, Math.max(0, (h.scrollTop / max) * 100)) : 0);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+  return (
+    <div
+      aria-hidden
+      className="fixed top-0 left-0 right-0 z-[60] h-[3px] pointer-events-none"
+      style={{ backgroundColor: "transparent" }}
+    >
+      <div
+        className="h-full transition-[width] duration-100"
+        style={{ width: `${pct}%`, backgroundColor: ACTION, boxShadow: `0 0 8px ${ACTION}` }}
+      />
+    </div>
+  );
+}
+
