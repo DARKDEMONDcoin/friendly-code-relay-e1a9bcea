@@ -93,6 +93,15 @@ import {
   COMMISSION_PCT,
   MIN_PAYOUT,
 } from "@/pages/billing/ReferralsPage";
+import {
+  DOC_PAGES,
+  DOC_EDGE_FUNCTIONS,
+  DOC_REGISTRY_STATS,
+  groupPagesByFolder,
+} from "@/lib/docsRegistry";
+import { integrations as INTEGRATIONS_LIST, INTEGRATION_CATEGORIES } from "@/lib/integrationsData";
+import { SLIDES_TEMPLATES } from "@/lib/slidesTemplates";
+import { SKILL_TOOLS, SKILL_MODELS } from "@/lib/skillTools";
 
 const LandingFooter = lazy(() => import("@/components/landing/LandingFooter"));
 
