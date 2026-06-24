@@ -179,8 +179,39 @@ const AboutPage = () => {
         </div>
       </section>
 
+      {/* STATS BAND */}
+      <section className="border-t border-border/30 bg-white/[0.015] py-12 md:py-16">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-10">
+            {[
+              { v: "36+", k: "AI engines unified" },
+              { v: "25", k: "Languages auto-translated" },
+              { v: "1", k: "Credit (MC) — one wallet" },
+              { v: "24/7", k: "Human + AI support" },
+            ].map((s, i) => (
+              <motion.div
+                key={s.k}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06 }}
+                className="text-center md:text-left"
+              >
+                <p className="font-display text-4xl font-black tracking-tight text-foreground md:text-6xl">
+                  {s.v}
+                </p>
+                <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  {s.k}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* INTRO */}
       <section className="border-t border-border/30 py-20 md:py-28">
+
         <div className="mx-auto grid max-w-6xl items-start gap-12 px-6 md:grid-cols-12 md:gap-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
