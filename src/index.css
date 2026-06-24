@@ -271,12 +271,15 @@ select {
   font-size: 16px !important;
 }
 
-/* Keep user-entered composer text clearly visible. Placeholder styling remains separate. */
-textarea:not(:placeholder-shown),
-input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not(:placeholder-shown),
-.chat-composer-frame textarea,
-.liquid-glass-input textarea,
-.ios26-glass-chip textarea {
+/* Keep user-entered composer text clearly visible. Placeholder styling remains separate.
+   Scoped strictly to the chat composer surfaces — a global rule here would make filled
+   inputs invisible on every light-background form (docs search, settings, etc.). */
+.chat-composer-frame textarea:not(:placeholder-shown),
+.chat-composer-frame input:not(:placeholder-shown),
+.liquid-glass-input textarea:not(:placeholder-shown),
+.liquid-glass-input input:not(:placeholder-shown),
+.ios26-glass-chip textarea:not(:placeholder-shown),
+.ios26-glass-chip input:not(:placeholder-shown) {
   color: hsl(0 0% 100%) !important;
   -webkit-text-fill-color: hsl(0 0% 100%) !important;
   caret-color: hsl(0 0% 100%) !important;
