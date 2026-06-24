@@ -193,16 +193,15 @@ export default function MediaResultCard({
               <div className="flex items-center gap-2 text-[12px] font-medium">
                 <Film className="w-4 h-4 text-primary" />
                 <span>Final stitched video</span>
-                <a
-                  href={finalVideoUrl}
-                  download
-                  target="_blank"
-                  rel="noreferrer"
-                  className="ms-auto inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
+                <Button
+                  size="sm"
+                  variant="default"
+                  className="ms-auto h-8 gap-1.5"
+                  onClick={() => forceDownload(finalVideoUrl, "final-video.mp4")}
                 >
                   <Download className="w-3.5 h-3.5" />
                   Download
-                </a>
+                </Button>
               </div>
               <video
                 src={finalVideoUrl}
