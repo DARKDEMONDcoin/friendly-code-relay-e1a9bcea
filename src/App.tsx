@@ -611,6 +611,12 @@ const App = () => {
                       <Route path="/docs" element={<DocsPage />} />
                       <Route path="/docs/:groupId" element={<DocsPage />} />
                       <Route path="/docs/:groupId/:sectionId" element={<DocsPage />} />
+                      {/* Localized Docs — auto-translated by i18n-translate (Qwen-Max) and
+                          cached forever in public.i18n_translations. Each language gets its
+                          own indexable URL + hreflang alternates for full multilingual SEO. */}
+                      <Route path="/:lang/docs" element={<DocsPage />} />
+                      <Route path="/:lang/docs/:groupId" element={<DocsPage />} />
+                      <Route path="/:lang/docs/:groupId/:sectionId" element={<DocsPage />} />
                       <Route path="/contact" element={<ContactPage />} />
                       <Route path="/egypt" element={<EgyptPage />} />
                       <Route path="/cookies" element={<CookiePolicyPage />} />
