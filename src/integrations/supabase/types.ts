@@ -2274,6 +2274,7 @@ export type Database = {
         Row: {
           created_at: string
           error_message: string | null
+          files: Json | null
           html_compiled: string | null
           id: string
           is_public: boolean
@@ -2282,6 +2283,7 @@ export type Database = {
           preview_url: string | null
           progress: number
           prompt: string
+          published_url: string | null
           share_slug: string | null
           status: string
           tasks: Json
@@ -2293,6 +2295,7 @@ export type Database = {
         Insert: {
           created_at?: string
           error_message?: string | null
+          files?: Json | null
           html_compiled?: string | null
           id?: string
           is_public?: boolean
@@ -2301,6 +2304,7 @@ export type Database = {
           preview_url?: string | null
           progress?: number
           prompt: string
+          published_url?: string | null
           share_slug?: string | null
           status?: string
           tasks?: Json
@@ -2312,6 +2316,7 @@ export type Database = {
         Update: {
           created_at?: string
           error_message?: string | null
+          files?: Json | null
           html_compiled?: string | null
           id?: string
           is_public?: boolean
@@ -2320,6 +2325,7 @@ export type Database = {
           preview_url?: string | null
           progress?: number
           prompt?: string
+          published_url?: string | null
           share_slug?: string | null
           status?: string
           tasks?: Json
