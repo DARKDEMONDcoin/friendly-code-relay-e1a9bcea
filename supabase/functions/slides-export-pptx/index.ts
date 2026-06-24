@@ -1,3 +1,4 @@
+/** @doc Exports a slide deck to a downloadable .pptx file. */
 import { buildCors } from "../_shared/cors.ts";
 // slides-export-pptx: Convert the existing deck JSON (from chat-slides-stream)
 // into a real, downloadable PPTX file using python-pptx in an E2B sandbox.

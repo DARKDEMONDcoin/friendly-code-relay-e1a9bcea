@@ -1,3 +1,4 @@
+/** @doc On-demand AI blog post generator used by the editor. */
 // blog-generate
 // Generates ONE high-quality English blog post from a topic and inserts
 // it into blog_posts as the "original" of a new translation group.

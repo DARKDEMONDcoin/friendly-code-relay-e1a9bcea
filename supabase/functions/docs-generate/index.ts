@@ -1,3 +1,4 @@
+/** @doc Generates long-form documents (Docs agent) and persists them with live previews. */
 import { corsHeaders } from "../_shared/cors.ts";
 // docs-generate: streaming free-form document generator (SSE).
 //

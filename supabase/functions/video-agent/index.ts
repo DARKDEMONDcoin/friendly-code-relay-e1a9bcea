@@ -1,3 +1,4 @@
+/** @doc Plans and orchestrates multi-clip video generation jobs. */
 import { corsHeaders } from "../_shared/cors.ts";
 // Video Agent — plans a long-form video as multiple shots, dispatches them,
 // polls until ready, then merges into a single MP4 via ffmpeg.wasm.

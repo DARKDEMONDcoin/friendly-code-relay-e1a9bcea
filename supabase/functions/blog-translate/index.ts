@@ -1,3 +1,4 @@
+/** @doc Translates blog posts into every supported language. */
 // blog-translate
 // Translates an existing English blog post into the remaining 24 languages
 // and inserts each as a separate blog_posts row sharing the same

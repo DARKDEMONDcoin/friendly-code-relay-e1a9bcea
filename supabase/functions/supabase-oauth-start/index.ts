@@ -1,3 +1,4 @@
+/** @doc Starts the OAuth flow for connecting a Supabase project. */
 import { corsHeaders } from "../_shared/cors.ts";
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { z } from 'npm:zod@3'

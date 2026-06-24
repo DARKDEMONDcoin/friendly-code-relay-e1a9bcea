@@ -1,3 +1,4 @@
+/** @doc Long-running deep-research job — plans, browses, synthesizes a full report. */
 import { buildCors } from "../_shared/cors.ts";
 // Deep Research background-job worker — plan-approval + multi-agent edition.
 // Actions: start (legacy auto), plan, approve, update_plan, cancel.

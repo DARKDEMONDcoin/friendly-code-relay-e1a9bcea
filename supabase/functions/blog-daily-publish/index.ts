@@ -1,3 +1,4 @@
+/** @doc Daily cron — publishes 3 fresh AI-generated blog posts. */
 // blog-daily-publish
 // Cron entry point — runs once a day at 06:00 UTC.
 // Pipeline:

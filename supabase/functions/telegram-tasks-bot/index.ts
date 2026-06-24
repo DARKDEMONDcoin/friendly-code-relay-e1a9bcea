@@ -1,3 +1,4 @@
+/** @doc Telegram bot that surfaces Megsy tasks and lets users react from chat. */
 // Thin wrapper. Hosts two unrelated runtimes under one edge function to
 // stay within the project's edge-function limit:
 //   1. Telegram tasks bot webhook (default)

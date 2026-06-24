@@ -1,3 +1,4 @@
+/** @doc Drives autonomous Operator/Megsy OS agents over multiple steps. */
 import { corsHeaders } from "../_shared/cors.ts";
 // Megsy Operator: orchestrator backed by Manus API v2.
 // Each `operator_runs` row maps to a Manus task. Each tick polls Manus for new

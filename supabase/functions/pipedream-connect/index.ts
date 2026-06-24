@@ -1,3 +1,4 @@
+/** @doc OAuth handshake for Pipedream-powered third-party integrations. */
 // Pipedream Connect — generate connect tokens & manage connected accounts.
 // Docs: https://pipedream.com/docs/connect/api
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
