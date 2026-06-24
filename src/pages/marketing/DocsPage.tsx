@@ -32,6 +32,7 @@ import {
   HelpCircle,
   Rocket,
   Search,
+  X,
   ChevronRight,
   CheckCircle2,
   Workflow,
