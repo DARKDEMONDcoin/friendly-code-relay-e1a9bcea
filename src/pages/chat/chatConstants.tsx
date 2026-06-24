@@ -75,6 +75,8 @@ export interface Message {
   mediaFinalVideoUrl?: string;
   mediaMergeStatus?: "idle" | "merging" | "done" | "error";
   mediaMergeError?: string;
+  /** Reference to a row in `generated_sites` — rendered as a live build card. */
+  siteBuild?: { siteId: string };
 }
 
 export const EMPTY_READERS: { user_id: string; name?: string; avatar?: string }[] = [];
