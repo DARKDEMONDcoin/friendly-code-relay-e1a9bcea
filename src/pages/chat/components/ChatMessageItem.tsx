@@ -10,7 +10,6 @@ import {
   DocsArtifactCard,
 } from "../lazyComponents";
 import AssistantMediaBlock from "./AssistantMediaBlock";
-import { lazy, Suspense as ReactSuspense } from "react";
 const SiteBuildCard = lazy(() => import("@/components/chat/site/SiteBuildCard"));
 import AssistantDocsClarifyBlock from "./AssistantDocsClarifyBlock";
 import { type Message, EMPTY_READERS, EMPTY_REACTIONS } from "../chatConstants";
