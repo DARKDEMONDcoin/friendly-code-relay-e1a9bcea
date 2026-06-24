@@ -34,9 +34,8 @@ export default defineConfig({
     // first paint users reported. Each route fetches its own chunks on demand.
     modulePreload: { polyfill: false },
     rollupOptions: {
+      external: [/^npm:/, /^https?:\/\//, /^jsr:/, /^node:/],
       output: {
-        // Bundle related deps together so we don't ship 200+ tiny chunks
-        // (every lucide icon becomes its own ~1KB request otherwise).
         manualChunks(id) {
           if (!id.includes("node_modules")) return;
           if (id.includes("lucide-react")) return "lucide";
@@ -49,5 +48,6 @@ export default defineConfig({
         },
       },
     },
+
   },
 });
