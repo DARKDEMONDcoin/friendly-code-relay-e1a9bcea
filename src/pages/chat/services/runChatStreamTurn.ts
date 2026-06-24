@@ -745,6 +745,7 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
             id: aId || last.id,
             images: searchImages.length > 0 ? searchImages : last.images,
             products: streamedProducts.length > 0 ? streamedProducts : last.products,
+            siteBuild: siteIdA ? { siteId: siteIdA } : last.siteBuild,
           };
           return next;
         });
