@@ -1,3 +1,4 @@
+/** @doc Privacy controls — training opt-out, data exports, deletions. */
 // Privacy & data settings — cartoon redesign on mobile.
 import { useNavigate } from "react-router-dom";
 import { ChevronIcon } from "@/components/settings/SettingsIcons";

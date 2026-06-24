@@ -1,3 +1,4 @@
+/** @doc Accessibility commitments and supported assistive technology. */
 import LegalPageLayout, { LegalSection } from "@/components/landing/LegalPageLayout";
 
 const sections: LegalSection[] = [

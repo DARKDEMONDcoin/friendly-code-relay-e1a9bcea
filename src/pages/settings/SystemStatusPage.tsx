@@ -1,3 +1,4 @@
+/** @doc Live system status — model providers and edge function health. */
 // System Status — live service health from service_status / service_incidents.
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";

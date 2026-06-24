@@ -1,3 +1,4 @@
+/** @doc Acceptable use and content policy for generated outputs. */
 import LegalPageLayout, { type LegalSection } from "@/components/landing/LegalPageLayout";
 
 const sections: LegalSection[] = [

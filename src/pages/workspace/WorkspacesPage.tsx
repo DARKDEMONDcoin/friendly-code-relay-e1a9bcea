@@ -1,3 +1,4 @@
+/** @doc List of all workspaces you belong to. */
 // Workspaces list — cartoon/neo-brutalist mobile style; Geist look preserved on desktop.
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";

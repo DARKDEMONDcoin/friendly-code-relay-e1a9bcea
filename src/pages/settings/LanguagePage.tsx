@@ -1,3 +1,4 @@
+/** @doc Pick UI language and AI reply language preferences. */
 // Language settings — cartoon redesign. Mobile uses the cartoon shell.
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";

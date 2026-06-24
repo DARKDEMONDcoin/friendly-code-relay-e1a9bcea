@@ -1,3 +1,4 @@
+/** @doc Contact form for sales, partnerships and press inquiries. */
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";

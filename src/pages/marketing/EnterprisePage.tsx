@@ -1,3 +1,4 @@
+/** @doc Enterprise plan — SSO, audit logs, custom contracts, dedicated support. */
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {

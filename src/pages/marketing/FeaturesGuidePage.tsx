@@ -1,3 +1,4 @@
+/** @doc Long-form feature tour with screenshots, comparisons and walkthroughs. */
 import { lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";

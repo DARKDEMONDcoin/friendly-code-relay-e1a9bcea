@@ -1,3 +1,4 @@
+/** @doc Affiliate program legal terms and commission rules. */
 import LegalPageLayout, { LegalSection } from "@/components/landing/LegalPageLayout";
 
 const sections: LegalSection[] = [

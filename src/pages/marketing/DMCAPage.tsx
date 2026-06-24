@@ -1,3 +1,4 @@
+/** @doc DMCA takedown procedure for copyrighted content. */
 import LegalPageLayout, { LegalSection } from "@/components/landing/LegalPageLayout";
 
 const sections: LegalSection[] = [

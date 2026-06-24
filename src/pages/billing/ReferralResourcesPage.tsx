@@ -1,3 +1,4 @@
+/** @doc Marketing kit for affiliates — banners, videos, copy snippets. */
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Download, Play, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";

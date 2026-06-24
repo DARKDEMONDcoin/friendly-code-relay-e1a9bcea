@@ -1,3 +1,4 @@
+/** @doc Security, compliance and trust posture — certifications and controls. */
 import LegalPageLayout, { type LegalSection } from "@/components/landing/LegalPageLayout";
 
 const sections: LegalSection[] = [

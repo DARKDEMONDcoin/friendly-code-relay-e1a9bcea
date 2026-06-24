@@ -1,3 +1,4 @@
+/** @doc Browse and manage installed skills. */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, ArrowUp, Pencil, Trash2, X, Plus, Paperclip } from "lucide-react";

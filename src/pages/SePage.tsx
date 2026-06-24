@@ -1,3 +1,4 @@
+/** @doc Internal SE diagnostic / health page. */
 import { useEffect, useMemo, useState } from "react";
 import {
   Plus,

@@ -1,3 +1,4 @@
+/** @doc Email, push and in-app notification preferences. */
 // Notification settings — cartoon redesign on mobile.
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";

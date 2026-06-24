@@ -1,3 +1,4 @@
+/** @doc Customize accent color, message style and reply tone. */
 import { useState, useCallback, useEffect } from "react";
 import { Check } from "lucide-react";
 import { motion } from "framer-motion";

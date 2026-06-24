@@ -1,3 +1,4 @@
+/** @doc Full-screen preview of a deep-research report. */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {

@@ -1,3 +1,4 @@
+/** @doc Audit trail of every action an Operator agent has taken. */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";

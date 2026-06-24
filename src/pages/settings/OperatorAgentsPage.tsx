@@ -1,3 +1,4 @@
+/** @doc Manage long-running autonomous Operator agents. */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";

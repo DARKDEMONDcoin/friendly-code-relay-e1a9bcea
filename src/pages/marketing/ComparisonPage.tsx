@@ -1,3 +1,4 @@
+/** @doc Head-to-head comparison page — Megsy vs a specific competitor. */
 import { useParams, Navigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Check, X, Minus } from "lucide-react";

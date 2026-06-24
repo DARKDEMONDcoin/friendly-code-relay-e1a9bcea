@@ -1,3 +1,4 @@
+/** @doc Privacy policy — how Megsy collects, stores and protects personal data. */
 import LegalPageLayout, { type LegalSection } from "@/components/landing/LegalPageLayout";
 
 const sections: LegalSection[] = [

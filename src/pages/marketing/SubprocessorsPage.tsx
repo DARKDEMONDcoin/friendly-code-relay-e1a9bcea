@@ -1,3 +1,4 @@
+/** @doc Full list of third-party subprocessors handling your data. */
 import LegalPageLayout, { LegalSection } from "@/components/landing/LegalPageLayout";
 
 const sections: LegalSection[] = [

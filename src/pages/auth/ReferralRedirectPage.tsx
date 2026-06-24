@@ -1,3 +1,4 @@
+/** @doc Captures referral code from a shared link and redirects to sign-up. */
 import { useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";

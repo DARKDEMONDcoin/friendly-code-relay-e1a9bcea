@@ -1,3 +1,4 @@
+/** @doc Switch between multiple signed-in Megsy accounts. */
 // Dedicated workspace switcher page — neo-brutalist sticker style, English copy.
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";

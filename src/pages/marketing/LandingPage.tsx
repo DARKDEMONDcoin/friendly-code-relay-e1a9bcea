@@ -1,3 +1,4 @@
+/** @doc Public home page — hero, showcase, featured demos and pricing preview. */
 import { useEffect, useState, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import Lenis from "lenis";

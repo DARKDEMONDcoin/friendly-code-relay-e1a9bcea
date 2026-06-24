@@ -1,3 +1,4 @@
+/** @doc Terms of service — the contract between you and Megsy AI. */
 import LegalPageLayout, { type LegalSection } from "@/components/landing/LegalPageLayout";
 
 const sections: LegalSection[] = [

@@ -1,3 +1,4 @@
+/** @doc Tell Megsy about you so replies feel personal. */
 // AI Personalization — neo-brutalist sticker style, matches Settings shell.
 // Loads / saves to `ai_personalization`. These values are injected into the
 // chat system prompt by supabase/functions/chat-alibaba so personalization

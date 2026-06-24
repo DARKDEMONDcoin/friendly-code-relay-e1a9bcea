@@ -1,3 +1,4 @@
+/** @doc Referral program dashboard — invites, tasks, commissions and withdrawals. */
 import { useState, useEffect, useCallback, createContext, useContext, useRef } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { toast } from "sonner";

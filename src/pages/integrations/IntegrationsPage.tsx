@@ -1,3 +1,4 @@
+/** @doc Browse and connect 1,000+ third-party integrations. */
 // Integrations page — Paper & Ink editorial desktop + cartoon mobile.
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";

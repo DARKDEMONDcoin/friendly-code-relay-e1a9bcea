@@ -1,3 +1,4 @@
+/** @doc Quick contact form from within settings. */
 // Contact human support — cartoon redesign on mobile.
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";

@@ -1,3 +1,4 @@
+/** @doc Billing dashboard — current plan, invoices, payment methods, MC usage. */
 // Billing — cartoon redesign. Mobile uses cartoon shell + sticker hero.
 import { useState, useEffect } from "react";
 import { TrendingUp, TrendingDown, Clock } from "lucide-react";

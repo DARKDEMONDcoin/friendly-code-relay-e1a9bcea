@@ -1,3 +1,4 @@
+/** @doc Help center entry inside settings. */
 // Help center — cartoon redesign on mobile.
 import { useState } from "react";
 import { Link } from "react-router-dom";

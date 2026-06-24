@@ -1,3 +1,4 @@
+/** @doc 404 page shown when the requested route doesn't exist. */
 import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 

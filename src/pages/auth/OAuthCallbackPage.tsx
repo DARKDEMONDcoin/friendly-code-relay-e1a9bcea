@@ -1,3 +1,4 @@
+/** @doc Handles the OAuth callback after the user authorizes a provider. */
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Loader2, Check, X } from "lucide-react";

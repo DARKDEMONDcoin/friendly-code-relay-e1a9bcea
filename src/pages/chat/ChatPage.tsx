@@ -1,3 +1,4 @@
+/** @doc Main chat workspace — all modes, all models, attachments, agents and the composer live here. */
 import SEOHead from "@/components/common/SEOHead";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useMediaUpload } from "@/hooks/useMediaUpload";

@@ -1,3 +1,4 @@
+/** @doc The page you're reading — the comprehensive, self-updating Megsy AI documentation. */
 // Megsy AI — Comprehensive Docs page (/docs)
 // Cartoon / brand-ink design system, matching the landing page + settings.
 // One long, fully-indexed reference for EVERY feature, page, agent, setting,

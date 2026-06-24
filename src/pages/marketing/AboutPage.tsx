@@ -1,3 +1,4 @@
+/** @doc About Megsy — team, mission, founders and timeline. */
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import LandingNavbar from "@/components/landing/LandingNavbar";
