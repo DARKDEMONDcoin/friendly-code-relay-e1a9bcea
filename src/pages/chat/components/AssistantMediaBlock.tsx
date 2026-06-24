@@ -26,6 +26,9 @@ export default function AssistantMediaBlock({ msg, setMessages, setInput }: Prop
           status={msg.mediaStatus ?? "awaiting"}
           currentSceneIndex={msg.mediaCurrentScene}
           onStart={async () => {
+            if (msg.id) {
+              void updateMessageMetadata(msg.id, { mediaStatus: "running" });
+            }
             setMessages((prev) =>
               prev.map((mm) =>
                 matches(mm)
@@ -33,6 +36,7 @@ export default function AssistantMediaBlock({ msg, setMessages, setInput }: Prop
                   : mm,
               ),
             );
+            const liveResults = [...(msg.mediaResults ?? [])];
             await runMediaPlan({
               plan: msg.mediaPlan!,
               onSceneStart: (idx) => {
@@ -51,6 +55,9 @@ export default function AssistantMediaBlock({ msg, setMessages, setInput }: Prop
                 );
               },
               onSceneDone: (res) => {
+                const i = liveResults.findIndex((r) => r.index === res.index);
+                if (i >= 0) liveResults[i] = res;
+                else liveResults.push(res);
                 setMessages((prev) =>
                   prev.map((mm) =>
                     matches(mm)
@@ -63,11 +70,23 @@ export default function AssistantMediaBlock({ msg, setMessages, setInput }: Prop
                       : mm,
                   ),
                 );
+                // Persist as each scene lands so refreshing mid-flight keeps results.
+                if (msg.id) {
+                  void updateMessageMetadata(msg.id, {
+                    mediaResults: liveResults,
+                  });
+                }
               },
             });
             setMessages((prev) =>
               prev.map((mm) => (matches(mm) ? { ...mm, mediaStatus: "done" } : mm)),
             );
+            if (msg.id) {
+              void updateMessageMetadata(msg.id, {
+                mediaStatus: "done",
+                mediaResults: liveResults,
+              });
+            }
           }}
           onEditPrompt={() => {
             setInput(msg.mediaPlan?.summary || "");
