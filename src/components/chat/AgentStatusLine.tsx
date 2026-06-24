@@ -83,7 +83,7 @@ const AgentStatusLine = ({ searchStatus, toolActivity, userText }: AgentStatusLi
     shimmer = false;
   } else if (phase === "thinking") {
     icon = <MegsyStar size={16} />;
-    label = ar ? "يفكر…" : "Thinking…";
+    label = "Thinking…";
   } else if (phase === "thinking_deep") {
     icon = (
       <span className="relative inline-flex items-center justify-center w-5 h-5">
@@ -91,20 +91,20 @@ const AgentStatusLine = ({ searchStatus, toolActivity, userText }: AgentStatusLi
         <Brain className="absolute -bottom-1 -right-1 w-3 h-3 text-foreground/70 animate-pulse" />
       </span>
     );
-    label = ar ? "يفكر بعمق…" : "Thinking deeply…";
+    label = "Thinking deeply…";
   } else if (phase === "tool") {
     const active = toolActivity ?? null;
     const meta = active ? resolveToolActivity(active.name, active.appSlug) : null;
     key = `tool:${active?.name || "status"}`;
     icon = <ToolIcon meta={meta} />;
-    const verb = meta ? (ar ? meta.ar : meta.en) : "";
+    const verb = meta ? meta.en : "";
     if (searchStatus?.trim()) label = searchStatus.trim();
     else if (active?.target) label = `${verb} ${active.target}`;
-    else label = verb || (ar ? "جارٍ العمل…" : "Working…");
+    else label = verb || "Working…";
   } else if (phase === "tool_done" && lastDoneTool) {
     const meta = resolveToolActivity(lastDoneTool.name, lastDoneTool.appSlug);
     key = `done:${lastDoneTool.name}`;
-    const verb = ar ? meta.ar : meta.en;
+    const verb = meta.en;
     const isError = lastDoneTool.status === "error";
     icon = (
       <span className="relative inline-flex items-center justify-center w-5 h-5">
@@ -119,15 +119,10 @@ const AgentStatusLine = ({ searchStatus, toolActivity, userText }: AgentStatusLi
         </span>
       </span>
     );
-    label = isError
-      ? ar
-        ? `${verb} — تعذّر`
-        : `${verb} — failed`
-      : ar
-        ? `${verb} — تم`
-        : `${verb} — done`;
+    label = isError ? `${verb} — failed` : `${verb} — done`;
     shimmer = false;
   }
+
 
   const motionProps = reduce
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }

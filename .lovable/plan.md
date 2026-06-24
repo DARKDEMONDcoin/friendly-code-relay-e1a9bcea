@@ -1,48 +1,48 @@
-## Goal
-Make "Create Website" in chat work end-to-end: real progress, public URL, downloadable files list with code viewer — using the existing `build_website` pipeline.
+# Multi-fix UX pass
 
-## What already exists (no rebuild needed)
-- `supabase/functions/_shared/odysseus/build-website.ts` — async builder that plans files, runs Vite build in an E2B sandbox, and uploads the dist to the `published-sites` storage bucket.
-- `generated_sites` table (id, status, progress, tasks jsonb, preview_url, …) with realtime hookup.
-- `chat-alibaba` detects website intent and forces the `build_website` tool call.
+Tackling all seven items in parallel. Each is scoped and independent.
 
-## What's missing → what this plan ships
+## 1. PWA splash (2s)
+Add a lightweight splash overlay rendered from `index.html` inline script + CSS that shows the app logo/background for ~2 seconds when launched from the home-screen (standalone mode). It auto-fades out after 2s or once React mounts (whichever is later). No service worker changes — manifest-only territory.
 
-### 1. Database
-Add two columns to `generated_sites`:
-- `files jsonb` — array of `{ path, content }` so the chat can show the source.
-- `published_url text` — final public URL (the `dist/index.html` after upload). Today only `preview_url` exists and it's the same thing, but we'll set this on the row once the upload succeeds so the frontend can flip the UI to "done".
+## 2. English loading text in chat
+Audit chat loading copy (`TypingIndicator`, `ThinkingLoader`, `RemoteAiBusyBanner`, media/site/slides/docs card loaders, deep-research status lines, mobile service panels). Replace any Arabic loading strings with English equivalents ("Thinking…", "Generating video…", "Building website…", "Researching…", "Composing slides…", etc.). Non-loading UI stays Arabic.
 
-### 2. Backend persistence
-Update `build-website.ts`:
-- After the plan step, write `files` to the row (truncate any single file's content to 200 KB; cap total to ~2 MB).
-- After the storage upload succeeds, write `published_url` and set `status = "done"`, `progress = 100`.
+## 3. Hide intro cards/buttons on first message (all modes)
+On the chat landing surface (desktop + mobile), once the user sends their first message, fade-out + collapse:
+- Deep research template picker card
+- Slides template button row
+- Greeting / mode chips / integrations strip / megsy-os intro
+- Any "quick action" cards
 
-### 3. New assistant card: `SiteBuildCard.tsx`
-- Accepts `siteId`. Subscribes to `generated_sites` realtime updates.
-- Shows: spinner + current task label + progress bar while `status = "building"`.
-- When done: large "🌐 Open website" link, secondary "⬇️ Download ZIP" (built client-side from `files` via JSZip), and a collapsible **Files** panel listing every path; clicking a file opens a code viewer (simple `<pre>` with mono font + line numbers, no heavy syntax highlighter to keep bundle small).
-- If `status = "error"`, shows `error_message` and a "Try again" hint.
+A small reopen affordance lives inside the composer (reuse the existing `+` / mode button) — toggling it animates the cards back in. Clean `fade-out` + height collapse (200–250ms).
 
-### 4. Chat wiring
-- Extend `Message` type with `siteBuild?: { siteId: string }`.
-- In `runChatStreamTurn.ts` (or the central tool-result interceptor in the stream), when a `build_website` tool result arrives, parse `site_id` from the JSON result and attach it to the assistant message + persist into the saved row's metadata.
-- Fallback: if the stream parser misses it, regex-extract the `site_id` from the `preview_url` pattern `/published-sites/<user>/<siteId>/index.html` in the assistant text.
-- `rowToMessage.ts` already handles metadata — add `siteBuild` restore so reloading the chat brings the card back identically to the media card persistence I just shipped.
+## 4. Hide composer inside Slides preview & Docs
+When the slides full-preview overlay or the docs viewer is open, hide:
+- the bottom composer/input bar
+- the model selector button
+- the sidebar trigger
+So the preview is unobstructed. Closing the preview restores them.
 
-### 5. Rendering
-- In `ChatMessageItem.tsx`, if `msg.siteBuild?.siteId`, render `<SiteBuildCard siteId={…} />` instead of (or above) the markdown body.
+## 5. Visible back button on mobile
+The current back button overlaps the top bar on mobile inside slides/docs. Give it a solid contrast pill (bg-background/90 backdrop-blur, border, shadow) and lift its z-index above the header. Verify on a 390px viewport via Playwright.
 
-## Non-goals (skip for now)
-- Editing files in-chat or re-deploying after edits.
-- Custom domain on each generated site.
-- Server-side ZIP packaging (client-side JSZip is enough for a few-MB site).
+## 6. Invite-friends sidebar parity
+The referral page sidebar uses a different drawer shape and close animation than the rest of the app. Replace it with the shared `Sheet`/sidebar primitive used elsewhere so shape, slide-in, and close animation match.
 
-## Technical details
-- Realtime: standard `supabase.channel('site:'+id).on('postgres_changes', { table:'generated_sites', filter:'id=eq.'+id }).subscribe()` inside `useEffect` with cleanup.
-- ZIP: `bun add jszip` (small, ~30 KB gz).
-- The `files` column write happens via the service role inside the edge function, so no new RLS needed; reads use existing user-owned `SELECT` policy on `generated_sites`.
+## 7. Verification
+After implementation, run Playwright headless at 390×844 logged in as the provided test account, screenshot:
+- chat landing → after sending one message (cards gone)
+- slides preview (composer hidden, back button visible)
+- docs viewer (composer hidden, back button visible)
+- referral page open + close sidebar
 
-## Verify before shipping
-- Trigger "ابني لي موقع landing لمطعم" → see card appear → progress ticks → final URL opens a real site → files list shows ~15-30 files → clicking `App.tsx` shows the JSX source → ZIP downloads and unzips cleanly.
-- Refresh the chat tab → card returns with the same state.
+## Technical notes
+- Splash: inline `<div id="pwa-splash">` in `index.html` shown only when `matchMedia('(display-mode: standalone)').matches`, removed after 2000ms.
+- Card hiding state lives in the chat landing component; persisted only for the session (resets when user clicks the composer toggle).
+- Composer hiding uses existing `isPreviewOpen` / route checks; no new state plumbing.
+- Will NOT touch business logic, message persistence, or backend code.
+
+## Out of scope
+- Translating the entire app to English (only loading copy).
+- Reworking the sidebar primitive — only swap the referral page to use it.
