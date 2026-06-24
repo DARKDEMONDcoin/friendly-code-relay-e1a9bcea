@@ -2898,6 +2898,36 @@ export default function DocsPage() {
             </div>
           </section>
         </div>
+
+        {/* Right mini TOC — sections within the currently active group */}
+        <aside className="hidden xl:block sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto pl-2">
+          <div
+            className="text-[11px] font-black uppercase tracking-widest mb-3"
+            style={{ color: PARCHMENT, opacity: 0.55 }}
+          >
+            On this page
+          </div>
+          <ul className="space-y-1.5 border-l-2 pl-3" style={{ borderColor: "hsl(var(--surface-4))" }}>
+            {activeGroup.sections.map((s) => {
+              const active = s.id === activeId;
+              return (
+                <li key={s.id}>
+                  <a
+                    href={`#${s.id}`}
+                    className="block text-[12.5px] leading-snug py-1 transition"
+                    style={{
+                      color: active ? PARCHMENT : PARCHMENT,
+                      opacity: active ? 1 : 0.55,
+                      fontWeight: active ? 800 : 500,
+                    }}
+                  >
+                    {s.title}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </aside>
       </main>
 
       <Suspense fallback={<SectionFallback />}>
