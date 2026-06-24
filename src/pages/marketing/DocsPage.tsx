@@ -1982,7 +1982,7 @@ const STATIC_GROUPS: DocGroup[] = [
             "Color contrast meets AA in both light and dark themes; never relies on colour alone to convey meaning.",
             "Forms have associated `<label>`s, inline error text and `aria-describedby` for help text.",
           ]},
-          { kind: "link", href: "/accessibility", label: "Read our full accessibility statement →" },
+          { kind: "link", href: "/legal/accessibility", label: "Read our full accessibility statement →" },
         ],
       },
     ],
