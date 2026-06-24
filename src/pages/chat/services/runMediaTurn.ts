@@ -108,20 +108,34 @@ export async function runMediaTurn(args: RunMediaTurnArgs): Promise<void> {
         notes: data.notes,
       };
     }
+    const initialResults = plan.scenes.map((s: any) => ({
+      index: s.index,
+      title: s.title,
+      status: "pending" as const,
+      type: modeLocal === "video" ? ("video" as const) : ("image" as const),
+    }));
+    // Persist the assistant media message so it survives reloads.
+    let assistantId: string | undefined;
+    if (cid) {
+      assistantId = await saveMessage(cid, "assistant", "", undefined, {
+        kind: "mediaPlan",
+        mediaPlan: plan,
+        mediaStatus: "awaiting",
+        mediaResults: initialResults,
+        mode: modeLocal,
+      });
+      if (assistantId) ownInsertedIdsRef.current.add(assistantId);
+    }
     setMessages((prev) =>
       prev.map((m) =>
         m.clientId === assistantClientId
           ? {
               ...m,
+              id: assistantId ?? m.id,
               content: "",
               mediaPlan: plan,
               mediaStatus: "awaiting",
-              mediaResults: plan.scenes.map((s: any) => ({
-                index: s.index,
-                title: s.title,
-                status: "pending" as const,
-                type: modeLocal === "video" ? ("video" as const) : ("image" as const),
-              })),
+              mediaResults: initialResults,
             }
           : m,
       ),

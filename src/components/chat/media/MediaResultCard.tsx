@@ -1,6 +1,34 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, Download, Film, Loader2, RotateCw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+
+async function forceDownload(url: string, filename: string) {
+  try {
+    const res = await fetch(url, { mode: "cors" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+  } catch {
+    // Fallback: open in new tab if cross-origin fetch blocked
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.target = "_blank";
+    a.rel = "noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    toast.message("Opened in a new tab — long-press the video to save it.");
+  }
+}
 
 export interface MediaSceneResult {
   index: number;
@@ -125,16 +153,21 @@ export default function MediaResultCard({
             <div className="p-2 flex items-center justify-between gap-1">
               <span className="text-[11px] font-medium truncate flex-1 min-w-0">{r.title}</span>
               {r.status === "done" && r.url && (
-                <a
-                  href={r.url}
-                  download
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-muted-foreground hover:text-foreground p-1 -m-1 transition-colors"
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-[11px] gap-1"
+                  onClick={() =>
+                    forceDownload(
+                      r.url!,
+                      `${r.title.replace(/[^\w-]+/g, "_") || `scene-${r.index}`}.${r.type === "video" ? "mp4" : "png"}`,
+                    )
+                  }
                   title="Download"
                 >
                   <Download className="w-3.5 h-3.5" />
-                </a>
+                  Download
+                </Button>
               )}
               {r.status === "error" && (
                 <Button
@@ -160,16 +193,15 @@ export default function MediaResultCard({
               <div className="flex items-center gap-2 text-[12px] font-medium">
                 <Film className="w-4 h-4 text-primary" />
                 <span>Final stitched video</span>
-                <a
-                  href={finalVideoUrl}
-                  download
-                  target="_blank"
-                  rel="noreferrer"
-                  className="ms-auto inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
+                <Button
+                  size="sm"
+                  variant="default"
+                  className="ms-auto h-8 gap-1.5"
+                  onClick={() => forceDownload(finalVideoUrl, "final-video.mp4")}
                 >
                   <Download className="w-3.5 h-3.5" />
                   Download
-                </a>
+                </Button>
               </div>
               <video
                 src={finalVideoUrl}

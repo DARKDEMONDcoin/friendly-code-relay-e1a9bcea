@@ -159,6 +159,27 @@ export async function saveMessage(
   return insertedId;
 }
 
+/** Merges new keys into a message's metadata JSON column (best-effort). */
+export async function updateMessageMetadata(
+  messageId: string,
+  patch: Record<string, unknown>,
+): Promise<void> {
+  try {
+    const { data: existing } = await supabase
+      .from("messages")
+      .select("metadata")
+      .eq("id", messageId)
+      .maybeSingle();
+    const merged = { ...((existing as any)?.metadata || {}), ...patch };
+    await supabase
+      .from("messages")
+      .update({ metadata: merged } as any)
+      .eq("id", messageId);
+  } catch {
+    // non-fatal — persistence is best effort
+  }
+}
+
 /**
  * Asks the slides edge function to produce a freeform pre/post narration
  * message wrapped around slide generation. Returns null on any failure.

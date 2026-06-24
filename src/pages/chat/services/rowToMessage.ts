@@ -22,10 +22,11 @@ export function rowToMessage(
 ): Message | null {
   const role = row.role as "user" | "assistant";
   const content = role === "assistant" ? sanitizeLeakedToolText(row.content) : row.content;
-  if (role === "assistant" && !content && !row.images?.length && !row.metadata) {
+  const meta = (row.metadata || {}) as any;
+  const hasMedia = !!meta.mediaPlan;
+  if (role === "assistant" && !content && !row.images?.length && !row.metadata && !hasMedia) {
     return null;
   }
-  const meta = (row.metadata || {}) as any;
   return {
     role,
     content,
@@ -36,18 +37,20 @@ export function rowToMessage(
     senderName: row.user_id ? senderMap[row.user_id]?.name : null,
     senderAvatar: row.user_id ? senderMap[row.user_id]?.avatar : null,
     mode:
-      meta.kind === "operatorRun"
-        ? "operator"
-        : meta.kind === "imageSlides" || convMode === "slides-images"
-          ? "slides-images"
-          : meta.kind === "slidesDeck" ||
-              meta.kind === "standardSlides" ||
-              meta.kind === "slidesPending" ||
-              convMode === "slides"
-            ? "slides"
-            : role === "assistant" && convMode === "research"
-              ? "deep-research"
-              : undefined,
+      meta.kind === "mediaPlan"
+        ? (meta.mode === "video" ? "video" : "images")
+        : meta.kind === "operatorRun"
+          ? "operator"
+          : meta.kind === "imageSlides" || convMode === "slides-images"
+            ? "slides-images"
+            : meta.kind === "slidesDeck" ||
+                meta.kind === "standardSlides" ||
+                meta.kind === "slidesPending" ||
+                convMode === "slides"
+              ? "slides"
+              : role === "assistant" && convMode === "research"
+                ? "deep-research"
+                : undefined,
     slidesDeck: meta.slidesDeck || undefined,
     standardSlides: meta.standardSlides || undefined,
     imageSlides: meta.imageSlides || undefined,
@@ -59,5 +62,11 @@ export function rowToMessage(
     chatJobId: meta.kind === "researchPending" ? meta.chatJobId : undefined,
     operatorRunId: meta.kind === "operatorRun" ? meta.operatorRunId : undefined,
     researchJobId: meta.kind === "researchPlan" ? meta.researchJobId : undefined,
+    // Restore media generation state (plan + per-scene results + merged video).
+    mediaPlan: hasMedia ? meta.mediaPlan : undefined,
+    mediaStatus: hasMedia ? (meta.mediaStatus ?? "done") : undefined,
+    mediaResults: hasMedia ? meta.mediaResults : undefined,
+    mediaFinalVideoUrl: hasMedia ? meta.mediaFinalVideoUrl : undefined,
+    mediaMergeStatus: hasMedia ? meta.mediaMergeStatus : undefined,
   } as Message;
 }
