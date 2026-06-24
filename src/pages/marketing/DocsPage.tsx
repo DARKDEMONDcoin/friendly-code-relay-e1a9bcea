@@ -2537,8 +2537,16 @@ export default function DocsPage() {
   const params = useParams<{ groupId?: string; sectionId?: string }>();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
-  const [activeId, setActiveId] = useState<string>(GROUPS[0].sections[0].id);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Resolve the active group from the URL (defaults to the first group).
+  const currentGroup = useMemo(
+    () => GROUPS.find((g) => g.id === params.groupId) ?? GROUPS[0],
+    [params.groupId],
+  );
+  const [activeId, setActiveId] = useState<string>(
+    () => params.sectionId || currentGroup.sections[0]?.id || GROUPS[0].sections[0].id,
+  );
 
   // Flat ordered list of every section across every group — used for prev/next.
   const flatSections = useMemo(
@@ -2548,6 +2556,13 @@ export default function DocsPage() {
       ),
     [],
   );
+
+  // When the route's group changes, scroll the page to the top so each
+  // group feels like its own dedicated docs page (Stripe/Linear style).
+  useEffect(() => {
+    if (params.sectionId) return; // section-specific scroll handled below
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [currentGroup.id, params.sectionId]);
 
   const filteredGroups = useMemo(() => {
     const q = query.trim().toLowerCase();
