@@ -2694,11 +2694,11 @@ export default function DocsPage() {
         </div>
       </header>
 
-      {/* Body */}
-      <main className="px-4 pb-24 mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-10">
+      {/* Body — 3-column on xl: left TOC · content · right mini TOC */}
+      <main className="px-4 pb-24 mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_220px] gap-10">
         {/* Sidebar TOC */}
         <aside className="hidden lg:block sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto pr-2">
-          <nav className="space-y-6">
+          <nav className="space-y-6" aria-label="Documentation sections">
             {filteredGroups.map((group) => (
               <div key={group.id}>
                 <div
@@ -2752,7 +2752,7 @@ export default function DocsPage() {
             <section key={group.id} aria-labelledby={`group-${group.id}`} className="space-y-10">
               <h2
                 id={`group-${group.id}`}
-                className="text-[11px] md:text-[12px] font-black uppercase tracking-[0.2em]"
+                className="text-[11px] md:text-[12px] font-black uppercase tracking-[0.2em] scroll-mt-28"
                 style={{ color: PARCHMENT, opacity: 0.55 }}
               >
                 {group.label}
@@ -2761,6 +2761,9 @@ export default function DocsPage() {
               {group.sections.map((s) => {
                 const Icon = s.icon;
                 const accent = s.accent ?? ACTION;
+                const flatIdx = flatSections.findIndex((f) => f.section.id === s.id);
+                const prev = flatIdx > 0 ? flatSections[flatIdx - 1] : null;
+                const next = flatIdx >= 0 && flatIdx < flatSections.length - 1 ? flatSections[flatIdx + 1] : null;
                 return (
                   <article
                     key={s.id}
@@ -2771,7 +2774,7 @@ export default function DocsPage() {
                       border: `1.5px solid hsl(var(--surface-4))`,
                     }}
                   >
-                    <div className="flex items-center gap-3 mb-3">
+                    <div className="flex items-center gap-3 mb-3 group/heading">
                       <span
                         className="inline-flex items-center justify-center w-11 h-11 rounded-2xl shrink-0"
                         style={{
@@ -2783,8 +2786,19 @@ export default function DocsPage() {
                       >
                         <Icon className="w-5 h-5" strokeWidth={2.5} />
                       </span>
-                      <h3 className="text-2xl md:text-[28px] font-black tracking-tight leading-tight">
-                        {s.title}
+                      <h3 className="text-2xl md:text-[28px] font-black tracking-tight leading-tight flex items-center gap-2">
+                        <a
+                          href={`#${s.id}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigate(`/docs/${group.id}/${s.id}`);
+                            history.replaceState(null, "", `#${s.id}`);
+                          }}
+                          className="hover:underline"
+                        >
+                          {s.title}
+                        </a>
+                        <CopyLinkButton sectionId={s.id} groupId={group.id} />
                       </h3>
                     </div>
                     {s.intro && (
@@ -2795,6 +2809,50 @@ export default function DocsPage() {
                         <BlockView key={i} block={b} accent={accent} />
                       ))}
                     </div>
+
+                    {/* Previous / Next */}
+                    {(prev || next) && (
+                      <nav
+                        className="mt-8 pt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t"
+                        style={{ borderColor: "hsl(var(--surface-4))" }}
+                        aria-label="Section navigation"
+                      >
+                        {prev ? (
+                          <a
+                            href={`#${prev.section.id}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              document.getElementById(prev.section.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                            }}
+                            className="flex items-center gap-3 p-4 rounded-2xl transition hover:translate-x-[-2px]"
+                            style={{ border: `1.5px solid hsl(var(--surface-4))`, backgroundColor: "hsl(var(--surface-2))" }}
+                          >
+                            <ChevronLeft className="w-4 h-4 opacity-60 shrink-0" />
+                            <div className="min-w-0">
+                              <div className="text-[11px] font-black uppercase tracking-widest opacity-60">Previous</div>
+                              <div className="text-[14px] font-bold truncate">{prev.section.title}</div>
+                            </div>
+                          </a>
+                        ) : <span />}
+                        {next ? (
+                          <a
+                            href={`#${next.section.id}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              document.getElementById(next.section.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                            }}
+                            className="flex items-center gap-3 p-4 rounded-2xl transition text-right hover:translate-x-[2px] justify-end"
+                            style={{ border: `1.5px solid hsl(var(--surface-4))`, backgroundColor: "hsl(var(--surface-2))" }}
+                          >
+                            <div className="min-w-0">
+                              <div className="text-[11px] font-black uppercase tracking-widest opacity-60">Next</div>
+                              <div className="text-[14px] font-bold truncate">{next.section.title}</div>
+                            </div>
+                            <ChevronRight className="w-4 h-4 opacity-60 shrink-0" />
+                          </a>
+                        ) : <span />}
+                      </nav>
+                    )}
                   </article>
                 );
               })}
