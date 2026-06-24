@@ -112,6 +112,7 @@ import {
 import { integrations as INTEGRATIONS_LIST, INTEGRATION_CATEGORIES } from "@/lib/integrationsData";
 import { SLIDES_TEMPLATES } from "@/lib/slidesTemplates";
 import { SKILL_TOOLS, SKILL_MODELS } from "@/lib/skillTools";
+import { CHANGELOG } from "@/data/changelog";
 
 const LandingFooter = lazy(() => import("@/components/landing/LandingFooter"));
 
