@@ -3,8 +3,8 @@
 // Cartoon / brand-ink design system, matching the landing page + settings.
 // One long, fully-indexed reference for EVERY feature, page, agent, setting,
 // integration, plan, policy, route and shortcut on megsyai.com.
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   Sparkles,
   MessageSquare,
@@ -66,6 +66,14 @@ import {
   Layers,
   Cpu,
   Pencil,
+  Link as LinkIcon,
+  Copy,
+  Check,
+  ChevronLeft,
+  History,
+  PlusCircle,
+  ShieldAlert,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 import LandingNavbar from "@/components/landing/LandingNavbar";
@@ -104,6 +112,7 @@ import {
 import { integrations as INTEGRATIONS_LIST, INTEGRATION_CATEGORIES } from "@/lib/integrationsData";
 import { SLIDES_TEMPLATES } from "@/lib/slidesTemplates";
 import { SKILL_TOOLS, SKILL_MODELS } from "@/lib/skillTools";
+import { CHANGELOG } from "@/data/changelog";
 
 const LandingFooter = lazy(() => import("@/components/landing/LandingFooter"));
 
@@ -1973,7 +1982,7 @@ const STATIC_GROUPS: DocGroup[] = [
             "Color contrast meets AA in both light and dark themes; never relies on colour alone to convey meaning.",
             "Forms have associated `<label>`s, inline error text and `aria-describedby` for help text.",
           ]},
-          { kind: "link", href: "/accessibility", label: "Read our full accessibility statement →" },
+          { kind: "link", href: "/legal/accessibility", label: "Read our full accessibility statement →" },
         ],
       },
     ],
@@ -2492,6 +2501,18 @@ function buildAutoGroups(): DocGroup[] {
         },
       ],
     },
+    {
+      id: "live-changelog",
+      label: "Changelog (auto-sync)",
+      sections: CHANGELOG.map((entry, i) => ({
+        id: `changelog-${entry.date}-${i}`,
+        title: `${entry.date} · ${entry.title}`,
+        icon: entry.tag === "fixed" ? Wrench : entry.tag === "security" ? ShieldAlert : entry.tag === "improved" ? RefreshCw : PlusCircle,
+        accent: entry.tag === "fixed" ? BLUSH : entry.tag === "security" ? ACTION : entry.tag === "improved" ? MINT : ACTION,
+        intro: entry.tag ? `Tag: ${entry.tag.toUpperCase()}` : undefined,
+        blocks: [{ kind: "ul" as const, items: entry.bullets }],
+      })),
+    },
   ];
 }
 
@@ -2513,8 +2534,20 @@ const SectionFallback = () => (
 );
 
 export default function DocsPage() {
+  const params = useParams<{ groupId?: string; sectionId?: string }>();
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [activeId, setActiveId] = useState<string>(GROUPS[0].sections[0].id);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Flat ordered list of every section across every group — used for prev/next.
+  const flatSections = useMemo(
+    () =>
+      GROUPS.flatMap((g) =>
+        g.sections.map((s) => ({ group: g, section: s })),
+      ),
+    [],
+  );
 
   const filteredGroups = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -2535,6 +2568,35 @@ export default function DocsPage() {
     })).filter((g) => g.sections.length > 0);
   }, [query]);
 
+  // ⌘K / Ctrl+K — focus search from anywhere.
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const isK = e.key === "k" || e.key === "K";
+      if (isK && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+      if (e.key === "Escape" && document.activeElement === searchInputRef.current) {
+        (document.activeElement as HTMLElement).blur();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  // Deep-link via /docs/:groupId/:sectionId — scroll the target into view.
+  useEffect(() => {
+    const targetId = params.sectionId || (params.groupId ? `group-${params.groupId}` : null);
+    if (!targetId) return;
+    // Wait one frame for the DOM to render.
+    const id = requestAnimationFrame(() => {
+      const el = document.getElementById(targetId);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [params.groupId, params.sectionId]);
+
   // Scroll-spy for the sidebar TOC.
   useEffect(() => {
     const ids = GROUPS.flatMap((g) => g.sections.map((s) => s.id));
@@ -2551,6 +2613,11 @@ export default function DocsPage() {
     });
     return () => io.disconnect();
   }, [filteredGroups]);
+
+  // Active group derived from active section, used by the right-side mini TOC.
+  const activeGroup = useMemo(() => {
+    return GROUPS.find((g) => g.sections.some((s) => s.id === activeId)) ?? GROUPS[0];
+  }, [activeId]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: INK, color: PARCHMENT }}>
@@ -2590,10 +2657,12 @@ export default function DocsPage() {
           <div className="mt-7 relative max-w-xl">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: INK, opacity: 0.6 }} />
             <input
+              ref={searchInputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search the docs — try ‘install’, ‘credits’, ‘slides’, ‘operator’…"
-              className="w-full h-12 pl-11 pr-4 rounded-2xl outline-none text-[15px] font-semibold"
+              aria-label="Search documentation"
+              className="w-full h-12 pl-11 pr-20 rounded-2xl outline-none text-[15px] font-semibold"
               style={{
                 backgroundColor: "#fff",
                 border: `2px solid ${INK}`,
@@ -2601,6 +2670,13 @@ export default function DocsPage() {
                 color: INK,
               }}
             />
+            <kbd
+              className="hidden sm:inline-flex absolute right-3 top-1/2 -translate-y-1/2 items-center gap-1 px-2 py-1 rounded-md text-[11px] font-black"
+              style={{ backgroundColor: INK, color: PARCHMENT }}
+              aria-hidden
+            >
+              ⌘K
+            </kbd>
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2">
@@ -2618,11 +2694,11 @@ export default function DocsPage() {
         </div>
       </header>
 
-      {/* Body */}
-      <main className="px-4 pb-24 mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-10">
+      {/* Body — 3-column on xl: left TOC · content · right mini TOC */}
+      <main className="px-4 pb-24 mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_220px] gap-10">
         {/* Sidebar TOC */}
         <aside className="hidden lg:block sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto pr-2">
-          <nav className="space-y-6">
+          <nav className="space-y-6" aria-label="Documentation sections">
             {filteredGroups.map((group) => (
               <div key={group.id}>
                 <div
@@ -2676,7 +2752,7 @@ export default function DocsPage() {
             <section key={group.id} aria-labelledby={`group-${group.id}`} className="space-y-10">
               <h2
                 id={`group-${group.id}`}
-                className="text-[11px] md:text-[12px] font-black uppercase tracking-[0.2em]"
+                className="text-[11px] md:text-[12px] font-black uppercase tracking-[0.2em] scroll-mt-28"
                 style={{ color: PARCHMENT, opacity: 0.55 }}
               >
                 {group.label}
@@ -2685,6 +2761,9 @@ export default function DocsPage() {
               {group.sections.map((s) => {
                 const Icon = s.icon;
                 const accent = s.accent ?? ACTION;
+                const flatIdx = flatSections.findIndex((f) => f.section.id === s.id);
+                const prev = flatIdx > 0 ? flatSections[flatIdx - 1] : null;
+                const next = flatIdx >= 0 && flatIdx < flatSections.length - 1 ? flatSections[flatIdx + 1] : null;
                 return (
                   <article
                     key={s.id}
@@ -2695,7 +2774,7 @@ export default function DocsPage() {
                       border: `1.5px solid hsl(var(--surface-4))`,
                     }}
                   >
-                    <div className="flex items-center gap-3 mb-3">
+                    <div className="flex items-center gap-3 mb-3 group/heading">
                       <span
                         className="inline-flex items-center justify-center w-11 h-11 rounded-2xl shrink-0"
                         style={{
@@ -2707,8 +2786,19 @@ export default function DocsPage() {
                       >
                         <Icon className="w-5 h-5" strokeWidth={2.5} />
                       </span>
-                      <h3 className="text-2xl md:text-[28px] font-black tracking-tight leading-tight">
-                        {s.title}
+                      <h3 className="text-2xl md:text-[28px] font-black tracking-tight leading-tight flex items-center gap-2">
+                        <a
+                          href={`#${s.id}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigate(`/docs/${group.id}/${s.id}`);
+                            history.replaceState(null, "", `#${s.id}`);
+                          }}
+                          className="hover:underline"
+                        >
+                          {s.title}
+                        </a>
+                        <CopyLinkButton sectionId={s.id} groupId={group.id} />
                       </h3>
                     </div>
                     {s.intro && (
@@ -2719,6 +2809,50 @@ export default function DocsPage() {
                         <BlockView key={i} block={b} accent={accent} />
                       ))}
                     </div>
+
+                    {/* Previous / Next */}
+                    {(prev || next) && (
+                      <nav
+                        className="mt-8 pt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t"
+                        style={{ borderColor: "hsl(var(--surface-4))" }}
+                        aria-label="Section navigation"
+                      >
+                        {prev ? (
+                          <a
+                            href={`#${prev.section.id}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              document.getElementById(prev.section.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                            }}
+                            className="flex items-center gap-3 p-4 rounded-2xl transition hover:translate-x-[-2px]"
+                            style={{ border: `1.5px solid hsl(var(--surface-4))`, backgroundColor: "hsl(var(--surface-2))" }}
+                          >
+                            <ChevronLeft className="w-4 h-4 opacity-60 shrink-0" />
+                            <div className="min-w-0">
+                              <div className="text-[11px] font-black uppercase tracking-widest opacity-60">Previous</div>
+                              <div className="text-[14px] font-bold truncate">{prev.section.title}</div>
+                            </div>
+                          </a>
+                        ) : <span />}
+                        {next ? (
+                          <a
+                            href={`#${next.section.id}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              document.getElementById(next.section.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                            }}
+                            className="flex items-center gap-3 p-4 rounded-2xl transition text-right hover:translate-x-[2px] justify-end"
+                            style={{ border: `1.5px solid hsl(var(--surface-4))`, backgroundColor: "hsl(var(--surface-2))" }}
+                          >
+                            <div className="min-w-0">
+                              <div className="text-[11px] font-black uppercase tracking-widest opacity-60">Next</div>
+                              <div className="text-[14px] font-bold truncate">{next.section.title}</div>
+                            </div>
+                            <ChevronRight className="w-4 h-4 opacity-60 shrink-0" />
+                          </a>
+                        ) : <span />}
+                      </nav>
+                    )}
                   </article>
                 );
               })}
@@ -2764,6 +2898,36 @@ export default function DocsPage() {
             </div>
           </section>
         </div>
+
+        {/* Right mini TOC — sections within the currently active group */}
+        <aside className="hidden xl:block sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto pl-2">
+          <div
+            className="text-[11px] font-black uppercase tracking-widest mb-3"
+            style={{ color: PARCHMENT, opacity: 0.55 }}
+          >
+            On this page
+          </div>
+          <ul className="space-y-1.5 border-l-2 pl-3" style={{ borderColor: "hsl(var(--surface-4))" }}>
+            {activeGroup.sections.map((s) => {
+              const active = s.id === activeId;
+              return (
+                <li key={s.id}>
+                  <a
+                    href={`#${s.id}`}
+                    className="block text-[12.5px] leading-snug py-1 transition"
+                    style={{
+                      color: active ? PARCHMENT : PARCHMENT,
+                      opacity: active ? 1 : 0.55,
+                      fontWeight: active ? 800 : 500,
+                    }}
+                  >
+                    {s.title}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </aside>
       </main>
 
       <Suspense fallback={<SectionFallback />}>
@@ -2838,14 +3002,7 @@ function BlockView({ block, accent }: { block: DocBlock; accent: string }) {
         </div>
       );
     case "code":
-      return (
-        <pre
-          className="rounded-xl p-4 overflow-x-auto text-[13px] leading-6"
-          style={{ backgroundColor: "hsl(var(--surface-3))", border: `1px solid hsl(var(--surface-4))` }}
-        >
-          <code>{block.text}</code>
-        </pre>
-      );
+      return <CodeBlock text={block.text} lang={block.lang} />;
     case "note":
       return (
         <div
@@ -2887,4 +3044,81 @@ function BlockView({ block, accent }: { block: DocBlock; accent: string }) {
         </Link>
       );
   }
+}
+
+/* ───────────────────────── Helpers ───────────────────────── */
+
+function CopyLinkButton({ sectionId, groupId }: { sectionId: string; groupId: string }) {
+  const [copied, setCopied] = useState(false);
+  const onCopy = async () => {
+    const url = `${window.location.origin}/docs/${groupId}/${sectionId}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1400);
+    } catch {
+      // Older browsers — fall back to a temporary text area.
+      const ta = document.createElement("textarea");
+      ta.value = url;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch { /* noop */ }
+      document.body.removeChild(ta);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1400);
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={onCopy}
+      aria-label={copied ? "Link copied" : "Copy link to this section"}
+      title={copied ? "Copied!" : "Copy link"}
+      className="opacity-0 group-hover/heading:opacity-100 focus:opacity-100 transition inline-flex items-center justify-center w-7 h-7 rounded-lg shrink-0"
+      style={{ border: `1.5px solid hsl(var(--surface-4))`, backgroundColor: "hsl(var(--surface-2))" }}
+    >
+      {copied ? <Check className="w-3.5 h-3.5" /> : <LinkIcon className="w-3.5 h-3.5" />}
+    </button>
+  );
+}
+
+function CodeBlock({ text, lang }: { text: string; lang?: string }) {
+  const [copied, setCopied] = useState(false);
+  const onCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1400);
+    } catch {
+      /* noop */
+    }
+  };
+  return (
+    <div className="relative group/code">
+      {lang && (
+        <div
+          className="absolute left-3 top-2 text-[10px] font-black uppercase tracking-widest opacity-60"
+          aria-hidden
+        >
+          {lang}
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={onCopy}
+        aria-label={copied ? "Code copied" : "Copy code"}
+        className="absolute right-2 top-2 inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-bold opacity-0 group-hover/code:opacity-100 focus:opacity-100 transition"
+        style={{ backgroundColor: "hsl(var(--surface-2))", border: `1.5px solid hsl(var(--surface-4))` }}
+      >
+        {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+        {copied ? "Copied" : "Copy"}
+      </button>
+      <pre
+        className={`rounded-xl p-4 ${lang ? "pt-7" : ""} overflow-x-auto text-[13px] leading-6`}
+        style={{ backgroundColor: "hsl(var(--surface-3))", border: `1px solid hsl(var(--surface-4))` }}
+      >
+        <code>{text}</code>
+      </pre>
+    </div>
+  );
 }
