@@ -2736,46 +2736,54 @@ export default function DocsPage() {
         {/* Sidebar TOC */}
         <aside className="hidden lg:block sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto pr-2">
           <nav className="space-y-6" aria-label="Documentation sections">
-            {filteredGroups.map((group) => (
-              <div key={group.id}>
-                <div
-                  className="text-[11px] font-black uppercase tracking-widest mb-2 px-2"
-                  style={{ color: PARCHMENT, opacity: 0.55 }}
-                >
-                  {group.label}
+            {filteredGroups.map((group) => {
+              const isCurrentGroup = group.id === currentGroup.id;
+              return (
+                <div key={group.id}>
+                  <Link
+                    to={`/docs/${group.id}`}
+                    className="block text-[11px] font-black uppercase tracking-widest mb-2 px-2 transition"
+                    style={{
+                      color: isCurrentGroup ? PARCHMENT : PARCHMENT,
+                      opacity: isCurrentGroup ? 1 : 0.55,
+                    }}
+                  >
+                    {group.label}
+                  </Link>
+                  <ul className="space-y-0.5">
+                    {group.sections.map((s) => {
+                      const Icon = s.icon;
+                      const active = isCurrentGroup && s.id === activeId;
+                      return (
+                        <li key={s.id}>
+                          <Link
+                            to={`/docs/${group.id}/${s.id}`}
+                            className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[13.5px] transition"
+                            style={
+                              active
+                                ? {
+                                    backgroundColor: PARCHMENT,
+                                    color: INK,
+                                    fontWeight: 800,
+                                    border: `1.5px solid ${INK}`,
+                                    boxShadow: `2px 2px 0 ${INK}`,
+                                  }
+                                : { color: PARCHMENT, opacity: isCurrentGroup ? 0.85 : 0.55 }
+                            }
+                          >
+                            <Icon className="w-3.5 h-3.5 shrink-0" />
+                            <span className="truncate">{s.title}</span>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
                 </div>
-                <ul className="space-y-0.5">
-                  {group.sections.map((s) => {
-                    const Icon = s.icon;
-                    const active = s.id === activeId;
-                    return (
-                      <li key={s.id}>
-                        <a
-                          href={`#${s.id}`}
-                          className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[13.5px] transition"
-                          style={
-                            active
-                              ? {
-                                  backgroundColor: PARCHMENT,
-                                  color: INK,
-                                  fontWeight: 800,
-                                  border: `1.5px solid ${INK}`,
-                                  boxShadow: `2px 2px 0 ${INK}`,
-                                }
-                              : { color: PARCHMENT, opacity: 0.75 }
-                          }
-                        >
-                          <Icon className="w-3.5 h-3.5 shrink-0" />
-                          <span className="truncate">{s.title}</span>
-                        </a>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            ))}
+              );
+            })}
           </nav>
         </aside>
+
 
         {/* Content */}
         <div className="min-w-0 space-y-16">
